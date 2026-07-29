@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doppy <br>Your pets best care, anytime, anywhere</br> </title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #F5C518;
+      --yellow-dark: #e0b000;
+      --blue: #1A73E8;
+      --blue-light: #D6E8FF;
+      --blue-soft: #EAF3FF;
+      --text-dark: #1a1a2e;
+      --text-mid: #4a4a6a;
+      --text-light: #8888aa;
+      --bg: #f5f7ff;
+      --white: #ffffff;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    .left {
+      background: var(--white);
+      padding: 48px 52px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-dark);
+      position: relative;
+      z-index: 1;
+      margin-bottom: 36px;
+      height: 140px;
+      overflow: hidden;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+    }
+    .logo-img {
+      object-fit: cover;
+      object-position: center;
+    }
+    .logo span { color: var(--blue); }
+
+    .hero { position: relative; z-index: 1; }
+
+    .hero h1 {
+      font-size: clamp(28px, 3vw, 40px);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+    .hero-accent {
+      width: 40px; height: 4px;
+      background: var(--yellow);
+      border-radius: 4px;
+      margin: 16px 0 20px;
+    }
+    .hero p {
+      font-size: 15px;
+      color: var(--text-mid);
+      line-height: 1.6;
+      max-width: 340px;
+      margin-bottom: 32px;
+    }
+
+    .pet-area {
+      position: absolute;
+      right: -10px; top: -30px;
+      width: 330px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .pet-area img {
+      width: 100%;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      background: var(--blue-soft);
+      display: block;
+    }
+
+    .dot-accent {
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--yellow);
+      bottom: -10px; right: 280px;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+    .fi-blue   { background: #1A73E8; }
+    .fi-yellow { background: var(--yellow); }
+    .fi-green  { background: #34C98A; }
+    .fi-purple { background: #7C6FF7; }
+
+    .feature-text h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 3px;
+    }
+    .feature-text p {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+
+    .dashboard-card {
+      position: absolute;
+      bottom: 40px; right: 20px;
+      width: 280px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 40px rgba(26,115,232,.15);
+      overflow: hidden;
+      z-index: 2;
+    }
+    .dc-header {
+      background: var(--white);
+      padding: 12px 16px 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dc-logo { font-size: 13px; font-weight: 800; color: var(--blue); }
+    .dc-body { padding: 12px 16px; }
+    .dc-greeting { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+    .dc-sub { font-size: 11px; color: var(--text-light); margin-bottom: 10px; }
+    .dc-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .dc-cell {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .dc-cell-label { font-size: 10px; color: var(--text-light); margin-bottom: 4px; }
+    .dc-cell-val { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+    .dc-cell-sub { font-size: 10px; color: var(--blue); cursor: pointer; }
+    .dc-activities { font-size: 11px; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; }
+    .dc-act-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dark);
+      padding: 3px 0;
+    }
+    .dc-check { color: #34C98A; font-weight: 700; }
+    .dc-nav {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      gap: 16px;
+    }
+    .dc-nav-item {
+      font-size: 10px;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: color .2s;
+    }
+    .dc-nav-item.active { color: var(--blue); font-weight: 600; }
+
+    .right {
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 52px;
+      position: relative;
+    }
+
+    .right-inner {
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .right-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .nav-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--text-mid);
+      transition: background .2s;
+    }
+    .nav-btn:hover { background: var(--blue-soft); }
+
+    .form-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 4px 32px rgba(26,115,232,.08);
+    }
+
+    .form-logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .form-logo svg { width: 52px; height: 52px; }
+
+    .form-card h2 {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+    .form-card .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-mid);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .avatar {
+      position: relative;
+      width: 72px; height: 72px;
+    }
+    .avatar-bg {
+      width: 72px; height: 72px;
+      background: var(--blue-soft);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar-bg svg { width: 40px; height: 40px; }
+    .avatar-cam {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 24px; height: 24px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid var(--white);
+    }
+    .avatar-cam svg { width: 12px; height: 12px; fill: white; }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+    .input-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      transition: border-color .2s;
+      margin-bottom: 14px;
+    }
+    .input-wrap:last-child { margin-bottom: 0; }
+    .input-wrap:focus-within { border-color: var(--blue); }
+    .input-icon { flex-shrink: 0; color: var(--text-light); }
+    .input-icon svg { width: 18px; height: 18px; display: block; }
+    .input-wrap input {
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-dark);
+      flex: 1;
+      background: transparent;
+    }
+    .input-wrap input::placeholder { color: var(--text-light); }
+    .input-toggle {
+      cursor: pointer;
+      color: var(--text-light);
+      flex-shrink: 0;
+      display: flex;
+    }
+    .input-toggle svg { width: 18px; height: 18px; }
+
+    .btn-cta {
+      width: 100%;
+      padding: 16px;
+      background: var(--yellow);
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      margin-bottom: 18px;
+    }
+    .btn-cta:hover { background: var(--yellow-dark); }
+    .btn-cta:active { transform: scale(.98); }
+    .btn-cta:disabled { opacity: .7; cursor: not-allowed; }
+
+    .login-link {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+    .login-link a {
+      color: var(--blue);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .login-link a:hover { text-decoration: underline; }
+
+    .toast {
+      position: fixed;
+      top: 24px; left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 100;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+
+      .left {
+        padding: 36px 28px 280px;
+        min-height: auto;
+      }
+      .pet-area {
+        width: 200px;
+        right: 0; top: 80px;
+      }
+      .dashboard-card {
+        bottom: 20px; left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+      }
+      .left::before { width: 180px; height: 180px; top: 60px; right: -30px; }
+
+      .right { padding: 36px 24px 48px; }
+      .form-card { padding: 32px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .pet-area { display: none; }
+      .left { padding-bottom: 320px; }
+      .hero h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast">🐾 Account created successfully!</div>
+
+<div class="page">
+
+  <!-- ═══════════════ LEFT ═══════════════ -->
+  <section class="left">
+
+    <div class="logo">
+      <img class="logo-img" src="/assets/Type 2.png" alt="Doppy Logo" height="250px" width="250px"/>
+    </div>
+
+    <div class="hero" style="position:relative;">
+      <h1>Everything <em>your<br/>pet</em> needs,<br/>in one place</h1>
+      <div class="hero-accent"></div>
+      <p>Organize their health, care, walks, and more. Doppy helps you give your companion the best possible life.</p>
+      <div class="pet-area" style="visibility:hidden;"></div>
+    </div>
+
+    <div class="features" style="margin-top: 20px;">
+      <div class="feature">
+        <div class="feature-icon fi-blue"></div>
+        <div class="feature-text">
+          <h3>Take care of their well-being</h3>
+          <p>Schedule vaccines, appointments, and important reminders.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon fi-yellow"></div>
+        <div class="feature-text">
+          <h3>Organize their day</h3>
+          <p>Walks, feeding, medications, and more, all in order.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon fi-green"></div>
+        <div class="feature-text">
+          <h3>Complete history</h3>
+          <p>Access all their information and tracking in one place.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon fi-purple"></div>
+        <div class="feature-text">
+          <h3>Made for you and your pet</h3>
+          <p>Simple interface, designed for owners who want the best.</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════ RIGHT ═══════════════ -->
+  <section class="right">
+    <div class="right-inner">
+
+      <div class="form-card">
+
+        <div class="right-nav">
+          <button class="nav-btn" onclick="history.back()" aria-label="Back">‹</button>
+        </div>
+
+        <h2>Create your account</h2>
+        <p class="subtitle">Join Doppy and start taking better care<br/>of your pet.</p>
+
+        <div class="avatar-wrap">
+          <div class="avatar">
+            <div class="avatar-bg">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="15" r="8" fill="#1A73E8" opacity=".5"/>
+                <ellipse cx="20" cy="34" rx="14" ry="8" fill="#1A73E8" opacity=".3"/>
+              </svg>
+            </div>
+            <div class="avatar-cam">
+              <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 3.5H8.8L8 2H4L3.2 3.5H2A1 1 0 001 4.5v5A1 1 0 002 10.5h8a1 1 0 001-1v-5A1 1 0 0010 3.5z" fill="white"/>
+                <circle cx="6" cy="7" r="1.8" fill="#1A73E8"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <form id="registerForm" onsubmit="event.preventDefault(); register();">
+          <div class="input-group">
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input type="text" id="nombre" placeholder="Full name" autocomplete="name" />
+            </div>
+
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="M22 7l-10 7L2 7"/>
+                </svg>
+              </span>
+              <input type="email" id="email" placeholder="Email / phone number" autocomplete="email" />
+            </div>
+
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/>
+                  <path d="M7 11V7a5 5 0 0110 0v4"/>
+                </svg>
+              </span>
+              <input type="password" id="pass" placeholder="Secure password" autocomplete="new-password" />
+              <span class="input-toggle" onclick="togglePass('pass', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </span>
+            </div>
+
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/>
+                  <path d="M7 11V7a5 5 0 0110 0v4"/>
+                </svg>
+              </span>
+              <input type="password" id="pass2" placeholder="Confirm password" autocomplete="new-password" />
+              <span class="input-toggle" onclick="togglePass('pass2', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-cta">Sign up</button>
+        </form>
+
+        <p class="login-link">Already have an account? <a href="logindu.html">Log in</a></p>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+  // 1. IMPORTANT: Replace this second string with your actual 'anon'/publishable key from your Supabase dashboard API settings.
+  const supabaseClient = window.supabase.createClient(
+    'https://xyiebwrjkmvmcpdhenjk.supabase.co',
+    'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
+  );
+
+  function togglePass(id, btn) {
+    const input = document.getElementById(id);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.style.color = isText ? 'var(--text-light)' : 'var(--blue)';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // FIX: since "clients" doesn't exist in your database, this auto-detects
+  // the real table name by testing common candidates until one responds
+  // without a "table not found" (PGRST205) error. Once found, it's cached
+  // in memory so it only has to run this check once per page load.
+  let _clientsTableName = null;
+  const CLIENTS_TABLE_CANDIDATES = ['clients', 'client', 'clientes', 'usuarios', 'users', 'owners', 'perfiles', 'profiles'];
+
+  async function resolveClientsTable() {
+    if (_clientsTableName) return _clientsTableName;
+
+    for (const candidate of CLIENTS_TABLE_CANDIDATES) {
+      const { error } = await supabaseClient.from(candidate).select('*').limit(1);
+      if (!error || error.code !== 'PGRST205') {
+        console.log('[Doppy] Tabla de clientes detectada:', candidate);
+        _clientsTableName = candidate;
+        return candidate;
+      }
+      console.log('[Doppy] "' + candidate + '" no existe, probando siguiente…');
+    }
+
+    console.error('[Doppy] No se encontró ninguna tabla de clientes candidata.');
+    return null;
+  }
+
+  async function register() {
+    const nombre = document.getElementById('nombre').value.trim();
+    const email  = document.getElementById('email').value.trim();
+    const pass   = document.getElementById('pass').value;
+    const pass2  = document.getElementById('pass2').value;
+
+    const btn = document.querySelector('.btn-cta');
+
+    if (!nombre || !email || !pass || !pass2) {
+      showToast('⚠️ Please fill in all fields.');
+      return;
+    }
+    if (pass !== pass2) {
+      showToast('⚠️ Passwords do not match.');
+      return;
+    }
+    if (pass.length < 6) {
+      showToast('⚠️ Password must be at least 6 characters long.');
+      return;
+    }
+    if (!email.includes('@')) {
+      showToast('⚠️ Enter a valid email address.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
+
+    try {
+      // 1. Create user in Supabase Auth. Supabase Auth stores the password
+      // securely (hashed) itself — that's why we no longer save a "contra"
+      // column anywhere: the real "clients" table doesn't have one, and
+      // storing plaintext passwords in your own table would be unsafe anyway.
+      const { data, error: authError } = await supabaseClient.auth.signUp({
+        email: email,
+        password: pass,
+        options: {
+          data: {
+            nombre: nombre
+          }
+        }
+      });
+
+      if (authError) {
+        console.error('Supabase auth error:', authError);
+        showToast('❌ Error: ' + authError.message);
+        return;
+      }
+
+      // If email confirmation is required, Supabase may not return a user id here.
+      if (!data.user) {
+        console.error('Signup returned no user (check if email confirmation is required).');
+        showToast('⚠️ Check your email to confirm your account.');
+        return;
+      }
+
+      // 2. Create the profile row in the clients table.
+      // FIX: id_client is auto-generated (don't set it), "name" (not "nombre"),
+      // and "auth_user_id" links back to the Supabase Auth user. The table
+      // name itself is auto-detected since "clients" doesn't exist as-is.
+      const authUserId = data.user.id;
+      const tableName = await resolveClientsTable();
+
+      if (!tableName) {
+        console.error('[Doppy] No se pudo determinar el nombre de la tabla de clientes.');
+        showToast('⚠️ Cuenta creada, pero no se encontró la tabla de perfiles.');
+        return;
+      }
+
+      const { error: dbError } = await supabaseClient
+        .from(tableName)
+        .insert([{
+          name: nombre,
+          email: email,
+          auth_user_id: authUserId
+        }]);
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        showToast('⚠️ Account created but failed to save profile: ' + dbError.message);
+        return;
+      }
+
+      showToast('🐾 Account created successfully!');
+      document.getElementById('nombre').value = '';
+      document.getElementById('email').value  = '';
+      document.getElementById('pass').value   = '';
+      document.getElementById('pass2').value  = '';
+
+      // Navigate after a brief delay
+      setTimeout(() => {
+        window.location.href = 'selpetdu.html';
+      }, 800);
+
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      showToast('❌ An unexpected error occurred.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign up';
+    }
+  }
+
+  // FIX: query the auto-detected clients table with the real column names (name / email).
+  async function cargarUsuarios() {
+    const tableName = await resolveClientsTable();
+    if (!tableName) return;
+
+    const { data, error } = await supabaseClient
+      .from(tableName)
+      .select('*');
+
+    console.log("Data:", data);
+    console.log("Error:", error);
+
+    const lista = document.getElementById("lista");
+    if (lista) {
+      lista.innerHTML = "";
+      if (data) {
+        data.forEach(client => {
+          lista.innerHTML += `
+            <li class="list-group-item">
+              ${client.name || ''} - ${client.email || ''}
+            </li>
+          `;
+        });
+      }
+    }
+  }
+</script>
+</body>
+</html>

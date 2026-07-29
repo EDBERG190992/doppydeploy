@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Doppy – Veterinary Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F3F4F6;color:#111827;min-height:100vh;display:flex}
+.app{display:flex;width:100%;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:260px;background:#ffffff;display:flex;flex-direction:column;align-items:stretch;padding:28px 20px;gap:6px;flex-shrink:0;position:sticky;top:0;height:100vh;align-self:flex-start;z-index:20}
+.logo{width:140px;height:140px;background:transparent;border-radius:0;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;cursor:pointer;overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:contain;display:block}
+.nav-item{width:100%;border-radius:14px;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;padding:12px 16px;cursor:pointer;transition:background .2s ease,box-shadow .2s ease;text-decoration:none;position:relative;overflow:hidden}
+.nav-item:hover{background:#2d5080}
+.nav-item.active{background:#0164b6;box-shadow:0 8px 18px rgba(1,100,182,.2)}
+.nav-item img{width:36px;height:36px;object-fit:contain;flex-shrink:0;display:block}
+.nav-item svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-item .nav-text{font-size:12px;color:#94a3b8;font-weight:500;line-height:1;white-space:nowrap;opacity:1;max-width:none;margin-left:0;transition:color .15s ease}
+.nav-item:hover .nav-text{color:#fff}
+.nav-item.active .nav-text{color:#fff}
+.nav-spacer{flex:1}
+
+/* ── MAIN ── */
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:100vh}
+
+/* ── TOP BAR ── */
+.topbar{height:60px;background:#fff;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:10}
+.page-title{font-size:15px;font-weight:600;flex:1}
+.search-box{display:flex;align-items:center;gap:8px;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;padding:6px 12px;width:200px}
+.search-box input{border:none;background:transparent;font-size:13px;outline:none;width:100%}
+.search-box svg{width:16px;height:16px;stroke:#6B7280;flex-shrink:0}
+.notif-btn{width:36px;height:36px;border-radius:50%;background:#F3F4F6;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.notif-btn svg{width:18px;height:18px;stroke:#6B7280;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;background:#EF4444;border-radius:50%;border:2px solid #fff}
+.user-chip{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 10px 4px 6px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;transition:background .15s}
+.user-chip:hover{background:#F9FAFB}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600}
+.user-role{font-size:10px;color:#6B7280}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* ── VIEWS ── */
+.view{display:none;width:100%;min-width:0}
+.view.active{display:block;width:100%}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(120deg,#EFF6FF,#DBEAFE);border-radius:12px;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.hero h2{font-size:20px;font-weight:700}
+.hero p{font-size:13px;color:#6B7280;margin-top:3px}
+.hero-dog{font-size:72px;line-height:1}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:20px;height:20px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stat-label{font-size:11px;color:#6B7280}
+.stat-val{font-size:22px;font-weight:700}
+.stat-sub{font-size:11px;color:#10B981}
+.stat-link{font-size:11px;color:#3B82F6;cursor:pointer}
+
+/* ── GRID ── */
+.grid3{display:grid;grid-template-columns:1fr 1.1fr 0.9fr;gap:12px;margin-bottom:12px}
+.section-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:13px;font-weight:600}
+.link{font-size:11px;color:#3B82F6;cursor:pointer;white-space:nowrap}
+
+/* ── APPOINTMENTS ── */
+.appt-item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid #F3F4F6;cursor:pointer;border-radius:8px;transition:background .15s}
+.appt-item:last-child{border-bottom:none}
+.appt-item:hover{background:#F9FAFB}
+.appt-time{font-size:11px;color:#6B7280;width:50px;flex-shrink:0}
+.pet-thumb{width:32px;height:32px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center;background:#F3F4F6;flex-shrink:0;overflow:hidden}
+.pet-avatar-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
+.appt-info{flex:1;min-width:0}
+.appt-name{font-size:13px;font-weight:600}
+.appt-breed{font-size:11px;color:#6B7280}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.b-blue{background:#EFF6FF;color:#1D4ED8}
+.b-green{background:#ECFDF5;color:#065F46}
+.b-orange{background:#FFFBEB;color:#92400E}
+.b-red{background:#FEF2F2;color:#991B1B}
+
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.cal-month{font-size:13px;font-weight:600;flex:1}
+.cal-btn{width:26px;height:26px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;cursor:pointer;font-size:14px;color:#6B7280;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.cal-btn:hover{background:#F3F4F6}
+.today-btn{font-size:10px;padding:2px 8px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;cursor:pointer;color:#6B7280}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px}
+.weekdays span{font-size:10px;color:#9CA3AF;font-weight:500;padding:2px 0}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.day{height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;position:relative;transition:background .15s;color:#374151}
+.day:hover:not(.empty){background:#F3F4F6}
+.day.today{background:#3B82F6;color:#fff;font-weight:700}
+.day.has-appt::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#F59E0B}
+.day.today.has-appt::after{background:#fff}
+.day.empty{cursor:default;color:transparent}
+.day.other{color:#D1D5DB}
+
+/* ── TIMELINE ── */
+.timeline-wrap{overflow-y:auto;overflow-x:hidden;max-height:160px;border-top:1px solid #F3F4F6;margin-top:10px;padding-top:8px}
+.timeline-wrap::-webkit-scrollbar{width:3px}
+.timeline-wrap::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+.tl-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}
+.tl-hour{font-size:10px;color:#9CA3AF;width:36px;flex-shrink:0;padding-top:3px}
+.tl-events{flex:1;display:flex;flex-direction:column;gap:2px}
+.tl-ev{font-size:11px;padding:2px 7px;border-radius:5px;font-weight:500}
+.tl-ev.blue{background:#EFF6FF;color:#1D4ED8}
+.tl-ev.green{background:#ECFDF5;color:#065F46}
+.tl-ev.orange{background:#FFFBEB;color:#92400E}
+.tl-empty{height:20px;border-left:2px solid #F3F4F6;margin-left:6px}
+
+/* ── REMINDERS ── */
+.reminder{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #F3F4F6}
+.reminder:last-child{border-bottom:none}
+.rem-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.rem-title{font-size:12px;font-weight:600}
+.rem-date{font-size:11px;color:#6B7280}
+.rem-status{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-left:auto;flex-shrink:0}
+
+/* ── QUICK ACTIONS ── */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.qa{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;background:#fff;font-size:12px;transition:all .15s}
+.qa:hover{border-color:#3B82F6;background:#EFF6FF;color:#1D4ED8}
+.qa svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── ACTIVITY ── */
+.activity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.act-item{display:flex;gap:10px;align-items:flex-start}
+.act-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.act-ico svg{width:16px;height:16px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.act-name{font-size:12px;font-weight:600}
+.act-sub{font-size:11px;color:#6B7280}
+.act-tag{font-size:10px;background:#F3F4F6;padding:1px 7px;border-radius:10px;color:#6B7280;display:inline-block;margin-top:2px}
+
+/* ── PET DETAIL ── */
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:#3B82F6;cursor:pointer;margin-bottom:16px;font-weight:500;width:fit-content}
+.back-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pet-profile-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:18px}
+.pet-big-emo{width:76px;height:76px;border-radius:50%;font-size:42px;display:flex;align-items:center;justify-content:center;background:#F3F4F6;flex-shrink:0;overflow:hidden}
+.pet-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pet-tag{font-size:11px;padding:2px 10px;border-radius:20px;background:#EFF6FF;color:#1D4ED8;font-weight:500}
+.info2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.info-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:14px}
+.info-card h3{font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #F3F4F6;font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:#6B7280}
+.info-val{font-weight:500}
+
+/* ── PETS GRID ── */
+.pets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:4px}
+.pet-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s}
+.pet-card:hover{border-color:#3B82F6;background:#EFF6FF;transform:translateY(-2px)}
+.pet-card .emo{font-size:44px;margin-bottom:8px;width:72px;height:72px;margin:0 auto 8px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#F3F4F6}
+.pet-card .pname{font-size:14px;font-weight:700}
+.pet-card .pbreed{font-size:11px;color:#6B7280}
+
+/* ── PLACEHOLDER ── */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:#6B7280}
+.placeholder .big{font-size:60px;margin-bottom:14px}
+.placeholder h2{font-size:16px;font-weight:600;color:#111827;margin-bottom:6px}
+
+/* ── FULL CALENDAR VIEW ── */
+.cal-full-layout{display:grid;grid-template-columns:1fr 280px;gap:16px;height:calc(100vh - 100px)}
+.cal-full-left{display:flex;flex-direction:column;gap:0;overflow:hidden}
+.cal-full-right{display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+
+/* top bar */
+.cal-topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.cal-filter-btn{padding:6px 14px;border:1px solid #E5E7EB;border-radius:20px;background:#fff;font-size:13px;cursor:pointer;transition:all .15s;color:#374151;font-weight:500}
+.cal-filter-btn:hover,.cal-filter-btn.active{background:#1E3A5F;color:#fff;border-color:#1E3A5F}
+.cal-month-nav{display:flex;align-items:center;gap:6px;margin:0 auto}
+.cal-prev-month{font-size:22px;font-weight:700;color:#CBD5E1;cursor:pointer;letter-spacing:-1px}
+.cal-cur-month{font-size:32px;font-weight:900;color:#1E3A5F;letter-spacing:-1px;min-width:120px;text-align:center}
+.cal-next-month{font-size:22px;font-weight:700;color:#CBD5E1;cursor:pointer;letter-spacing:-1px}
+.cal-nav-arr{width:28px;height:28px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#6B7280;transition:background .15s}
+.cal-nav-arr:hover{background:#F3F4F6}
+.btn-new-appt{display:flex;align-items:center;gap:6px;padding:8px 18px;background:#F59E0B;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn-new-appt:hover{background:#D97706}
+
+/* day schedule */
+.day-label{font-size:13px;font-weight:700;color:#3B82F6;letter-spacing:.5px;margin-bottom:12px;padding:0 4px}
+.schedule-wrap{flex:1;overflow-y:auto;padding-right:4px}
+.schedule-wrap::-webkit-scrollbar{width:4px}
+.schedule-wrap::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:4px}
+.schedule-row{display:flex;gap:12px;margin-bottom:0}
+.schedule-hour{width:70px;flex-shrink:0;font-size:12px;color:#9CA3AF;padding-top:12px;text-align:right}
+.schedule-slot{flex:1;min-height:56px;border-top:1px solid #F3F4F6;padding:8px 0 0 0}
+.schedule-slot.current-hour{border-top:2px solid #3B82F6}
+.schedule-slot.current-hour .schedule-hour-dot{display:block}
+
+.appt-block{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:10px 14px;margin-bottom:6px;cursor:pointer;transition:all .15s;position:relative}
+.appt-block:hover{border-color:#3B82F6;box-shadow:0 2px 8px rgba(59,130,246,.1)}
+.appt-block.color-green{border-left:3px solid #10B981}
+.appt-block.color-blue{border-left:3px solid #3B82F6}
+.appt-block.color-orange{border-left:3px solid #F59E0B}
+.appt-block.color-purple{border-left:3px solid #8B5CF6}
+.appt-pet-emo{width:36px;height:36px;border-radius:50%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
+.appt-block-info{flex:1}
+.appt-block-name{font-size:14px;font-weight:700}
+.appt-block-sub{font-size:12px;color:#6B7280}
+.appt-block-right{text-align:right}
+.appt-block-time{font-size:13px;font-weight:600;color:#3B82F6}
+.appt-block-type{font-size:11px;color:#6B7280}
+.appt-block-menu{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9CA3AF;font-size:18px;transition:background .15s;flex-shrink:0}
+.appt-block-menu:hover{background:#F3F4F6}
+
+/* mini calendar right */
+.mini-cal-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:14px}
+.mini-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mini-cal-title{font-size:13px;font-weight:600}
+.mini-cal-arr{background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:16px;padding:2px 6px;border-radius:4px}
+.mini-cal-arr:hover{background:#F3F4F6;color:#374151}
+.mini-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px}
+.mini-weekdays span{font-size:10px;color:#9CA3AF;font-weight:500}
+.mini-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.mday{height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;color:#374151;position:relative;transition:background .15s}
+.mday:hover:not(.mempty){background:#F3F4F6}
+.mday.mtoday{background:#1E3A5F;color:#fff;font-weight:700}
+.mday.mselected:not(.mtoday){background:#3B82F6;color:#fff}
+.mday.mhas-appt::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:#F59E0B}
+.mday.mtoday.mhas-appt::after,.mday.mselected.mhas-appt::after{background:#fff}
+.mday.mempty{cursor:default;color:transparent}
+.mday.mother{color:#D1D5DB}
+
+/* filters card */
+.filters-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:14px}
+.filters-card h3{font-size:12px;font-weight:600;color:#374151;margin-bottom:10px}
+.filter-select{width:100%;padding:6px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:12px;color:#374151;background:#fff;cursor:pointer;margin-bottom:8px;outline:none}
+.filter-select:focus{border-color:#3B82F6}
+
+/* upcoming list card */
+.upcoming-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:14px;flex:1;overflow:hidden;display:flex;flex-direction:column}
+.upcoming-card h3{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.upcoming-list{overflow-y:auto;flex:1}
+.upcoming-list::-webkit-scrollbar{width:3px}
+.upcoming-list::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:3px}
+.upcoming-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F3F4F6;cursor:pointer}
+.upcoming-item:last-child{border-bottom:none}
+.upcoming-item:hover .upcoming-name{color:#3B82F6}
+.up-emo{width:32px;height:32px;border-radius:50%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.upcoming-info{flex:1;min-width:0}
+.upcoming-name{font-size:12px;font-weight:600;transition:color .15s}
+.upcoming-type{font-size:11px;color:#6B7280}
+.upcoming-date{text-align:right;font-size:11px;font-weight:600;color:#3B82F6;flex-shrink:0}
+
+/* promo card */
+.promo-card{background:#FFF8E7;border:1px solid #FDE68A;border-radius:10px;padding:14px;text-align:center}
+.promo-card p{font-size:13px;font-weight:700;color:#1E3A5F;line-height:1.4;margin-bottom:4px}
+.promo-card small{font-size:11px;color:#6B7280}
+.promo-card button{margin-top:10px;width:100%;padding:8px;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
+.promo-card button:hover{background:#D97706}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-size:16px;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;line-height:1;padding:0 4px}
+.modal-close:hover{color:#374151}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;outline:none;transition:border-color .15s;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#3B82F6}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{width:100%;padding:10px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px}
+.btn-submit:hover{background:#2563EB}
+
+/* ── FORUM ── */
+.forum-layout{display:grid;grid-template-columns: 1fr 220px;gap:0;width:100%;min-height:calc(100vh - 140px);overflow:hidden;margin:0;background:#F3F4F6;border-radius:12px;border:1px solid #E5E7EB;box-shadow:0 2px 12px rgba(15,23,42,.05)}
+.forum-left{background:#fff;border-right:1px solid #E5E7EB;padding:16px 0;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
+.forum-left::-webkit-scrollbar{width:3px}
+.forum-left::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:3px}
+.fl-section-label{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.8px;padding:10px 16px 4px}
+.fl-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:13px;color:#374151;transition:background .15s;border-radius:0}
+.fl-item:hover{background:#F9FAFB;color:#1E3A5F}
+.fl-item.active{background:#EFF6FF;color:#1D4ED8;font-weight:600}
+.fl-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.fl-divider{height:1px;background:#F3F4F6;margin:8px 16px}
+.fl-promo{margin:auto 12px 12px;background:#FFF8E7;border:1px solid #FDE68A;border-radius:10px;padding:12px;font-size:12px}
+.fl-promo strong{display:block;font-size:13px;color:#1E3A5F;margin-bottom:4px}
+.fl-promo p{color:#6B7280;line-height:1.4;margin-bottom:8px}
+.fl-promo button{width:100%;padding:6px;background:#F59E0B;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+
+.forum-center{display:flex;flex-direction:column;overflow:hidden;min-width:0;min-height:0}
+.forum-tabs{display:flex;align-items:center;gap:4px;padding:12px 16px;background:#fff;border-bottom:1px solid #E5E7EB;overflow-x:auto;flex-shrink:0}
+.forum-tabs::-webkit-scrollbar{display:none}
+.ftab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;color:#6B7280;border:1px solid transparent;transition:all .15s}
+.ftab:hover{background:#F3F4F6;color:#374151}
+.ftab.active{background:#1E3A5F;color:#fff}
+.btn-create-post{margin-left:auto;display:flex;align-items:center;gap:6px;padding:7px 14px;background:#F59E0B;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.btn-create-post:hover{background:#D97706}
+
+.forum-feed{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:12px}
+.forum-feed::-webkit-scrollbar{width:4px}
+.forum-feed::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:4px}
+
+/* compose box */
+.compose-box{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px}
+.compose-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.compose-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.compose-input{flex:1;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;color:#374151;font-family:inherit;resize:none;min-height:38px;transition:border-color .15s;background:#F9FAFB}
+.compose-input:focus{border-color:#3B82F6;background:#fff;min-height:70px}
+.compose-actions{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid #F3F4F6}
+.compose-action-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border:none;background:none;font-size:12px;color:#6B7280;cursor:pointer;border-radius:6px;transition:background .15s}
+.compose-action-btn:hover{background:#F3F4F6;color:#374151}
+.compose-action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.compose-submit{margin-left:auto;padding:6px 16px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.compose-submit:hover{background:#2563EB}
+
+/* post card */
+.post-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px;transition:box-shadow .15s}
+.post-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.post-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff}
+.post-author-name{font-size:13px;font-weight:700}
+.post-meta{font-size:11px;color:#9CA3AF}
+.post-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:6px}
+.pb-vet{background:#EFF6FF;color:#1D4ED8}
+.pb-community{background:#ECFDF5;color:#065F46}
+.pb-event{background:#FEF3C7;color:#92400E}
+.post-menu{margin-left:auto;background:none;border:none;font-size:18px;color:#9CA3AF;cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1}
+.post-menu:hover{background:#F3F4F6;color:#374151}
+.post-body{font-size:13px;color:#374151;line-height:1.6;margin-bottom:10px}
+.post-body strong{font-weight:700;font-size:14px;display:block;margin-bottom:4px;color:#111827}
+.post-img{width:100%;border-radius:8px;overflow:hidden;margin-bottom:10px;background:#F3F4F6;height:160px;display:flex;align-items:center;justify-content:center;font-size:48px}
+.post-warning{display:flex;align-items:flex-start;gap:8px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:8px 12px;font-size:12px;color:#92400E;margin-bottom:10px}
+.post-tag{font-size:12px;color:#3B82F6;font-weight:500;margin-bottom:10px}
+.post-footer{display:flex;align-items:center;gap:4px;border-top:1px solid #F3F4F6;padding-top:10px}
+.post-action{display:flex;align-items:center;gap:5px;padding:5px 10px;border:none;background:none;font-size:12px;color:#6B7280;cursor:pointer;border-radius:6px;transition:all .15s}
+.post-action:hover{background:#F3F4F6;color:#374151}
+.post-action.liked{color:#EF4444}
+.post-action svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.post-action.liked svg{stroke:#EF4444}
+.post-action-save{margin-left:auto}
+
+/* right panel */
+.forum-right{background:#fff;border-left:1px solid #E5E7EB;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-width:0}
+.forum-right::-webkit-scrollbar{width:3px}
+.forum-right::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:3px}
+.fr-section-title{font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.fr-section-title span{font-size:11px;color:#3B82F6;font-weight:400;cursor:pointer}
+.event-card{border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:8px}
+.event-img{height:60px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:32px}
+.event-body{padding:8px 10px}
+.event-title{font-size:12px;font-weight:700;color:#111827;margin-bottom:2px}
+.event-meta{font-size:11px;color:#6B7280;line-height:1.5}
+.event-add{width:100%;margin-top:6px;padding:5px;background:#EFF6FF;color:#1D4ED8;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
+.event-add:hover{background:#DBEAFE}
+.trending-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F3F4F6;font-size:12px;cursor:pointer}
+.trending-item:last-child{border-bottom:none}
+.trending-item:hover .trending-text{color:#3B82F6}
+.trending-num{width:18px;height:18px;border-radius:50%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6B7280;flex-shrink:0}
+.trending-text{color:#374151;transition:color .15s}
+.biz-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F3F4F6}
+.biz-item:last-child{border-bottom:none}
+.biz-emo{width:36px;height:36px;border-radius:8px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.biz-name{font-size:12px;font-weight:600}
+.biz-meta{font-size:11px;color:#6B7280}
+.biz-stars{font-size:11px;color:#F59E0B}
+.biz-contact{margin-left:auto;padding:4px 10px;background:#EFF6FF;color:#1D4ED8;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.biz-contact:hover{background:#DBEAFE}
+
+/* image upload preview */
+.img-preview{width:100%;border-radius:8px;background:#F9FAFB;border:1px dashed #D1D5DB;height:80px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#9CA3AF;margin-top:8px;transition:all .15s}
+.img-preview:hover{border-color:#3B82F6;color:#3B82F6;background:#EFF6FF}
+
+/* ── PROFILE ── */
+.profile-card{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:24px;max-width:1200px; max-height: 1200px;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700;flex-shrink:0}
+.db-note{margin-top:14px;padding:12px;background:#F9FAFB;border-radius:8px;font-size:12px;color:#6B7280;border-left:3px solid #3B82F6}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <img src="/assets/Type 2.png" alt="Logo">
+  </div>
+
+  <div class="nav-item active" data-page="dash" onclick="nav('dash')">
+    <img src="/assets/HomeB.png" alt="Dashboard">
+    <span class="nav-text">Home</span>
+  </div>
+
+  <div class="nav-item" data-page="calendar" onclick="nav('calendar')">
+    <img src="/assets/CalendarB.png" alt="Calendar">
+    <span class="nav-text">Calendar</span>
+  </div>
+
+  <div class="nav-item" data-page="pets" onclick="nav('pets')">
+    <img src="/assets/PawB.png" alt="Pets">
+    <span class="nav-text">Pets</span>
+  </div>
+
+  <div class="nav-item" data-page="forum" onclick="nav('forum')">
+    <img src="/assets/ChatB.png" alt="Forum">
+    <span class="nav-text">Forum</span>
+  </div>
+
+  <div class="nav-item" data-page="profile" onclick="nav('profile')">
+    <img src="/assets/UserB.png" alt="Profile">
+    <span class="nav-text">Profile</span>
+  </div>
+
+  <div class="nav-spacer"></div>
+</nav>
+<style>
+  .nav-item:active .nav-text{
+    opacity: 0;
+  }
+</style>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <span class="page-title" id="page-title">Dashboard</span>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="top-search" type="text" placeholder="Search pet, appointment..." oninput="applySearch()"/>
+      </div>
+      <div class="notif-btn">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="user-chip" onclick="nav('profile')">
+        <div class="avatar" id="topbar-avatar">AR</div>
+        <div>
+          <div class="user-name" id="topbar-username">Dr. Albert Ramírez</div>
+          <div class="user-role" id="topbar-userrole">Veterinarian</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div class="view active" id="view-dash">
+        <div class="hero">
+          <div>
+            <h2>Welcome back, Dr. Albert!</h2>
+            <p>Here’s a summary of your clinic today.</p>
+          </div>
+        
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#EFF6FF">
+              <svg viewBox="0 0 24 24" stroke="#3B82F6"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Registered pets</div>
+              <div class="stat-val">128</div>
+              <div class="stat-sub">↑ 12% vs last week</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FFFBEB">
+              <svg viewBox="0 0 24 24" stroke="#F59E0B"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Appointments today</div>
+              <div class="stat-val">8</div>
+              <div class="stat-link" onclick="nav('calendar')">View calendar →</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#ECFDF5">
+              <svg viewBox="0 0 24 24" stroke="#10B981"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Clinical records</div>
+              <div class="stat-val">156</div>
+            
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FEF2F2">
+              <svg viewBox="0 0 24 24" stroke="#EF4444"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </div>
+            <div>
+              <div class="stat-label">Reminders</div>
+              <div class="stat-val">5</div>
+              
+            </div>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <!-- Upcoming appointments -->
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">Upcoming appointments</span>
+              <span class="link" onclick="nav('calendar')">View calendar</span>
+            </div>
+            <div id="appt-list"></div>
+            <div style="text-align:center;margin-top:10px">
+              <span class="link" onclick="nav('calendar')">View all appointments →</span>
+            </div>
+          </div>
+
+          <!-- Calendario -->
+          <div class="section-card">
+            <div class="cal-nav">
+              <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+              <span class="cal-month" id="cal-title"></span>
+              <button class="today-btn" onclick="goToday()">Today</button>
+              <button class="cal-btn" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="weekdays">
+              <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div class="cal-days" id="cal-days"></div>
+            <div class="timeline-wrap" id="timeline"></div>
+            <div style="text-align:center;margin-top:8px">
+              <span class="link" onclick="nav('calendar')">View full calendar →</span>
+            </div>
+          </div>
+
+          <!-- Reminders + actions -->
+          <div class="section-card" style="display:flex;flex-direction:column">
+            <div class="section-header">
+              <span class="section-title">Reminders</span>
+              
+            </div>
+            <div id="reminders"></div>
+            <div class="section-header" style="margin-top:14px">
+              <span class="section-title">Quick actions</span>
+            </div>
+            <div class="quick-grid">
+              <div class="qa" onclick="openModal()">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+                New appointment
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actividad reciente -->
+        <div class="section-card">
+          <div class="section-header">
+            <span class="section-title">Recent activity</span>
+            <span class="link">View all activity</span>
+          </div>
+          <div class="activity-grid">
+            <div class="act-item">
+              <div class="act-ico" style="background:#EFF6FF">
+                <svg viewBox="0 0 24 24" stroke="#3B82F6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div>
+                <div class="act-name">Clinical record added</div>
+                <div class="act-sub">Max · 21/05/2025 08:45 AM</div>
+                <span class="act-tag">Today</span>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-ico" style="background:#FFFBEB">
+                <svg viewBox="0 0 24 24" stroke="#F59E0B"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><polyline points="9 11 12 14 16 10"/></svg>
+              </div>
+              <div>
+                <div class="act-name">Appointment completed</div>
+                <div class="act-sub">Luna · 21/05/2025 10:30 AM</div>
+                <span class="act-tag">Today</span>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-ico" style="background:#ECFDF5">
+                <svg viewBox="0 0 24 24" stroke="#10B981"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <div class="act-name">Vaccine administered</div>
+                <div class="act-sub">Rocky · 21/05/2025 01:00 PM</div>
+                <span class="act-tag">Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PET DETAIL ══ -->
+      <div class="view" id="view-pet">
+        <div class="back-btn" onclick="nav('dash')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to dashboard
+        </div>
+        <div id="pet-detail"></div>
+      </div>
+
+      <!-- ══ PETS LIST ══ -->
+      <div class="view" id="view-pets">
+        <div class="section-card">
+          <div class="section-header">
+            <span class="section-title">Registered pets</span>
+            <span class="link" onclick="newPet()">+ New pet</span>
+          </div>
+          <div class="pets-grid" id="pets-grid"></div>
+        </div>
+      </div>
+
+      <!-- ══ CALENDAR FULL ══ -->
+      <div class="view" id="view-calendar">
+        <!-- top bar -->
+        <div class="cal-topbar">
+          <button class="cal-filter-btn active" id="filt-today" onclick="calFilter('today')">Today</button>
+          <button class="cal-filter-btn" id="filt-tomorrow" onclick="calFilter('tomorrow')">Tomorrow</button>
+          <button class="cal-filter-btn" id="filt-all" onclick="calFilter('all')">All</button>
+          <div class="cal-month-nav">
+            <span class="cal-prev-month" id="fc-prev-label"></span>
+            <button class="cal-nav-arr" onclick="fcChangeMonth(-1)">‹</button>
+            <span class="cal-cur-label" id="fc-cur-label"></span>
+            <button class="cal-nav-arr" onclick="fcChangeMonth(1)">›</button>
+            <span class="cal-next-month" id="fc-next-label"></span>
+          </div>
+          <button class="btn-new-appt" onclick="openModal()">＋ New appointment</button>
+        </div>
+
+        <div class="cal-full-layout">
+          <!-- LEFT: day schedule -->
+          <div class="cal-full-left">
+            <div class="day-label" id="fc-day-label">LUNES 21 MAYO</div>
+            <div class="schedule-wrap" id="fc-schedule"></div>
+          </div>
+
+          <!-- RIGHT: mini-cal + filters + upcoming -->
+          <div class="cal-full-right">
+            <!-- mini calendar -->
+            <div class="mini-cal-card">
+              <div class="mini-cal-nav">
+                <span class="mini-cal-title" id="mc-title"></span>
+                <div style="display:flex;gap:4px">
+                  <button class="mini-cal-arr" onclick="mcChangeMonth(-1)">‹</button>
+                  <button class="mini-cal-arr" onclick="mcChangeMonth(1)">›</button>
+                </div>
+              </div>
+              <div class="mini-weekdays">
+                <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+              </div>
+              <div class="mini-days" id="mc-days"></div>
+            </div>
+
+            <!-- filters -->
+            <div class="filters-card">
+              <h3>Filters</h3>
+              <select class="filter-select" id="filter-type" onchange="applyFilters()">
+                <option value="">All types</option>
+                <option value="Vaccination">Vaccination</option>
+                <option value="Consultation">Consultation</option>
+                <option value="Review">Review</option>
+                <option value="Dermatology check">Dermatology check</option>
+              </select>
+              <select class="filter-select" id="filter-vet" onchange="applyFilters()">
+                <option value="">All veterinarians</option>
+                <option value="AR">Dr. Albert Ramírez</option>
+                <option value="AL">Dra. Ana López</option>
+              </select>
+            </div>
+
+            <!-- upcoming -->
+            <div class="upcoming-card">
+              <h3>Upcoming appointments <span class="link" style="font-weight:400">View all</span></h3>
+              <div class="upcoming-list" id="fc-upcoming"></div>
+            </div>
+               </div>  
+        </div> 
+      </div> 
+
+           
+
+      <!-- ══ MODAL NUEVA CITA ══ -->
+      <div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+        <div class="modal">
+          <h2>New appointment <button class="modal-close" onclick="closeModal()">×</button></h2>
+          <div class="form-group">
+            <label>Pet</label>
+            <select id="f-pet">
+              <option value="">Select pet...</option>
+              <option value="max">Max – Golden Retriever</option>
+              <option value="luna">Luna – French Bulldog</option>
+              <option value="rocky">Rocky – Beagle</option>
+              <option value="milo">Milo – Poodle</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="f-date"/>
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="time" id="f-time"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Appointment type</label>
+            <select id="f-type">
+              <option value="">Select...</option>
+              <option value="Vaccination">Vaccination</option>
+              <option value="Consultation">General consultation</option>
+              <option value="Review">Review</option>
+              <option value="Dermatology check">Dermatology check</option>
+              <option value="Deworming">Deworming</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Veterinarian</label>
+            <select id="f-vet">
+              <option value="AR">Dr. Albert Ramírez</option>
+              <option value="AL">Dra. Ana López</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Notes (optional)</label>
+            <textarea id="f-notes" placeholder="Special instructions, reason for visit..."></textarea>
+          </div>
+          <button class="btn-submit" onclick="saveAppt()">Save appointment</button>
+        </div>
+      </div>
+
+      <!-- ══ FORUM ══ -->
+      <div class="view" id="view-forum">
+        <div class="forum-layout">
+
+          <!-- CENTER FEED -->
+          <div class="forum-center">
+            <!-- tabs -->
+            <div class="forum-tabs">
+              <div class="ftab active" onclick="setFeedTab(this,'all')">All</div>
+              <div class="ftab" onclick="setFeedTab(this,'vet')">Veterinary recommendations</div>
+              <div class="ftab" onclick="setFeedTab(this,'community')">Community Feed</div>
+              <div class="ftab" onclick="setFeedTab(this,'events')">Events</div>
+              <div class="ftab" onclick="setFeedTab(this,'biz')">Businesses</div>
+              <button class="btn-create-post" onclick="openForumPost()">＋ Create post</button>
+            </div>
+
+            <!-- feed -->
+            <div class="forum-feed" id="forum-feed">
+              <!-- compose box -->
+              <div class="compose-box">
+                <div class="compose-top">
+                  <div class="compose-avatar">AR</div>
+                  <textarea class="compose-input" id="compose-text" placeholder="Share a tip, recommendation, or something with the community..." rows="1" oninput="autoResize(this)"></textarea>
+                </div>
+                <div class="compose-actions">
+                  <button class="compose-action-btn" onclick="document.getElementById('img-upload').click()">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Photo / Video
+                  </button>
+                  <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="handleImageUpload(event)"/>
+                  <button class="compose-action-btn" onclick="composeType='tip';document.getElementById('compose-text').placeholder='Write your veterinary advice...'">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Create tip
+                  </button>
+                  <button class="compose-action-btn" onclick="composeType='event';document.getElementById('compose-text').placeholder='Describe the event...'">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Event
+                  </button>
+                  <button class="compose-action-btn" onclick="composeType='poll';document.getElementById('compose-text').placeholder='Question for the poll...'">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    Poll
+                  </button>
+                  <button class="compose-submit" onclick="submitPost()">Publish</button>
+                </div>
+                <div id="img-preview-area"></div>
+              </div>
+
+              <!-- posts rendered by JS -->
+              <div id="posts-container"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANEL -->
+          <div class="forum-right">
+            <div>
+              <div class="fr-section-title">Upcoming events <span>View all</span></div>
+              <div class="event-card">
+                <div class="event-img">
+                  <img src="" alt="Dog Walk in the Park">
+                </div>
+                <div class="event-body">
+                  <div class="event-title">Dog Walk in the Park</div>
+                  <div class="event-meta">📅 May 25, 2024 · 8:00 AM<br>📍 Central Park<br>🏥 Paws Community</div>
+                  <button class="event-add">+ Add to calendar</button>
+                </div>
+              </div>
+              <div class="event-card">
+                <div class="event-img">🐈</div>
+                <div class="event-body">
+                  <div class="event-title">Cat Adoption Day</div>
+                  <div class="event-meta">📅 Jun 8, 2024 · 10:00 AM<br>📍 Happy Paws Shelter<br>🏥 Happy Paws Clinic</div>
+                  <button class="event-add">+ Add to calendar</button>
+                </div>
+              </div>
+              <div class="event-card">
+                <div class="event-img">💉</div>
+                <div class="event-body">
+                  <div class="event-title">Vaccination Campaign</div>
+                  <div class="event-meta">📅 Jun 15, 2024 · 9:00 AM<br>📍 Happy Paws Clinic<br>🏥 Happy Paws Clinic</div>
+                  <button class="event-add">+ Add to calendar</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="fr-section-title">Trending tips <span>View all</span></div>
+              <div id="trending-list"></div>
+            </div>
+            <div>
+              <div class="fr-section-title">Nearby businesses <span>View all</span></div>
+              <div class="biz-item">
+                <div class="biz-emo">✂️</div>
+                <div>
+                  <div class="biz-name">Happy Paws Grooming</div>
+                  <div class="biz-stars">★★★★☆ <span style="color:#6B7280">(126)</span></div>
+                  <div class="biz-meta">Grooming salon · 1.2 km</div>
+                </div>
+                <button class="biz-contact" onclick="showComingSoon('contactBusiness')">Contact</button>
+              </div>
+              <div class="biz-item">
+                <div class="biz-emo">🐾</div>
+                <div>
+                  <div class="biz-name">Pet Food Express</div>
+                  <div class="biz-stars">★★★★½ <span style="color:#6B7280">(89)</span></div>
+                  <div class="biz-meta">Pet store · 1.5 km</div>
+                </div>
+                <button class="biz-contact" onclick="showComingSoon('contactBusiness')">Contact</button>
+              </div>
+              <div class="biz-item">
+                <div class="biz-emo">🏥</div>
+                <div>
+                  <div class="biz-name">VetCare 24h</div>
+                  <div class="biz-stars">★★★★★ <span style="color:#6B7280">(211)</span></div>
+                  <div class="biz-meta">Veterinary clinic · 2.1 km</div>
+                </div>
+                <button class="biz-contact" onclick="showComingSoon('contactBusiness')">Contact</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ PROFILE ══ -->
+      <div class="view" id="view-profile">
+        <div class="profile-card">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+            <div class="profile-avatar" id="profile-avatar">AR</div>
+            <div>
+              <div id="profile-name" style="font-size:19px;font-weight:700">Dr. Albert Ramírez</div>
+              <div id="profile-role" style="font-size:13px;color:#6B7280">Veterinarian · Happy Pets Clinic</div>
+              <div style="margin-top:6px">
+                <span class="badge b-blue" style="font-size:11px">Plan Pro</span>
+              </div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #F3F4F6;padding-top:14px">
+            <div style="font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Account information</div>
+            <div id="profile-info">
+              <div class="info-row"><span class="info-label">Email</span><span class="info-val">albert@happypets.com</span></div>
+              <div class="info-row"><span class="info-label">Phone</span><span class="info-val">+507 6000-0000</span></div>
+              <div class="info-row"><span class="info-label">Clinic</span><span class="info-val">Happy Pets</span></div>
+              <div class="info-row"><span class="info-label">Specialty</span><span class="info-val">General medicine</span></div>
+              <div class="info-row"><span class="info-label">License</span><span class="info-val">VET-2021-1042</span></div>
+            </div>
+          </div>
+          <div class="db-note">
+            🔗 This profile will connect to the database in the next phase. All fields will be editable and synced in real time.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ──────────────── DATA (será reemplazado por DB) ────────────────
+const pets = [
+  {id:'max',   name:'Max',   img:'assets/dogd.png', breed:'Golden Retriever', age:'3 years', weight:'28 kg', type:'Dog', color:'Golden',   owner:'Carlos Gómez',    phone:'+507 6111-1111', lastVisit:'21/05/2025', nextVisit:'21/06/2025', vaccine:'Up to date',   notes:'Allergic to dust. Calm temperament.', affiliated:true, medicalRecords:[{date:'21/05/2025', summary:'Annual wellness exam. Weight stable, vaccines current.'},{date:'21/02/2025', summary:'Vaccination update and skin allergy consult.'}], prescriptions:[{date:'21/05/2025', medicine:'Amoxicillin 250 mg', instructions:'Twice daily for 7 days.'}], privateNotes:[{date:'21/05/2025', note:'Monitor for itching after flea treatment.'}], appts:[{t:'09:00 AM',type:'Vaccination',bc:'b-blue'},{t:'21/06',type:'General check',bc:'b-green'}]},
+  {id:'luna',  name:'Luna',  img:'assets/parrotd.png', breed:'Parakeet',   age:'2 years', weight:'11 kg', type:'Dog', color:'Tabby', owner:'María Pérez',     phone:'+507 6222-2222', lastVisit:'21/05/2025', nextVisit:'15/06/2025', vaccine:'Up to date',   notes:'Mild breathing issues. Monitor closely.', affiliated:true, medicalRecords:[{date:'15/05/2025', summary:'Respiratory check. No acute distress.'},{date:'10/03/2025', summary:'Nutrition plan reviewed for weight management.'}], prescriptions:[{date:'15/05/2025', medicine:'Fluticasone spray', instructions:'One spray per nostril daily.'}], privateNotes:[{date:'15/05/2025', note:'Confirm follow-up after 7 days if coughing persists.'}], appts:[{t:'10:30 AM',type:'Consultation',bc:'b-green'},{t:'25/05',type:'Deworming',bc:'b-orange'}]},
+  {id:'rocky', name:'Rocky', img:'assets/lizardd.png', breed:'Chameleon',           age:'4 years', weight:'15 kg', type:'Dog', color:'Tricolor', owner:'Juan Torres',     phone:'+507 6333-3333', lastVisit:'21/05/2025', nextVisit:'30/05/2025', vaccine:'Next',  notes:'Active and needs daily exercise.', affiliated:true, medicalRecords:[{date:'21/05/2025', summary:'Skin examination and parasite screening.'},{date:'08/04/2025', summary:'Diet and hydration counseling.'}], prescriptions:[{date:'21/05/2025', medicine:'Ivermectin 1% drops', instructions:'Apply once weekly for parasites.'}], privateNotes:[{date:'21/05/2025', note:'Owner to bring detailed diet log on next visit.'}], appts:[{t:'01:00 PM',type:'Review',bc:'b-orange'},{t:'30/05',type:'Vaccine',bc:'b-blue'}]},
+  {id:'milo',  name:'Milo',  img:'assets/catd.png', breed:'Birman',           age:'1 year',  weight:'6 kg',  type:'Dog', color:'White',   owner:'Ana Rodríguez',   phone:'+507 6444-4444', lastVisit:'15/05/2025', nextVisit:'21/05/2025', vaccine:'Pending',notes:'Annual review pending. First year.', affiliated:true, medicalRecords:[{date:'15/05/2025', summary:'Puppy vaccination schedule started. Healthy.'}], prescriptions:[], privateNotes:[{date:'15/05/2025', note:'Discuss spay timing at next appointment.'}], appts:[{t:'03:30 PM',type:'Vaccination',bc:'b-blue'}]}
+];
+
+const appts = [
+  {time:'09:00 AM', petId:'max',   type:'Vaccination', bc:'b-blue'},
+  {time:'10:30 AM', petId:'luna',  type:'Consultation',   bc:'b-green'},
+  {time:'01:00 PM', petId:'rocky', type:'Review',   bc:'b-orange'},
+  {time:'03:30 PM', petId:'milo',  type:'Vaccination', bc:'b-blue'}
+];
+
+const reminders = [
+  {ico:'🔔', title:'Max vaccine',           date:'Next dose: 25/05/2025', status:'Next',  bc:'b-blue'},
+  {ico:'⚠️', title:'Luna deworming', date:'Expired: 18/05/2025',        status:'Expired',  bc:'b-red'},
+  {ico:'🔔', title:'Rocky vaccine',         date:'Next dose: 30/05/2025', status:'Next',  bc:'b-blue'},
+  {ico:'ℹ️', title:'Milo annual review',  date:'Book appointment',              status:'Pending',bc:'b-orange'}
+];
+
+const tlEvents = {
+  9: [{label:'Max · Vaccination',  cls:'blue'}],
+  10:[{label:'Luna · Consultation',   cls:'green'}],
+  13:[{label:'Rocky · Review',  cls:'orange'}],
+  15:[{label:'Milo · Vaccination', cls:'blue'}]
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const accountType = localStorage.getItem('accountType') || 'vet';
+const accountData = {
+  vet: {
+    userName: 'Dr. Albert Ramírez',
+    userRole: 'Veterinarian',
+    heroTitle: 'Welcome back, Dr. Albert! 👋',
+    heroSubtitle: 'Here’s a summary of your clinic today.',
+    avatar: 'AR',
+    profileItems: [
+      ['Email', 'albert@happypets.com'],
+      ['Phone', '+507 6000-0000'],
+      ['Clinic', 'Happy Pets'],
+      ['Specialty', 'General medicine'],
+      ['License', 'VET-2021-1042']
+    ]
+  },
+  owner: {
+    userName: 'María Rodríguez',
+    userRole: 'Pet Owner',
+    heroTitle: 'Welcome back, María! ',
+    heroSubtitle: 'Here’s your pet care overview.',
+    avatar: 'MR',
+    profileItems: [
+      ['Email', 'maria@pets.com'],
+      ['Phone', '+507 6999-1234'],
+      ['Location', 'Panama City'],
+      ['Pets', '4 registered pets'],
+      ['Membership', 'Premium']
+    ]
+  }
+};
+let calDate = new Date(2025, 4, 21); // May 2025
+
+function getInitials(name) {
+  return name.split(' ').filter(Boolean).slice(0,2).map(part => part[0].toUpperCase()).join('');
+}
+
+function initAccountView() {
+  const account = {...(accountData[accountType] || accountData.vet)};
+  const storedName = localStorage.getItem('userName');
+  const storedEmail = localStorage.getItem('userEmail');
+
+  if (storedName) {
+    account.userName = storedName;
+    account.heroTitle = `Welcome back, ${storedName.split(' ')[0]}`;
+    account.avatar = getInitials(storedName) || account.avatar;
+  }
+
+  if (storedEmail) {
+    let hasEmail = false;
+    account.profileItems = account.profileItems.map(item => {
+      if (item[0] === 'Email') {
+        hasEmail = true;
+        return ['Email', storedEmail];
+      }
+      return item;
+    });
+    if (!hasEmail) {
+      account.profileItems.unshift(['Email', storedEmail]);
+    }
+  }
+
+  const topbarAvatarEl = document.getElementById('topbar-avatar');
+  const topbarNameEl = document.getElementById('topbar-username');
+  const topbarRoleEl = document.getElementById('topbar-userrole');
+  const heroTitleEl = document.querySelector('.hero h2');
+  const heroSubtitleEl = document.querySelector('.hero p');
+  const avatarEl = document.querySelector('.profile-card .profile-avatar');
+  const profileNameEl = document.getElementById('profile-name');
+  const profileRoleEl = document.getElementById('profile-role');
+  const profileInfoEl = document.getElementById('profile-info');
+
+  if (topbarAvatarEl) topbarAvatarEl.textContent = account.avatar;
+  if (topbarNameEl) topbarNameEl.textContent = account.userName;
+  if (topbarRoleEl) topbarRoleEl.textContent = account.userRole;
+  if (heroTitleEl) heroTitleEl.textContent = account.heroTitle;
+  if (heroSubtitleEl) heroSubtitleEl.textContent = account.heroSubtitle;
+  if (avatarEl) avatarEl.textContent = account.avatar;
+  if (profileNameEl) profileNameEl.textContent = account.userName;
+  if (profileRoleEl) profileRoleEl.textContent = account.userRole;
+
+  if (profileInfoEl) {
+    profileInfoEl.innerHTML = account.profileItems.map(item =>
+      `<div class="info-row"><span class="info-label">${item[0]}</span><span class="info-val">${item[1]}</span></div>`
+    ).join('');
+  }
+}
+
+// ──────────────── BUILDERS ────────────────
+function renderPetAvatar(p) {
+  return p.img ? `<img src="${p.img}" alt="${p.name}" class="pet-avatar-img">` : '';
+}
+
+function buildAppts(search='') {
+  const query = search.trim().toLowerCase();
+  document.getElementById('appt-list').innerHTML = appts.filter(a => {
+    const p = pets.find(x => x.id === a.petId) || {};
+    const text = `${p.name} ${p.breed} ${a.type} ${a.time}`.toLowerCase();
+    return !query || text.includes(query);
+  }).map(a => {
+    const p = pets.find(x => x.id === a.petId);
+    return `<div class="appt-item" onclick="openPet('${p.id}')">
+      <span class="appt-time">${a.time}</span>
+      <div class="pet-thumb">${renderPetAvatar(p)}</div>
+      <div class="appt-info">
+        <div class="appt-name">${p.name}</div>
+        <div class="appt-breed">${p.breed} · ${p.age}</div>
+      </div>
+      <span class="badge ${a.bc}">${a.type}</span>
+    </div>`;
+  }).join('');
+}
+
+function buildReminders() {
+  const bcMap = {
+    'b-blue':'#EFF6FF','b-red':'#FEF2F2','b-orange':'#FFFBEB'
+  };
+  document.getElementById('reminders').innerHTML = reminders.map(r => `
+    <div class="reminder">
+      <div class="rem-ico" style="background:${bcMap[r.bc]||'#F3F4F6'}">${r.ico}</div>
+      <div style="flex:1;min-width:0">
+        <div class="rem-title">${r.title}</div>
+        <div class="rem-date">${r.date}</div>
+      </div>
+      <span class="rem-status badge ${r.bc}">${r.status}</span>
+    </div>`).join('');
+}
+
+function buildPetsGrid(search='') {
+  const vcBc = {
+    'Up to date':'b-green','Next':'b-blue','Pending':'b-orange'
+  };
+  const query = search.trim().toLowerCase();
+  document.getElementById('pets-grid').innerHTML = pets.filter(p => {
+    const text = `${p.name} ${p.breed} ${p.owner} ${p.notes}`.toLowerCase();
+    return !query || text.includes(query);
+  }).map(p => `
+    <div class="pet-card" onclick="openPet('${p.id}')">
+      <div class="emo">${renderPetAvatar(p)}</div>
+      <div class="pname">${p.name}</div>
+      <div class="pbreed">${p.breed}</div>
+      <div class="pbreed">${p.age}</div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge ${vcBc[p.vaccine]||'b-orange'}">${p.vaccine}</span>
+        <span class="badge ${p.affiliated?'b-green':'b-red'}">${p.affiliated?'Affiliated':'Not affiliated'}</span>
+      </div>
+    </div>`).join('');
+}
+
+function buildPetOptions() {
+  const select = document.getElementById('f-pet');
+  if (!select) return;
+  select.innerHTML = `<option value="">Select pet...</option>` + pets.map(p =>
+    `<option value="${p.id}">${p.name} – ${p.breed}</option>`
+  ).join('');
+}
+
+function applySearch() {
+  const query = document.getElementById('top-search')?.value || '';
+  buildPetsGrid(query);
+  buildAppts(query);
+}
+
+function newPet() {
+  const name = prompt('Pet name');
+  if (!name) return;
+  const breed = prompt('Pet breed');
+  if (!breed) return;
+  const id = name.trim().toLowerCase().replace(/\s+/g,'-') + '-' + Date.now();
+  pets.push({
+    id,
+    name: name.trim(),
+    img:'assets/dogd.png',
+    breed: breed.trim(),
+    age:'Unknown',
+    weight:'Unknown',
+    type:'Pet',
+    color:'Unknown',
+    owner:'New owner',
+    phone:'Unknown',
+    lastVisit:'N/A',
+    nextVisit:'N/A',
+    vaccine:'Pending',
+    notes:'Newly affiliated pet. Complete medical history soon.',
+    affiliated:true,
+    medicalRecords:[],
+    prescriptions:[],
+    privateNotes:[],
+    appts:[]
+  });
+  buildPetsGrid();
+  buildPetOptions();
+  alert('Pet successfully affiliated and registered.');
+}
+
+// ──────────────── CALENDAR ────────────────
+function buildCal() {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('cal-title').textContent = `${MONTHS[m]} ${y}`;
+  const first = new Date(y, m, 1);
+  const last  = new Date(y, m+1, 0);
+  const startDay = (first.getDay() + 6) % 7; // Mon = 0
+  const apptDays = [9, 10, 13, 15, 21, 25, 30];
+  const today = new Date(2025, 4, 21);
+  let html = '';
+  for (let i = 0; i < startDay; i++) html += `<div class="day empty"></div>`;
+  for (let d = 1; d <= last.getDate(); d++) {
+    const isToday = d === today.getDate() && m === today.getMonth() && y === today.getFullYear();
+    const hasA = apptDays.includes(d);
+    html += `<div class="day${isToday?' today':''}${hasA?' has-appt':''}">${d}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML = html;
+  buildTimeline();
+}
+
+function buildTimeline() {
+  const hours = [8,9,10,11,12,13,14,15,16];
+  document.getElementById('timeline').innerHTML = hours.map(h => {
+    const evs = tlEvents[h];
+    const evHTML = evs
+      ? evs.map(e => `<div class="tl-ev ${e.cls}">${e.label}</div>`).join('')
+      : `<div class="tl-empty"></div>`;
+    return `<div class="tl-row">
+      <span class="tl-hour">${h}:00</span>
+      <div class="tl-events">${evHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+function changeMonth(d) { calDate = new Date(calDate.getFullYear(), calDate.getMonth()+d, 1); buildCal(); }
+function goToday()      { calDate = new Date(2025, 4, 21); buildCal(); }
+
+// ──────────────── PET DETAIL ────────────────
+function openPet(id) {
+  const p = pets.find(x => x.id === id);
+  const vcBc = {'Up to date':'b-green','Next':'b-blue','Pending':'b-orange'};
+  const recordsHtml = p.medicalRecords.map(r => `
+      <div class="info-row"><span class="info-label">${r.date}</span><span class="info-val">${r.summary}</span></div>
+    `).join('') || `<p style="font-size:13px;color:#6B7280">No medical records available.</p>`;
+  const prescriptionHtml = p.prescriptions.length ? p.prescriptions.map(r => `
+      <div class="info-row"><span class="info-label">${r.date}</span><span class="info-val">${r.medicine} — ${r.instructions}</span></div>
+    `).join('') : `<p style="font-size:13px;color:#6B7280">No prescriptions have been added yet.</p>`;
+  const privateNotesHtml = p.privateNotes.length ? p.privateNotes.map(n => `
+      <div class="info-row"><span class="info-label">${n.date}</span><span class="info-val">${n.note}</span></div>
+    `).join('') : `<p style="font-size:13px;color:#6B7280">No private notes yet.</p>`;
+  document.getElementById('pet-detail').innerHTML = `
+    <div class="pet-profile-card">
+      <div class="pet-big-emo">${renderPetAvatar(p)}</div>
+      <div>
+        <div style="font-size:19px;font-weight:700">${p.name}</div>
+        <div style="font-size:13px;color:#6B7280">${p.breed} · ${p.age} · ${p.weight}</div>
+        <div class="pet-tags">
+          <span class="pet-tag">${p.type}</span>
+          <span class="pet-tag">Color: ${p.color}</span>
+          <span class="badge ${vcBc[p.vaccine]||'b-orange'}">${p.vaccine}</span>
+          <span class="badge ${p.affiliated?'b-green':'b-red'}">${p.affiliated?'Affiliated':'Not affiliated'}</span>
+        </div>
+      </div>
+    </div>
+    <div class="info2">
+      <div class="info-card">
+        <h3>Owner</h3>
+        <div class="info-row"><span class="info-label">Name</span><span class="info-val">${p.owner}</span></div>
+        <div class="info-row"><span class="info-label">Phone</span><span class="info-val">${p.phone}</span></div>
+      </div>
+      <div class="info-card">
+        <h3>History</h3>
+        <div class="info-row"><span class="info-label">Last visit</span><span class="info-val">${p.lastVisit}</span></div>
+        <div class="info-row"><span class="info-label">Next appointment</span><span class="info-val">${p.nextVisit}</span></div>
+      </div>
+    </div>
+    <div class="section-card" style="margin-bottom:12px">
+      <div class="section-header"><span class="section-title">Medical records</span></div>
+      ${recordsHtml}
+    </div>
+    <div class="section-card" style="margin-bottom:12px">
+      <div class="section-header"><span class="section-title">Prescriptions</span></div>
+      ${prescriptionHtml}
+      <div style="margin-top:12px">
+        <div class="form-group">
+          <label>Prescription details</label>
+          <textarea id="new-prescription" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px;min-height:80px;resize:vertical" placeholder="Example: Amoxicillin 250 mg, twice daily for 7 days."></textarea>
+        </div>
+        <button class="btn-submit" onclick="savePrescription('${p.id}')">Save prescription</button>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-header"><span class="section-title">Private veterinarian notes</span></div>
+      ${privateNotesHtml}
+      <div style="margin-top:12px">
+        <div class="form-group">
+          <label>Note for veterinarian</label>
+          <textarea id="new-private-note" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px;min-height:80px;resize:vertical" placeholder="Example: Follow up after surgery in 2 weeks."></textarea>
+        </div>
+        <button class="btn-submit" onclick="savePrivateNote('${p.id}')">Save note</button>
+      </div>
+    </div>`;
+  document.getElementById('page-title').textContent = p.name;
+  showView('pet');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+}
+
+// ──────────────── NAVIGATION ────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + name);
+  if (el) el.classList.add('active');
+}
+
+function nav(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.querySelector(`[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+  const titles = {dash:'Dashboard', calendar:'Calendar', pets:'Pets', forum:'Forum', profile:'Profile'};
+  document.getElementById('page-title').textContent = titles[page] || '';
+  if (page === 'dash')           showView('dash');
+  else if (page === 'calendar')  { showView('calendar'); initFullCal(); }
+  else if (page === 'pets')      { showView('pets'); buildPetsGrid(); }
+  else if (page === 'forum')     { showView('forum'); initForum(); }
+  else if (page === 'profile')   showView('profile');
+}
+
+// ──────────────── FULL CALENDAR ────────────────
+let fcDate = new Date(2025, 4, 21);
+let mcDate = new Date(2025, 4, 21);
+let selectedDay = 21;
+let calFilterMode = 'today';
+
+// All appointments (expandable – this replaces the DB later)
+let allAppts = [
+  {id:1, petId:'max',   date:'2025-05-21', time:'09:00', type:'Vaccination',  color:'blue',   vet:'AR'},
+  {id:2, petId:'luna',  date:'2025-05-21', time:'10:00', type:'Consultation',    color:'green',  vet:'AL'},
+  {id:3, petId:'rocky', date:'2025-05-21', time:'11:00', type:'Review',    color:'orange', vet:'AR'},
+  {id:4, petId:'milo',  date:'2025-05-21', time:'13:00', type:'Vaccination',  color:'blue',   vet:'AR'},
+  {id:5, petId:'max',   date:'2025-05-25', time:'09:00', type:'Dermatology check',     color:'purple', vet:'AL'},
+  {id:6, petId:'luna',  date:'2025-05-25', time:'11:00', type:'Deworming', color:'orange', vet:'AR'},
+  {id:7, petId:'rocky', date:'2025-05-30', time:'10:00', type:'Vaccination',  color:'blue',   vet:'AL'},
+];
+
+function fmtTime(t){ const [h,m]=t.split(':'); const hr=parseInt(h); return `${hr>12?hr-12:hr||12}:${m} ${hr>=12?'PM':'AM'}`; }
+function fmtDateLabel(d){ const days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']; const ms=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER']; return `${days[d.getDay()]} ${d.getDate()} ${ms[d.getMonth()]}`; }
+function dateKey(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function getFilteredAppts(){
+  const today = dateKey(new Date(2025,4,21));
+  const tomorrow = dateKey(new Date(2025,4,22));
+  const typeF = document.getElementById('filter-type')?.value || '';
+  const vetF  = document.getElementById('filter-vet')?.value  || '';
+  return allAppts.filter(a => {
+    if(calFilterMode==='today' && a.date!==today) return false;
+    if(calFilterMode==='tomorrow' && a.date!==tomorrow) return false;
+    const selDate = `${fcDate.getFullYear()}-${String(fcDate.getMonth()+1).padStart(2,'0')}-${String(selectedDay).padStart(2,'0')}`;
+    if(calFilterMode==='all' && a.date!==selDate) return false;
+    if(typeF && a.type!==typeF) return false;
+    if(vetF  && a.vet!==vetF)  return false;
+    return true;
+  });
+}
+
+function buildFCSchedule(){
+  const hours = [8,9,10,11,12,13,14,15,16,17];
+  const filtered = getFilteredAppts();
+  const byHour = {};
+  filtered.forEach(a=>{ const h=parseInt(a.time.split(':')[0]); if(!byHour[h]) byHour[h]=[]; byHour[h].push(a); });
+
+  document.getElementById('fc-schedule').innerHTML = hours.map(h=>{
+    const events = byHour[h]||[];
+    const isCurrent = h===11;
+    const evHTML = events.map(a=>{
+      const p=pets.find(x=>x.id===a.petId);
+      return `<div class="appt-block color-${a.color}">
+        <div class="appt-pet-emo">${renderPetAvatar(p)}</div>
+        <div class="appt-block-info">
+          <div class="appt-block-name">${p.name}</div>
+          <div class="appt-block-sub">${p.breed} · ${p.age}</div>
+        </div>
+        <div class="appt-block-right">
+          <div class="appt-block-time">${fmtTime(a.time)}</div>
+          <div class="appt-block-type">${a.type}</div>
+        </div>
+        <div class="appt-block-menu" title="Opciones">⋮</div>
+      </div>`;
+    }).join('');
+    return `<div class="schedule-row">
+      <div class="schedule-hour">${fmtTime(h+':00')}</div>
+      <div class="schedule-slot${isCurrent?' current-hour':''}">
+        ${evHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  // update day label
+  const selDate = calFilterMode==='tomorrow' ? new Date(2025,4,22) : new Date(fcDate.getFullYear(), fcDate.getMonth(), selectedDay);
+  document.getElementById('fc-day-label').textContent = fmtDateLabel(selDate);
+  buildFCUpcoming();
+}
+
+function buildFCUpcoming(){
+  const upcoming = allAppts.slice().sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time)).slice(0,6);
+  document.getElementById('fc-upcoming').innerHTML = upcoming.map(a=>{
+    const p=pets.find(x=>x.id===a.petId);
+    const [,m,d]=a.date.split('-');
+    return `<div class="upcoming-item">
+      <div class="up-emo">${renderPetAvatar(p)}</div>
+      <div class="upcoming-info">
+        <div class="upcoming-name">${p.name}</div>
+        <div class="upcoming-type">${a.type}</div>
+      </div>
+      <div class="upcoming-date">${d} ${MONTHS[parseInt(m)-1].slice(0,3)}<br>${fmtTime(a.time)}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildFCMonthNav(){
+  const prev = new Date(fcDate.getFullYear(), fcDate.getMonth()-1, 1);
+  const next = new Date(fcDate.getFullYear(), fcDate.getMonth()+1, 1);
+  document.getElementById('fc-prev-label').textContent = MONTHS[prev.getMonth()].slice(0,3).toUpperCase();
+  document.getElementById('fc-cur-label').textContent  = MONTHS[fcDate.getMonth()].slice(0,3).toUpperCase();
+  document.getElementById('fc-next-label').textContent = MONTHS[next.getMonth()].slice(0,3).toUpperCase();
+}
+
+function buildMiniCal(){
+  const y=mcDate.getFullYear(), m=mcDate.getMonth();
+  document.getElementById('mc-title').textContent = `${MONTHS[m]} ${y}`;
+  const first=new Date(y,m,1), last=new Date(y,m+1,0);
+  const startDay=(first.getDay()+6)%7;
+  const apptDays=new Set(allAppts.filter(a=>{ const [ay,am]=a.date.split('-'); return parseInt(ay)===y&&parseInt(am)-1===m; }).map(a=>parseInt(a.date.split('-')[2])));
+  let html='';
+  for(let i=0;i<startDay;i++) html+=`<div class="mday mempty"></div>`;
+  for(let d=1;d<=last.getDate();d++){
+    const isTd=d===21&&m===4&&y===2025;
+    const isSel=d===selectedDay&&m===mcDate.getMonth()&&y===mcDate.getFullYear();
+    const hasA=apptDays.has(d);
+    html+=`<div class="mday${isTd?' mtoday':''}${isSel&&!isTd?' mselected':''}${hasA?' mhas-appt':''}" onclick="selectDay(${d})">${d}</div>`;
+  }
+  document.getElementById('mc-days').innerHTML=html;
+}
+
+function selectDay(d){
+  selectedDay=d;
+  fcDate=new Date(mcDate.getFullYear(),mcDate.getMonth(),d);
+  calFilterMode='all';
+  document.querySelectorAll('.cal-filter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('filt-all').classList.add('active');
+  buildMiniCal();
+  buildFCSchedule();
+}
+
+function fcChangeMonth(dir){
+  fcDate=new Date(fcDate.getFullYear(),fcDate.getMonth()+dir,1);
+  mcDate=new Date(fcDate);
+  selectedDay=1;
+  buildFCMonthNav();
+  buildMiniCal();
+  buildFCSchedule();
+}
+
+function mcChangeMonth(dir){
+  mcDate=new Date(mcDate.getFullYear(),mcDate.getMonth()+dir,1);
+  buildMiniCal();
+}
+
+function calFilter(mode){
+  calFilterMode=mode;
+  document.querySelectorAll('.cal-filter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('filt-'+mode).classList.add('active');
+  buildFCSchedule();
+}
+
+function applyFilters(){ buildFCSchedule(); }
+
+function initFullCal(){
+  buildFCMonthNav();
+  buildMiniCal();
+  buildFCSchedule();
+}
+
+// ──────────────── MODAL ────────────────
+function openModal(){
+  buildPetOptions();
+  const today=new Date(2025,4,21);
+  document.getElementById('f-date').value=`2025-05-21`;
+  document.getElementById('f-time').value='09:00';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModalOutside(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+
+function saveAppt(){
+  const petId=document.getElementById('f-pet').value;
+  const date=document.getElementById('f-date').value;
+  const time=document.getElementById('f-time').value;
+  const type=document.getElementById('f-type').value;
+  const vet=document.getElementById('f-vet').value;
+  if(!petId||!date||!time||!type){ alert('Please complete all required fields.'); return; }
+  const colors={Vaccination:'blue',Consultation:'green',Review:'orange','Dermatology check':'purple',Deworming:'orange'};
+  const newA={id:Date.now(),petId,date,time,type,color:colors[type]||'blue',vet};
+  allAppts.push(newA);
+  closeModal();
+  buildFCSchedule();
+  buildMiniCal();
+  // also refresh dashboard appts
+  buildAppts();
+  alert(`✅ Appointment saved:\n${type} – ${time.replace(':',':')} on ${date}`);
+}
+
+// ──────────────── FORUM ────────────────
+let forumPosts = [
+  {id:1, author:'Dr. Ana López', role:'Veterinarian', clinic:'Happy Paws Veterinary Clinic', initials:'AL', color:'#3B82F6', time:'2h ago', badge:'vet', badgeLabel:'Veterinary Tip', type:'tip',
+    title:'What to do if your dog has a minor cut?',
+    body:'Minor cuts are common in dogs, especially during walks or outdoor play. Here are the basic steps you can take at home to keep your pet safe.',
+    img:'🐕', warning:'For emergencies or severe symptoms, contact your veterinarian immediately.', likes:128, comments:24, petFilter:'dog', topic:'health', saved:false, liked:false},
+  {id:2, author:'María González', role:'Bruno\'s owner', clinic:'Community', initials:'MG', color:'#10B981', time:'3h ago', badge:'community', badgeLabel:'Community', type:'community',
+    title:'Meet Bruno! 🐾',
+    body:'Today we celebrate Bruno\'s 1st birthday. He is the most energetic and loving companion! Grateful for every moment with him 💙\n#BrunoTheCorgi',
+    img:'🦮', likes:95, comments:18, petFilter:'dog', topic:'all', saved:false, liked:false},
+  {id:3, author:'Dr. Carlos Ramírez', role:'Veterinarian', clinic:'Paws & Claws Clinic', initials:'CR', color:'#8B5CF6', time:'5h ago', badge:'vet', badgeLabel:'Veterinary Tip', type:'tip',
+    title:'Signs of dehydration in pets',
+    body:'Recognizing dehydration early can save your pet\'s life. The main signs include: skin that loses elasticity, dry gums, sunken eyes, and lethargy. Always keep fresh water available.',
+    img:'💧', likes:210, comments:37, petFilter:'all', topic:'health', saved:false, liked:false},
+  {id:4, author:'Laura Martínez', role:'Michi\'s owner', clinic:'Community', initials:'LM', color:'#F59E0B', time:'6h ago', badge:'community', badgeLabel:'Community', type:'community',
+    title:'Nutrition tip 🥩',
+    body:'Wet food or dry food for your cat? Both have benefits. Wet food helps with hydration, while dry food supports dental health. The ideal option is to combine them. Share your experience!',
+    img:'🐈', likes:67, comments:12, petFilter:'cat', topic:'nutrition', saved:false, liked:false},
+];
+
+let forumFilter = {tab:'all', section:'all', pet:'all', topic:'all'};
+let composeType = 'post';
+let composeImageData = null;
+
+const trendingTips = [
+  'Signs of dehydration in pets',
+  'How to brush your dog\'s teeth',
+  'Is wet food better than dry food?',
+  'Flea prevention in summer',
+  'When to spay or neuter your pet',
+];
+
+function buildTrending(){
+  document.getElementById('trending-list').innerHTML = trendingTips.map((t,i)=>`
+    <div class="trending-item">
+      <div class="trending-num">${i+1}</div>
+      <span class="trending-text">${t}</span>
+    </div>`).join('');
+}
+
+function buildPosts(){
+  let posts = forumPosts.slice();
+  if(forumFilter.tab==='vet')       posts=posts.filter(p=>p.badge==='vet');
+  if(forumFilter.tab==='community') posts=posts.filter(p=>p.badge==='community');
+  if(forumFilter.tab==='events')    posts=posts.filter(p=>p.badge==='event');
+  if(forumFilter.pet!=='all')       posts=posts.filter(p=>p.petFilter===forumFilter.pet||p.petFilter==='all');
+  if(forumFilter.topic!=='all')     posts=posts.filter(p=>p.topic===forumFilter.topic||p.topic==='all');
+
+  const badgeMap={vet:'pb-vet',community:'pb-community',event:'pb-event'};
+
+  document.getElementById('posts-container').innerHTML = posts.map(p=>{
+    const hasImg = p.img;
+    return `<div class="post-card" id="post-${p.id}">
+      <div class="post-header">
+        <div class="post-avatar" style="background:${p.color}">${p.initials}</div>
+        <div>
+          <div class="post-author-name">${p.author} ${p.badge==='vet'?'✓':''}
+            <span class="post-badge ${badgeMap[p.badge]||'pb-community'}">${p.badgeLabel}</span>
+          </div>
+          <div class="post-meta">${p.clinic} · ${p.time}</div>
+        </div>
+        <button class="post-menu" onclick="postMenu(${p.id})">⋮</button>
+      </div>
+      ${hasImg?`<div class="post-img">${p.img}</div>`:''}
+      <div class="post-body">
+        <strong>${p.title}</strong>
+        ${p.body.replace(/\n/g,'<br>')}
+      </div>
+      ${p.warning?`<div class="post-warning">⚠️ <span>${p.warning}</span></div>`:''}
+      ${p.hashtag?`<div class="post-tag">${p.hashtag}</div>`:''}
+      <div class="post-footer">
+        <button class="post-action${p.liked?' liked':''}" onclick="toggleLike(${p.id})">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          <span id="likes-${p.id}">${p.likes}</span>
+        </button>
+        <button class="post-action" onclick="toggleComments(${p.id})">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          ${p.comments}
+        </button>
+        <button class="post-action post-action-save${p.saved?' liked':''}" onclick="toggleSave(${p.id})">
+          <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          ${p.saved?'Saved':'Save'}
+        </button>
+        <button class="post-action" onclick="sharePost(${p.id})">
+          <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+      </div>
+      <div id="comments-${p.id}" style="display:none;margin-top:10px;border-top:1px solid #F3F4F6;padding-top:10px">
+        <div style="font-size:12px;color:#6B7280;margin-bottom:8px">Comments</div>
+        <div id="comments-list-${p.id}"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <div class="compose-avatar" style="width:28px;height:28px;font-size:11px">AR</div>
+          <input type="text" placeholder="Write a comment..." style="flex:1;border:1px solid #E5E7EB;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;font-family:inherit" id="comment-input-${p.id}" onkeydown="if(event.key==='Enter')addComment(${p.id})"/>
+          <button onclick="addComment(${p.id})" style="padding:6px 12px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">Send</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleLike(id){
+  const p=forumPosts.find(x=>x.id===id);
+  p.liked=!p.liked; p.likes+=p.liked?1:-1;
+  const btn=document.querySelector(`#post-${id} .post-action`);
+  btn.classList.toggle('liked',p.liked);
+  document.getElementById(`likes-${id}`).textContent=p.likes;
+}
+
+function toggleSave(id){
+  const p=forumPosts.find(x=>x.id===id); p.saved=!p.saved;
+  buildPosts();
+}
+
+function sharePost(id){
+  navigator.clipboard?.writeText(window.location.href+'#post-'+id).catch(()=>{});
+  alert('Link copied to clipboard! 🔗');
+}
+
+function postMenu(id){
+  const options=['Report post','Hide post','Copy link'];
+  alert('Options:\n'+options.join('\n'));
+}
+
+function toggleComments(id){
+  const el=document.getElementById(`comments-${id}`);
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function addComment(id){
+  const input=document.getElementById(`comment-input-${id}`);
+  const text=input.value.trim(); if(!text) return;
+  const list=document.getElementById(`comments-list-${id}`);
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;gap:8px;margin-bottom:8px;align-items:flex-start';
+  div.innerHTML=`<div class="compose-avatar" style="width:26px;height:26px;font-size:10px;flex-shrink:0">AR</div>
+    <div style="background:#F9FAFB;border-radius:8px;padding:6px 10px;flex:1">
+      <div style="font-size:11px;font-weight:600;margin-bottom:2px">Dr. Albert Ramírez</div>
+      <div style="font-size:12px;color:#374151">${text}</div>
+    </div>`;
+  list.appendChild(div);
+  const p=forumPosts.find(x=>x.id===id); p.comments++;
+  input.value='';
+}
+
+function setFeedTab(el, tab){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active'); forumFilter.tab=tab; buildPosts();
+}
+
+function setForumSection(el, section){
+  document.querySelectorAll('.fl-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active'); forumFilter.section=section;
+}
+
+function setPetFilter(el, pet){
+  document.querySelectorAll('.fl-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active'); forumFilter.pet=pet; buildPosts();
+}
+
+function setTopicFilter(el, topic){
+  document.querySelectorAll('.fl-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active'); forumFilter.topic=topic; buildPosts();
+}
+
+function autoResize(el){ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+
+function handleImageUpload(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    composeImageData=ev.target.result;
+    document.getElementById('img-preview-area').innerHTML=`
+      <div style="position:relative;margin-top:8px">
+        <img src="${ev.target.result}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid #E5E7EB"/>
+        <button onclick="removeImage()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;font-size:14px;cursor:pointer;line-height:1">×</button>
+      </div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage(){ composeImageData=null; document.getElementById('img-preview-area').innerHTML=''; }
+
+function submitPost(){
+  const text=document.getElementById('compose-text').value.trim();
+  if(!text){ alert('Write something before posting.'); return; }
+  const types={tip:{badge:'vet',badgeLabel:'Veterinary Tip'},event:{badge:'event',badgeLabel:'Event'},poll:{badge:'community',badgeLabel:'Poll'},post:{badge:'community',badgeLabel:'Community'}};
+  const t=types[composeType]||types.post;
+  const newPost={
+    id:Date.now(), author:'Dr. Albert Ramírez', role:'Veterinarian', clinic:'Happy Paws Clinic',
+    initials:'AR', color:'linear-gradient(135deg,#667eea,#764ba2)', time:'Just now',
+    badge:t.badge, badgeLabel:t.badgeLabel, type:composeType,
+    title:text.split('\n')[0].substring(0,60),
+    body:text, img:composeImageData?'📷':'',
+    likes:0, comments:0, petFilter:'all', topic:'all', saved:false, liked:false
+  };
+  forumPosts.unshift(newPost);
+  document.getElementById('compose-text').value='';
+  removeImage(); composeType='post';
+  forumFilter.tab='all';
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.ftab').classList.add('active');
+  buildPosts();
+  document.getElementById('forum-feed').scrollTo({top:0,behavior:'smooth'});
+}
+
+function openForumPost(){
+  document.getElementById('compose-text').focus();
+  document.getElementById('forum-feed').scrollTo({top:0,behavior:'smooth'});
+}
+
+function showComingSoon(key){
+  alert('Coming soon! This feature will be available in the next version.');
+}
+
+function savePrescription(petId){
+  const text = document.getElementById('new-prescription')?.value.trim();
+  if(!text){ alert('Enter the prescription details.'); return; }
+  const p = pets.find(x=>x.id===petId);
+  p.prescriptions.unshift({date:new Date().toLocaleDateString(), medicine:text.split('.')[0] || text, instructions:text});
+  openPet(petId);
+}
+
+function savePrivateNote(petId){
+  const text = document.getElementById('new-private-note')?.value.trim();
+  if(!text){ alert('Enter the private note.'); return; }
+  const p = pets.find(x=>x.id===petId);
+  p.privateNotes.unshift({date:new Date().toLocaleDateString(), note:text});
+  openPet(petId);
+}
+
+function initForum(){ buildTrending(); buildPosts(); }
+
+// ──────────────── INIT ────────────────
+initAccountView();
+buildAppts();
+buildReminders();
+buildCal();
+initFullCal();
+</script>
+</body>
+</html>

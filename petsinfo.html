@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poppy - Pet Info</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --blue: #2f6fed;
+    --blue-dark: #1d4fbf;
+    --yellow: #f6b93b;
+    --yellow-dark: #e8a72a;
+    --bg: #f5f7fb;
+    --card-bg: #ffffff;
+    --text-dark: #1c2b3a;
+    --text-muted: #7c8a9c;
+    --border: #e3e8f0;
+    --green: #2ecc71;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+  }
+
+  .app{
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* Sidebar */
+  .sidebar{
+    width: 320px;
+    background: linear-gradient(180deg, #eef2fb 0%, #e8edf8 100%);
+    padding: 40px 36px;
+    position: relative;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:26px;
+    font-weight:800;
+    color: var(--blue);
+    margin-bottom: 40px;
+  }
+  .logo span.accent{ color:#222; }
+
+  .heart-badge{
+    width:40px;height:40px;
+    background:#dce6fb;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:20px;
+    font-size:18px;
+    color: var(--blue);
+  }
+
+  .sidebar h1{
+    font-size:28px;
+    line-height:1.25;
+    margin: 0 0 12px 0;
+  }
+  .sidebar h1 .hl{ color: var(--blue); }
+
+  .sidebar p.sub{
+    color: var(--text-muted);
+    font-size:14.5px;
+    line-height:1.5;
+    margin-bottom:32px;
+  }
+
+  .feature{
+    display:flex;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .feature-icon{
+    width:40px;height:40px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .feature-icon.blue{ background:#dbe8ff; }
+  .feature-icon.green{ background:#d9f7e6; }
+  .feature-icon.yellow{ background:#fdeecb; }
+  .feature h3{
+    margin:0 0 3px 0;
+    font-size:15px;
+  }
+  .feature p{
+    margin:0;
+    font-size:13px;
+    color: var(--text-muted);
+    line-height:1.4;
+  }
+
+  .pets-photo{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:200px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200"><rect width="320" height="200" fill="%23dfe7f7"/></svg>') no-repeat;
+    background-size:cover;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .pets-photo .placeholder-text{
+    color:#9aa8bc;
+    font-size:13px;
+    margin-bottom:16px;
+  }
+
+  /* Main content */
+  .main{
+    flex:1;
+    padding: 40px 56px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .top-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 40px;
+  }
+
+  .back-btn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--border);
+    padding:9px 16px;
+    border-radius:10px;
+    font-size:14px;
+    color: var(--text-dark);
+    cursor:pointer;
+    transition: background .15s, transform .05s;
+  }
+  .back-btn:hover{ background:#f0f3f9; }
+  .back-btn:active{ transform: scale(0.97); }
+
+  .stepper{
+    display:flex;
+    align-items:center;
+    gap:0;
+  }
+  .step{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    position:relative;
+  }
+  .step .circle{
+    width:30px;height:30px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;
+    font-weight:600;
+    background:#e3e8f0;
+    color: var(--text-muted);
+  }
+  .step.done .circle{ background: var(--blue); color:#fff; }
+  .step.active .circle{ background: var(--blue); color:#fff; }
+  .step .label{
+    font-size:12.5px;
+    color: var(--text-muted);
+  }
+  .step.active .label, .step.done .label{ color: var(--text-dark); font-weight:600; }
+  .step-line{
+    width:70px;
+    height:3px;
+    background: var(--border);
+    margin: 0 8px 22px 8px;
+    border-radius:2px;
+  }
+  .step-line.done{ background: var(--blue); }
+
+  .help-btn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--border);
+    padding:9px 16px;
+    border-radius:10px;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .help-btn:hover{ background:#f0f3f9; }
+
+  .content-wrap{
+    flex:1;
+  }
+
+  .title-block{
+    margin-bottom: 28px;
+  }
+  .title-block h2{
+    font-size:26px;
+    margin:0 0 6px 0;
+  }
+  .title-block h2 .hl{ color: var(--blue); }
+  .title-block p{
+    margin:0;
+    color: var(--text-muted);
+    font-size:14.5px;
+  }
+
+  .form-area{
+    display:flex;
+    gap:32px;
+    align-items:flex-start;
+  }
+
+  /* Pet type card */
+  .pet-card{
+    background: var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px;
+    width:200px;
+    text-align:center;
+    flex-shrink:0;
+    position:relative;
+  }
+  .pet-avatar{
+    width:96px;height:96px;
+    border-radius:50%;
+    background:#eaf1fd;
+    display:flex;align-items:center;justify-content:center;
+    margin: 0 auto 14px auto;
+    font-size:44px;
+    position:relative;
+  }
+  .edit-pencil{
+    position:absolute;
+    top:4px;right:22px;
+    width:26px;height:26px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .pet-card h3{
+    margin:0 0 8px 0;
+    font-size:17px;
+  }
+  .change-type{
+    color: var(--blue);
+    font-size:13px;
+    cursor:pointer;
+    background:none;
+    border:none;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:0;
+  }
+  .change-type:hover{ text-decoration: underline; }
+
+  /* Form fields */
+  .fields{
+    flex:1;
+    background: var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:28px 32px;
+  }
+  .field{
+    margin-bottom:20px;
+  }
+  .field label{
+    display:block;
+    font-size:14px;
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  .field input[type="text"], .field input[type="number"]{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:14px;
+    outline:none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus{
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(47,111,237,0.12);
+  }
+  .age-row{
+    display:flex;
+    gap:10px;
+  }
+  .age-row input{ flex:1; }
+  .age-row select{
+    flex:0 0 110px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 10px;
+    font-size:14px;
+    background:#fff;
+    outline:none;
+  }
+  .gender-row{
+    display:flex;
+    gap:14px;
+  }
+  .gender-btn{
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fff;
+    font-size:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition: all .15s;
+  }
+  .gender-btn.selected{
+    border-color: var(--blue);
+    background:#eaf1fd;
+    color: var(--blue);
+    font-weight:600;
+  }
+  .gender-btn:hover{ border-color:#c3d3ef; }
+
+  .error-msg{
+    color:#e74c3c;
+    font-size:12.5px;
+    margin-top:6px;
+    display:none;
+  }
+  .field.invalid input{ border-color:#e74c3c; }
+  .field.invalid .error-msg{ display:block; }
+
+  .footer-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top: 28px;
+  }
+
+  .safe-banner{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#eaf1fd;
+    border-radius:12px;
+    padding:14px 18px;
+    flex:1;
+    margin-right:24px;
+  }
+  .safe-banner .shield{
+    width:32px;height:32px;
+    background:#d3e2fb;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .safe-banner strong{ font-size:14px; display:block; }
+  .safe-banner span.desc{ font-size:12.5px; color: var(--text-muted); }
+  .safe-banner .lock{ margin-left:auto; color:#9aa8bc; }
+
+  .continue-btn{
+    background: var(--yellow);
+    border:none;
+    padding:14px 30px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    color:#3a2a06;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+    transition: background .15s, transform .05s;
+  }
+  .continue-btn:hover{ background: var(--yellow-dark); }
+  .continue-btn:active{ transform: scale(0.97); }
+  .continue-btn:disabled{
+    opacity:0.55;
+    cursor:not-allowed;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text-dark);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:10px;
+    font-size:14px;
+    opacity:0;
+    pointer-events:none;
+    transition: all .25s ease;
+    z-index:100;
+  }
+  .toast.show{
+    opacity:1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 900px){
+    .app{ flex-direction:column; }
+    .sidebar{ width:auto; }
+    .main{ padding:24px; }
+    .form-area{ flex-direction:column; }
+    .pet-card{ width:100%; }
+    .stepper .label{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="assets/Type 2.png" alt="Doppy logo" style="max-width:160px;width:100%;height:auto;display:block;">
+    </div>
+    <div class="heart-badge">♥</div>
+    <h1>Let's give your pet the <span class="hl">best care</span> </h1>
+    <p class="sub">Tell us a bit more about your pet so we can personalize their experience.</p>
+
+    <div class="feature">
+      <div class="feature-icon blue">🐾</div>
+      <div>
+        <h3>Personalized care</h3>
+        <p>Get tailored recommendations and reminders for your pet.</p>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon green">📅</div>
+      <div>
+        <h3>Health tracking</h3>
+        <p>Keep track of their health, vaccines and important visits.</p>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon yellow">👥</div>
+      <div>
+        <h3>All in one place</h3>
+        <p>Manage everything about your pet easily and securely.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="top-bar">
+      <button class="back-btn" id="backBtn">‹ Back</button>
+
+      <div class="stepper">
+        <div class="step done" data-step="1">
+          <div class="circle">✓</div>
+          <div class="label">Pet Type</div>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step active" data-step="2">
+          <div class="circle">2</div>
+          <div class="label">Basic Info</div>
+        </div>
+      </div>
+
+      <button class="help-btn" id="helpBtn">? Need help?</button>
+    </div>
+
+    <div class="content-wrap">
+      <div class="title-block">
+        <h2>Let's get to know <span class="hl">your pet</span> 💙</h2>
+        <p>Add some basic information about your pet.</p>
+      </div>
+
+      <form class="form-area" id="petForm">
+        <div class="pet-card">
+          <div class="edit-pencil" title="Change photo">✎</div>
+          <div class="pet-avatar" id="petEmoji">🐶</div>
+          <h3 id="petTypeLabel">Dog</h3>
+          <button type="button" class="change-type" id="changeTypeBtn">⇄ Change type</button>
+        </div>
+
+        <div class="fields">
+          <div class="field" id="nameField">
+            <label for="petName">Pet's name</label>
+            <input type="text" id="petName" placeholder="e.g. Max" autocomplete="off">
+            <div class="error-msg">Please enter your pet's name.</div>
+          </div>
+
+          <div class="field" id="ageField">
+            <label for="petAge">Pet's age</label>
+            <div class="age-row">
+              <input type="number" min="0" id="petAge" placeholder="e.g. 2">
+              <select id="ageUnit">
+                <option value="years">Years</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+            <div class="error-msg">Please enter a valid age.</div>
+          </div>
+
+          <div class="field" id="breedField">
+            <label for="petBreed">Pet's breed</label>
+            <input type="text" id="petBreed" placeholder="e.g. Golden Retriever" autocomplete="off">
+            <div class="error-msg">Please enter your pet's breed.</div>
+          </div>
+
+          <div class="field">
+            <label>Pet's gender</label>
+            <div class="gender-row">
+              <button type="button" class="gender-btn selected" data-gender="male">♂ Male</button>
+              <button type="button" class="gender-btn" data-gender="female">♀ Female</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="footer-row">
+        <div class="safe-banner">
+          <div class="shield">🛡️</div>
+          <div>
+            <strong>Your pet's information is safe with us</strong>
+            <span class="desc">We use top security standards to keep their data protected.</span>
+          </div>
+          <div class="lock">🔒</div>
+        </div>
+        <button class="continue-btn" id="continueBtn" type="submit" form="petForm">Continue ›</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Supabase setup ──────────────────────────────
+  const supabaseClient = window.supabase.createClient(
+    'https://xyiebwrjkmvmcpdhenjk.supabase.co',
+    'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
+  );
+
+  // FIX: se agregan turtle y lizard para que coincida con las 6 opciones
+  // de selpetdu.html (antes solo tenía dog/cat/bird/rabbit).
+  const petTypes = {
+    dog:    { emoji: '🐶', label: 'Dog' },
+    cat:    { emoji: '🐱', label: 'Cat' },
+    bird:   { emoji: '🐦', label: 'Bird' },
+    turtle: { emoji: '🐢', label: 'Turtle' },
+    rabbit: { emoji: '🐰', label: 'Rabbit' },
+    lizard: { emoji: '🦎', label: 'Lizard' }
+  };
+  const typeKeys = Object.keys(petTypes);
+
+  // FIX: en vez de siempre arrancar en "Dog", tomamos el tipo que el
+  // usuario ya eligió en selpetdu.html (guardado en localStorage).
+  const pendingType = (localStorage.getItem('doppy_pending_pet_type') || '').toLowerCase();
+  let currentTypeIndex = typeKeys.includes(pendingType) ? typeKeys.indexOf(pendingType) : 0;
+
+  const petEmoji = document.getElementById('petEmoji');
+  const petTypeLabel = document.getElementById('petTypeLabel');
+  const changeTypeBtn = document.getElementById('changeTypeBtn');
+  const toast = document.getElementById('toast');
+
+  // Aplica el tipo inicial (ya sea el elegido antes, o "Dog" por defecto)
+  (function initPetType(){
+    const key = typeKeys[currentTypeIndex];
+    petEmoji.textContent = petTypes[key].emoji;
+    petTypeLabel.textContent = petTypes[key].label;
+  })();
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2200);
+  }
+
+  // Cycle pet type
+  changeTypeBtn.addEventListener('click', () => {
+    currentTypeIndex = (currentTypeIndex + 1) % typeKeys.length;
+    const key = typeKeys[currentTypeIndex];
+    petEmoji.textContent = petTypes[key].emoji;
+    petTypeLabel.textContent = petTypes[key].label;
+  });
+
+  // Gender selection
+  document.querySelectorAll('.gender-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  // Back button -> goes back in browser history, or shows message if none
+  document.getElementById('backBtn').addEventListener('click', () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      showToast('Going back to: Pet Type');
+    }
+  });
+
+  // Help button
+  document.getElementById('helpBtn').addEventListener('click', () => {
+    showToast('Help center: reach us at support@poppy.app');
+  });
+
+  // FIX: resuelve el id_client del dueño actual (auth -> users.auth_user_id
+  // -> users.id_client), igual que en registerdu.html y dashboarddu.html,
+  // para poder guardar la mascota con su owner_id real.
+  async function getCurrentClientId(){
+    try{
+      console.log('[Doppy][petsinfo] getCurrentClientId: pidiendo sesión...');
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      console.log('[Doppy][petsinfo] getCurrentClientId: respuesta de auth ->', { user, authError });
+      if (authError || !user) {
+        console.warn('[Doppy] No hay sesión activa todavía.', authError);
+        return null;
+      }
+      const { data, error } = await supabaseClient
+        .from('users')
+        .select('id_client')
+        .eq('auth_user_id', user.id)
+        .single();
+      console.log('[Doppy][petsinfo] getCurrentClientId: respuesta de users ->', { data, error });
+      if (error || !data) {
+        console.warn('[Doppy] No se encontró un registro en "users" para este auth_user_id.', error);
+        return null;
+      }
+      return data.id_client;
+    }catch(err){
+      console.error('[Doppy] Error obteniendo el cliente actual:', err);
+      return null;
+    }
+  }
+
+  // Form validation + submit
+  const form = document.getElementById('petForm');
+  const nameField = document.getElementById('nameField');
+  const ageField = document.getElementById('ageField');
+  const breedField = document.getElementById('breedField');
+  const petName = document.getElementById('petName');
+  const petAge = document.getElementById('petAge');
+  const petBreed = document.getElementById('petBreed');
+  const continueBtn = document.getElementById('continueBtn');
+
+  function validate(){
+    let valid = true;
+
+    if (petName.value.trim() === '') {
+      nameField.classList.add('invalid');
+      valid = false;
+    } else {
+      nameField.classList.remove('invalid');
+    }
+
+    if (petAge.value === '' || Number(petAge.value) < 0) {
+      ageField.classList.add('invalid');
+      valid = false;
+    } else {
+      ageField.classList.remove('invalid');
+    }
+
+    if (petBreed.value.trim() === '') {
+      breedField.classList.add('invalid');
+      valid = false;
+    } else {
+      breedField.classList.remove('invalid');
+    }
+
+    return valid;
+  }
+
+  // FIX: se agrega un banner de error visible en la propia página (no solo
+  // en consola), y TODO el flujo queda dentro de un único try/catch/finally
+  // para que ningún error quede atrapado silenciosamente. Cada paso imprime
+  // un marcador en consola para poder ubicar exactamente dónde se detiene
+  // si algo vuelve a fallar.
+  function showFatalError(msg){
+    console.error('[Doppy][petsinfo] ' + msg);
+    showToast('❌ ' + msg);
+    let banner = document.getElementById('doppyErrorBanner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'doppyErrorBanner';
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#fee2e2;color:#991b1b;padding:12px 20px;font-size:13px;font-weight:600;z-index:999;text-align:center;';
+      document.body.prepend(banner);
+    }
+    banner.textContent = '⚠️ ' + msg;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.log('[Doppy][petsinfo] Paso 1: submit disparado');
+
+    if (!validate()) {
+      showToast('Please fill in the required fields.');
+      return;
+    }
+
+    const gender = document.querySelector('.gender-btn.selected').dataset.gender === 'male' ? 'Male' : 'Female';
+    const ageUnit = document.getElementById('ageUnit').value === 'years' ? 'years' : 'months';
+
+    const data = {
+      type: petTypeLabel.textContent,
+      name: petName.value.trim(),
+      age: `${petAge.value} ${ageUnit}`,
+      breed: petBreed.value.trim(),
+      gender
+    };
+    console.log('[Doppy][petsinfo] Paso 2: datos validados:', data);
+
+    continueBtn.disabled = true;
+    continueBtn.textContent = 'Saving…';
+
+    try {
+      const isMale = gender === 'Male';
+      const isYears = ageUnit === 'years';
+      const petRowId = localStorage.getItem('pet_row_id');
+
+      console.log('[Doppy][petsinfo] Paso 3: resolviendo owner_id...');
+      let ownerId = null;
+      try {
+        ownerId = await getCurrentClientId();
+      } catch (ownerErr) {
+        console.error('[Doppy][petsinfo] Error resolviendo owner_id:', ownerErr);
+      }
+      console.log('[Doppy][petsinfo] Paso 4: owner_id resuelto ->', ownerId);
+
+      if (ownerId === null) {
+        showFatalError('No se encontró sesión activa. Inicia sesión antes de registrar tu mascota.');
+        return;
+      }
+
+      const petPayload = {
+        petTypes: petTypeLabel.textContent,
+        pet_name: petName.value.trim(),
+        pet_age: Number(petAge.value),
+        pet_year: isYears,
+        pet_breed: petBreed.value.trim(),
+        pet_gender: isMale,
+        owner_id: ownerId
+      };
+      console.log('[Doppy][petsinfo] Paso 5: payload listo:', petPayload);
+
+      if (petRowId) {
+        console.log('[Doppy][petsinfo] Paso 6: actualizando fila existente id=' + petRowId);
+        const { error } = await supabaseClient
+          .from('pets')
+          .update(petPayload)
+          .eq('id', petRowId);
+
+        if (error) {
+          showFatalError('Error al actualizar: ' + error.message);
+          return;
+        }
+      } else {
+        console.log('[Doppy][petsinfo] Paso 6: insertando fila nueva');
+        const { data: inserted, error } = await supabaseClient
+          .from('pets')
+          .insert([petPayload])
+          .select('id')
+          .single();
+
+        if (error) {
+          showFatalError('Error al guardar: ' + error.message);
+          return;
+        }
+
+        console.log('[Doppy][petsinfo] Paso 7: fila insertada con id=' + inserted.id);
+        localStorage.setItem('pet_row_id', inserted.id);
+      }
+
+      localStorage.removeItem('doppy_pending_pet_type');
+      showToast(`Saved! ${data.name} (${data.type}, ${data.age}, ${data.breed}, ${data.gender})`);
+      console.log('[Doppy][petsinfo] Paso 8: guardado exitoso, redirigiendo...');
+
+      setTimeout(() => {
+        window.location.href = 'logindu.html';
+      }, 900);
+
+    } catch (err) {
+      showFatalError('Error inesperado: ' + (err && err.message ? err.message : String(err)));
+    } finally {
+      continueBtn.disabled = false;
+      continueBtn.textContent = 'Continue ›';
+    }
+  });
+
+  // Clear invalid state as user types
+  [petName, petAge, petBreed].forEach(input => {
+    input.addEventListener('input', () => {
+      input.closest('.field').classList.remove('invalid');
+    });
+  });
+</script>
+
+</body>
+</html>

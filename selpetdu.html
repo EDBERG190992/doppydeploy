@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doppy — Elige el tipo de mascota</title>
+<style>
+:root{
+  --blue: #087fbc;
+  --blue-light: #eaf2ff;
+  --blue-dark: #1c4fb8;
+  --yellow: #f5a623;
+  --yellow-dark: #e0941a;
+  --text-dark: #1c2b3a;
+  --text-gray: #6b7a8d;
+  --border: #e4e9f0;
+  --green: #22c08a;
+  --green-light: #e3f9f1;
+  --purple-light: #efeaff;
+  --cream-light: #fdf3e2;
+  --teal-light: #e2f6f2;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background:#dfe7f0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  color:var(--text-dark);
+}
+
+.wizard{
+  display:flex;
+  width:100%;
+  max-width:1400px;
+  min-height:720px;
+  background:#fff;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 30px 60px rgba(20,40,80,0.15);
+  align-items:stretch;
+}
+
+/* ============ PANEL IZQUIERDO ============ */
+.side-panel{
+  width:340px;
+  flex-shrink:0;
+  background:#f4f7fb;
+  padding:28px 24px;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:800;
+  color:var(--blue);
+  display:flex;
+  align-items:center;
+  gap:2px;
+  margin-bottom:36px;
+}
+.logo img{
+  width:250px;
+  height:200px;
+  object-fit:cover;
+  object-position:center;
+}
+.logo-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--yellow);
+  display:inline-block;
+  margin-right:4px;
+}
+.logo-text{color:var(--blue);}
+
+.heart-icon{
+  color:var(--blue);
+  font-size:20px;
+  display:inline-block;
+  margin-bottom:10px;
+}
+
+.side-heading h1{
+  font-size:26px;
+  line-height:1.3;
+  font-weight:800;
+  color:var(--text-dark);
+  margin-bottom:14px;
+}
+.side-heading .highlight{color:var(--blue);}
+
+.side-sub{
+  color:var(--text-gray);
+  font-size:14.5px;
+  line-height:1.5;
+  margin-bottom:28px;
+}
+
+.benefits{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.benefits li{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+.benefit-icon{
+  width:38px;height:38px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+  flex-shrink:0;
+}
+.icon-blue{background:var(--blue-light);}
+.icon-green{background:var(--green-light);}
+.icon-yellow{background:var(--cream-light);}
+.benefits strong{font-size:14.5px;color:var(--text-dark);}
+.benefits p{font-size:13px;color:var(--text-gray);line-height:1.4;margin-top:2px;}
+
+.side-illustration{
+  margin-top:auto;
+  position:relative;
+  height:180px;
+  border-radius:20px;
+  background:linear-gradient(180deg,#cfe0f7 0%, #b9d3f2 100%);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:6px;
+  overflow:hidden;
+}
+.illustration-blob{
+  position:absolute;
+  inset:0;
+}
+.pet-emoji{
+  font-size:110px;
+  line-height:1;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+}
+.cat-emoji{font-size:90px;margin-bottom:4px;}
+
+/* ============ PANEL DERECHO ============ */
+.main-panel{
+  flex:1;
+  padding:40px 56px 40px;
+  overflow-y:auto;
+}
+
+.top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:36px;
+  gap:16px;
+  margin-left:-24px;
+}
+
+.back-btn, .help-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#fff;
+  font-size:14px;
+  font-weight:600;
+  color:var(--text-dark);
+  cursor:pointer;
+  white-space:nowrap;
+}
+.back-btn:hover, .help-btn:hover{background:#f5f7fa;}
+.back-btn svg{
+  width:16px;
+  height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.help-btn span:first-child{
+  width:18px;height:18px;border-radius:50%;
+  border:1.5px solid var(--text-gray);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;
+}
+
+.stepper{
+  list-style:none;
+  display:flex;
+  align-items:flex-start;
+  gap:0;
+  flex:1;
+  justify-content:center;
+  max-width:500px;
+  margin-left:-36px;
+}
+.step{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  position:relative;
+  flex:1;
+}
+.step:not(:last-child)::after{
+  content:'';
+  position:absolute;
+  top:16px;
+  left:calc(50% + 20px);
+  right:calc(-50% + 20px);
+  height:2px;
+  background:var(--border);
+}
+.step-circle{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:#eef1f6;
+  color:var(--text-gray);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;
+  border:1px solid var(--border);
+}
+.step-label{font-size:12.5px;color:var(--text-gray);font-weight:600;}
+.step.active .step-circle{background:var(--blue);color:#fff;border-color:var(--blue);}
+.step.active .step-label{color:var(--text-dark);}
+
+.title{
+  font-size:30px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+.title .highlight{color:var(--blue);}
+.subtitle{
+  color:var(--text-gray);
+  font-size:15px;
+  margin-bottom:28px;
+}
+
+.pet-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+  margin-bottom:24px;
+}
+
+.pet-card{
+  position:relative;
+  border:2px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:22px 20px 24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  cursor:pointer;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .1s ease;
+  background:#c0eaff;
+}
+.pet-card:hover{
+  border-color:#c7d8f5;
+  transform:translateY(-2px);
+}
+.pet-card input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.pet-card:has(input:checked){
+  border-color:#087fbc;
+  box-shadow:0 8px 20px rgba(8,127,188,0.15);
+}
+
+.pet-visual{
+  width:120px;height:120px;
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:64px;
+  margin-bottom:16px;
+  position: hidden;
+}
+.visual-dog{background:transparent;border-radius:16px;}
+.visual-cat{background:transparent;border-radius:50%;}
+.visual-bird{background:transparent;border-radius:50%;}
+.visual-turtle{background:transparent;border-radius:50%;}
+.visual-rabbit{background:transparent;border-radius:50%;}
+.visual-lizard{background:transparent;border-radius:50%;}
+
+.pet-name{font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:6px;}
+.pet-desc{font-size:13.5px;color:var(--text-gray);line-height:1.4;max-width:220px;}
+
+.pet-radio{
+  width:20px;height:20px;
+  border-radius:50%;
+  border:2px solid #087fbc;
+  margin-top:16px;
+  position:relative;
+  flex-shrink:0;
+}
+.pet-card:has(input:checked) .pet-radio{
+  border-color:#087fbc;
+  background:#087fbc;
+}
+.pet-card:has(input:checked) .pet-radio::after{
+  content:'✓';
+  position:absolute;
+  inset:0;
+  color:#fff;
+  font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;
+}
+
+.security-banner{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:var(--blue-light);
+  border-radius:var(--radius-md);
+  padding:16px 20px;
+  margin-bottom:24px;
+}
+.shield-icon{font-size:20px;}
+.security-banner strong{font-size:14px;display:block;color:var(--text-dark);}
+.security-banner p{font-size:13px;color:var(--text-gray);margin-top:2px;}
+
+.actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:16px;
+}
+
+.save-status{
+  font-size:13px;
+  color:var(--text-gray);
+  min-height:16px;
+}
+.save-status.error{color:#d0342c;}
+.save-status.success{color:var(--green);}
+
+.next-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--yellow);
+  color:#3a2500;
+  border:none;
+  padding:14px 32px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .15s ease, transform .1s ease;
+}
+.next-btn:hover{background:var(--yellow-dark);}
+.next-btn:active{transform:scale(0.98);}
+.next-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.arrow{font-size:16px;}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 1180px){
+  .pet-grid{grid-template-columns:repeat(2, 1fr);}
+  .main-panel{padding:36px 40px;}
+}
+
+@media (max-width: 980px){
+  body{padding:16px;align-items:flex-start;}
+  .wizard{
+    flex-direction:column;
+    min-height:auto;
+    border-radius:20px;
+  }
+  .side-panel{
+    width:100%;
+    padding:28px 28px 24px;
+  }
+  .side-heading h1{font-size:22px;}
+  .benefits{flex-direction:row;flex-wrap:wrap;gap:16px 24px;}
+  .benefits li{flex:1 1 220px;}
+  .side-illustration{display:none;}
+  .main-panel{padding:28px 28px 32px;}
+  .top-bar{flex-wrap:wrap;row-gap:16px;}
+  .stepper{order:3;flex-basis:100%;max-width:none;justify-content:space-between;}
+  .step:not(:last-child)::after{left:calc(50% + 18px);right:calc(-50% + 18px);}
+  .title{font-size:26px;}
+  .pet-grid{grid-template-columns:repeat(2, 1fr);gap:16px;}
+  .pet-visual{width:100px;height:100px;font-size:52px;}
+}
+
+@media (max-width: 640px){
+  .side-panel{padding:24px 20px 20px;}
+  .benefits{flex-direction:column;}
+  .benefits li{flex:none;}
+  .logo{font-size:24px;margin-bottom:24px;}
+  .side-heading h1{font-size:20px;}
+  .main-panel{padding:24px 18px 28px;}
+  .top-bar{gap:12px;}
+  .back-btn span, .help-btn span:first-child{font-size:13px;}
+  .back-btn, .help-btn{padding:9px 14px;font-size:13px;}
+  .stepper{gap:0;}
+  .step-label{font-size:11px;}
+  .step-circle{width:28px;height:28px;font-size:12px;}
+  .title{font-size:22px;}
+  .subtitle{font-size:13.5px;margin-bottom:20px;}
+  .pet-grid{grid-template-columns:repeat(2, 1fr);gap:12px;}
+  .pet-card{padding:16px 12px 18px;}
+  .pet-visual{width:80px;height:80px;font-size:40px;margin-bottom:12px;border-radius:12px;}
+  .pet-name{font-size:15px;}
+  .pet-desc{font-size:12px;}
+  .security-banner{flex-direction:column;text-align:center;align-items:center;gap:8px;padding:14px;}
+}
+
+@media (max-width: 420px){
+  .pet-grid{grid-template-columns:1fr;}
+  .pet-card{flex-direction:row;align-items:center;text-align:left;gap:14px;padding:12px 14px;}
+  .pet-visual{margin-bottom:0;width:64px;height:64px;font-size:32px;flex-shrink:0;}
+  .pet-desc{max-width:none;}
+  .pet-radio{margin-top:0;margin-left:auto;}
+  .stepper{display:none;}
+  .top-bar{justify-content:space-between;}
+  .actions{flex-direction:column-reverse;align-items:stretch;gap:10px;}
+  .next-btn{justify-content:center;width:100%;}
+  .save-status{text-align:center;}
+}
+
+</style>
+</head>
+<body>
+
+<div class="wizard">
+
+  <!-- ===== PANEL IZQUIERDO ===== -->
+  <aside class="side-panel">
+    <div class="logo">
+     <img src="/assets/Type 2.png" alt="Doppy Logo" width="250" height="250">
+    </div>
+
+    <div class="side-heading">
+      <h1>Let's add your pet to the <span class="highlight">Doppy</span> family</h1>
+      <p class="side-sub">Tell us a bit about your pet so we can help you take the best care of them.</p>
+    </div>
+
+    <ul class="benefits">
+      <li>
+        <span class="benefit-icon icon-blue">🐾</span>
+        <div>
+          <strong>Personalized care</strong>
+          <p>Get reminders, tips and recommendations tailored to your pet.</p>
+        </div>
+      </li>
+      <li>
+        <span class="benefit-icon icon-green">📅</span>
+        <div>
+          <strong>Health tracking</strong>
+          <p>Keep track of vaccines, visits and important details.</p>
+        </div>
+      </li>
+      <li>
+        <span class="benefit-icon icon-yellow">👥</span>
+        <div>
+          <strong>All in one place</strong>
+          <p>Manage everything about your pet easily and securely.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="side-illustration" aria-hidden="true">
+      <div class="illustration-blob"></div>
+      <span class="pet-emoji dog-emoji">🐶</span>
+      <span class="pet-emoji cat-emoji">🐱</span>
+    </div>
+  </aside>
+
+  <!-- ===== PANEL DERECHO ===== -->
+  <main class="main-panel">
+
+    <div class="top-bar">
+      <button class="back-btn" type="button" id="backBtn">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+        <span>Back</span>
+      </button>
+
+      <ol class="stepper">
+        <li class="step active" data-step="1">
+          <span class="step-circle">1</span>
+          <span class="step-label">Pet Type</span>
+        </li>
+        <li class="step" data-step="2">
+          <span class="step-circle">2</span>
+          <span class="step-label">Basic Info</span>
+        </li>
+      </ol>
+
+      <button class="help-btn" type="button">
+        <span>?</span> Need help?
+      </button>
+    </div>
+
+    <h2 class="title">Choose your <span class="highlight">pet's</span> type </h2>
+    <p class="subtitle">This helps us provide the best experience for you and your pet.</p>
+
+    <form id="petTypeForm">
+      <div class="pet-grid">
+
+        <label class="pet-card" data-pet="dog">
+          <input type="radio" name="petType" value="dog" checked>
+          <span class="pet-visual visual-dog"> <img src="/assets/dogd.png" alt="Dog" height="120" width="120"></span>
+          <span class="pet-name">Dog</span>
+          <span class="pet-desc">Loyal, active and full of love.</span>
+          <span class="pet-radio"></span>
+        </label>
+
+        <label class="pet-card" data-pet="cat">
+          <input type="radio" name="petType" value="cat">
+          <span class="pet-visual visual-cat"> <img src="/assets/catd.png" alt="Cat" height="120" width="120"></span>
+          <span class="pet-name">Cat</span>
+          <span class="pet-desc">Independent, curious and incredibly special.</span>
+          <span class="pet-radio"></span>
+        </label>
+
+        <label class="pet-card" data-pet="bird">
+          <input type="radio" name="petType" value="bird">
+          <span class="pet-visual visual-bird"> <img src="/assets/parrotd.png" alt="Bird" height="120" width="120"></span>
+          <span class="pet-name">Bird</span>
+          <span class="pet-desc">Colorful, cheerful and full of energy.</span>
+          <span class="pet-radio"></span>
+        </label>
+
+        <label class="pet-card" data-pet="turtle">
+          <input type="radio" name="petType" value="turtle">
+          <span class="pet-visual visual-turtle"> <img src="/assets/turtled.png" alt="Turtle" height="120" width="120"></span>
+          <span class="pet-name">Turtle</span>
+          <span class="pet-desc">Calm, steady and fascinating.</span>
+          <span class="pet-radio"></span>
+        </label>
+
+        <label class="pet-card" data-pet="rabbit">
+          <input type="radio" name="petType" value="rabbit">
+          <span class="pet-visual visual-rabbit"> <img src="/assets/rabitd.png" alt="Rabbit" height="120" width="120"></span>
+          <span class="pet-name">Rabbit</span>
+          <span class="pet-desc">Gentle, adorable and full of personality.</span>
+          <span class="pet-radio"></span>
+        </label>
+
+        <label class="pet-card" data-pet="lizard">
+          <input type="radio" name="petType" value="lizard">
+          <span class="pet-visual visual-lizard"> <img src="/assets/lizardd.png" alt="Lizard" height="120" width="120"></span>
+          <span class="pet-name">Lizard</span>
+          <span class="pet-desc">Unique, cool and curious.</span>
+          <span class="pet-radio"></span>
+        </label>
+
+      </div>
+
+      <div class="security-banner">
+        <span class="shield-icon">🛡️</span>
+        <div>
+          <strong>Your pet's data is safe with us</strong>
+          <p>We use top security standards to keep their information protected.</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <span class="save-status" id="saveStatus"></span>
+        <button type="submit" class="next-btn" id="nextBtn">
+          <span id="nextBtnText">Next</span> <span class="arrow">→</span>
+        </button>
+      </div>
+    </form>
+
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   DOPPY — Paso 1: Selección de tipo de mascota
+   ------------------------------------------------------------
+   FIX: ya no se manda a un backend inexistente (TU-BACKEND-AQUI.com).
+   El tipo elegido se guarda temporalmente y se pasa al dashboard,
+   que abrirá el formulario "Add Pet" (ya conectado a Supabase) con
+   ese tipo preseleccionado para que el usuario complete el resto
+   de los datos (nombre, edad, raza, foto) y quede guardado de verdad
+   en la tabla "pets".
+   ============================================================ */
+
+const form = document.getElementById("petTypeForm");
+const nextBtn = document.getElementById("nextBtn");
+const nextBtnText = document.getElementById("nextBtnText");
+const saveStatus = document.getElementById("saveStatus");
+const backBtn = document.getElementById("backBtn");
+
+document.querySelectorAll(".pet-card").forEach((card) => {
+  card.addEventListener("click", () => {
+    const input = card.querySelector("input[type=radio]");
+    input.checked = true;
+  });
+});
+
+backBtn.addEventListener("click", () => {
+  window.location.href = "signupdu.html";
+});
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const selected = form.querySelector('input[name="petType"]:checked');
+  if (!selected) {
+    showStatus("Por favor selecciona un tipo de mascota.", "error");
+    return;
+  }
+
+  const petType = selected.value;
+
+  // Guardamos el tipo elegido para que petsinfo.html lo use como
+  // preselección al cargar (nombre/edad/raza se completan ahí).
+  localStorage.setItem("doppy_pending_pet_type", petType);
+
+  setLoading(true);
+  showStatus("Guardado ✓", "success");
+
+  setTimeout(() => {
+    window.location.href = "petsinfo.html";
+  }, 400);
+});
+
+/* ---------- UI helpers ---------- */
+
+function setLoading(isLoading) {
+  nextBtn.disabled = isLoading;
+  nextBtnText.textContent = isLoading ? "Guardando..." : "Next";
+}
+
+function showStatus(message, type) {
+  saveStatus.textContent = message;
+  saveStatus.className = "save-status " + (type || "");
+}
+
+</script>
+</body>
+</html>

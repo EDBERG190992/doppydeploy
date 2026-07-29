@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doppy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow:      #F5C518;
+      --yellow-dark: #e0b000;
+      --blue:        #3B6FD4;
+      --blue-light:  #BFCFEE;
+      --blue-soft:   #D6E8FF;
+      --blue-bg:     #B8D4F5;
+      --text-dark:   #1a1a2e;
+      --text-mid:    #555577;
+      --text-light:  #9999bb;
+      --border:      #dde3f0;
+      --white:       #ffffff;
+      --radius:      20px;
+      --radius-sm:   12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      max-width: 1100px;
+      min-height: 600px;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 28px 90px rgba(59,111,212,.22);
+    }
+
+    .left {
+      background: var(--white);
+      padding: 32px 40px 48px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .nav-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text-mid);
+      font-size: 16px;
+      transition: background .2s;
+    }
+    .nav-btn:hover { background: var(--blue-soft); }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -6px;
+      margin-bottom: 16px;
+      width: auto;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .logo-frame {
+      width: 260px;
+      height: 130px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: transparent;
+      transform: translateY(-6px);
+      position: relative;
+    }
+    .logo-img {
+      width: 280px;
+      height: 280px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+
+    .left h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+    .left .sub {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 32px;
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      transition: border-color .2s;
+    }
+    .input-wrap:focus-within { border-color: var(--blue); }
+
+    .input-icon { flex-shrink: 0; color: var(--blue); display: flex; }
+    .input-icon svg { width: 20px; height: 20px; display: block; }
+
+    .input-wrap input {
+      border: none; outline: none;
+      font-family: inherit; font-size: 14px;
+      color: var(--blue);
+      flex: 1;
+      background: transparent;
+    }
+    .input-wrap input::placeholder { color: var(--blue); opacity: .7; }
+
+    .toggle-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-light); display: flex; flex-shrink: 0;
+    }
+    .toggle-btn svg { width: 20px; height: 20px; }
+
+    .pass-row { position: relative; }
+    .pass-row .deco-dot-pass { right: -30px; }
+
+    .btn-cta {
+      width: 100%;
+      padding: 16px;
+      background: var(--yellow);
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      margin-bottom: 20px;
+    }
+    .btn-cta:hover { background: var(--yellow-dark); }
+    .btn-cta:active { transform: scale(.98); }
+    .btn-cta:disabled { opacity: .6; cursor: not-allowed; }
+
+    .forgot {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      text-decoration: none;
+      display: block;
+    }
+    .forgot:hover { text-decoration: underline; }
+
+    .right {
+      background: var(--blue-bg);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .right-circle-lg {
+      position: absolute;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.22);
+      bottom: -80px; left: -60px;
+    }
+    .right-dot-1 {
+      position: absolute;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.35);
+      top: 140px; right: 28px;
+    }
+    .right-dot-2 {
+      position: absolute;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.25);
+      top: 210px; right: 20px;
+    }
+
+    .right-wave {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 55%;
+      background: rgba(255,255,255,.18);
+      border-radius: 60% 60% 0 0;
+    }
+
+    .pets-img {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .pets-emoji {
+      position: relative;
+      z-index: 2;
+      font-size: 110px;
+      line-height: 1;
+      padding-bottom: 32px;
+      display: flex;
+      gap: -10px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 24px; left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 999;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 700px) {
+      .card { grid-template-columns: 1fr; max-width: 420px; }
+      .right { min-height: 260px; }
+      .pets-emoji { font-size: 70px; }
+      .left { padding: 28px 28px 40px; }
+      .logo-text { font-size: 30px; }
+      .pass-row .deco-dot-pass { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="card">
+
+  <!-- ═══ LEFT ═══ -->
+  <div class="left">
+
+    <div class="top-nav">
+      <a class="nav-btn" href="typeofuser.html" aria-label="Back" style="text-decoration:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <button class="nav-btn" aria-label="Help">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+      </button>
+    </div>
+
+    <div class="logo">
+      <div class="logo-frame">
+        <img class="logo-img" src="/assets/Type 2.png" alt="Doppy Logo" />
+      </div>
+    </div>
+
+    <h2>Welcome back!</h2>
+    <p class="sub">Sign in to continue caring for your pets.</p>
+
+    <!-- La verificación real de existencia se hace contra la tabla "users"
+         (columnas name, email, auth_user_id) dentro de login(), después de
+         que Supabase Auth valida la contraseña. Ver comentarios en el <script>. -->
+    <form id="loginForm" onsubmit="event.preventDefault(); login();">
+      <div class="input-group">
+        <!-- Name -->
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/>
+              <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+            </svg>
+          </span>
+          <input type="text" id="name" placeholder="Enter your name" autocomplete="name" />
+        </div>
+
+        <!-- Email -->
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="M22 7l-10 7L2 7"/>
+            </svg>
+          </span>
+          <input type="email" id="email" placeholder="Enter your gmail" autocomplete="email" />
+        </div>
+
+        <!-- Password -->
+        <div class="pass-row" style="position:relative;">
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="pass" placeholder="Enter your Password" autocomplete="current-password" />
+            <button class="toggle-btn" onclick="togglePass()" type="button" aria-label="Toggle password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-cta">Done</button>
+    </form>
+    <a class="forgot" href="#">Forgot your password?</a>
+
+  </div>
+
+  <!-- ═══ RIGHT ═══ -->
+  <div class="right">
+
+    <div class="right-heart">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M28 46 C28 46 8 34 8 20 C8 13 13 8 20 8 C24 8 28 11 28 11 C28 11 32 8 36 8 C43 8 48 13 48 20 C48 34 28 46 28 46Z"
+          stroke="#3B6FD4" stroke-width="2.5" fill="none"/>
+      </svg>
+    </div>
+
+    <div class="right-dot-1"></div>
+    <div class="right-dot-2"></div>
+    <div class="right-circle-lg"></div>
+    <div class="right-wave"></div>
+
+</div>
+
+<script>
+  // 1. Initialize the Supabase client de forma defensiva: si el script de
+  // Supabase no llegó a cargar (por ejemplo, sin conexión a internet o el
+  // CDN bloqueado), esto ya no rompe el resto del archivo — solo avisa.
+  let supabaseClient = null;
+  try {
+    if (typeof window.supabase === 'undefined') {
+      throw new Error('El script de Supabase no cargó (revisa tu conexión a internet o si algo bloquea cdn.jsdelivr.net).');
+    }
+    supabaseClient = window.supabase.createClient(
+      'https://xyiebwrjkmvmcpdhenjk.supabase.co',
+      'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
+    );
+  } catch (initErr) {
+    console.error('[Doppy] Error inicializando Supabase:', initErr);
+  }
+
+  function togglePass() {
+    const input = document.getElementById('pass');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function translateAuthError(message) {
+    const m = (message || '').toLowerCase();
+    if (m.includes('invalid login credentials')) {
+      return 'Incorrect email or password.';
+    }
+    if (m.includes('email not confirmed')) {
+      return 'Please confirm your email before signing in. Check your inbox.';
+    }
+    if (m.includes('user not found')) {
+      return 'No account found with that email.';
+    }
+    return 'Could not sign in: ' + message;
+  }
+
+  async function login() {
+    if (!supabaseClient) {
+      showToast('❌ No se pudo conectar con Supabase. Revisa tu conexión e intenta de nuevo.');
+      return;
+    }
+
+    const name  = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pass  = document.getElementById('pass').value;
+    const btn   = document.querySelector('.btn-cta');
+
+    if (!name || !email || !pass) {
+      showToast('⚠️ Please fill in all fields.');
+      return;
+    }
+    if (!email.includes('@')) {
+      showToast('⚠️ Enter a valid email address.');
+      return;
+    }
+    if (pass.length < 6) {
+      showToast('⚠️ Password must be at least 6 characters.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      // 2. Verify credentials against Supabase Auth.
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: pass
+      });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        showToast('❌ ' + translateAuthError(error.message));
+        return;
+      }
+
+      const user = data.user;
+
+      // 3. La contraseña ya fue validada por Supabase Auth. Ahora hay que
+      // confirmar que esta persona tiene un perfil real de dueño de mascota,
+      // es decir, que exista una fila en "users" ligada a este auth_user_id.
+      const { data: userRow, error: userErr } = await supabaseClient
+        .from('users')
+        .select('id_client, name, email')
+        .eq('auth_user_id', user.id)
+        .maybeSingle();
+
+      if (userErr) {
+        console.error('Supabase error (users):', userErr);
+        showToast('❌ Could not verify your account: ' + userErr.message);
+        await supabaseClient.auth.signOut();
+        return;
+      }
+
+      if (!userRow) {
+        // El usuario existe en Supabase Auth pero no tiene fila en "users"
+        showToast('Please, create an account');
+        await supabaseClient.auth.signOut();
+        return;
+      }
+
+      // 4. Todo válido: guardamos los datos del usuario y lo llevamos a su dashboard
+      localStorage.setItem('userName', userRow.name || name);
+      localStorage.setItem('userEmail', user.email);
+      localStorage.setItem('userId', user.id);
+      localStorage.setItem('clientId', userRow.id_client);
+      localStorage.setItem('accountType', 'owner');
+
+      showToast('✅ Welcome back!');
+      setTimeout(() => {
+        window.location.href = 'dashboarddu.html';
+      }, 500);
+
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      showToast('❌ An unexpected error occurred: ' + (err.message || err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Done';
+    }
+  }
+</script>
+</body>
+</html>
