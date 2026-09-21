@@ -1,5 +1,5 @@
 /* ============================================================
-   Doppy · Clinic Dashboard — app.js
+   Doppy · Clínica Panel — app.js
    Contains: i18n, HTML body template, icons, data, and all
    application logic (rendering, modals, charts, PDF export).
    ============================================================ */
@@ -29,7 +29,7 @@ try {
 let CURRENT_VETERINARY_ID = 1;
 // TODO: reemplazar por el staff_id real del admin logueado.
 const CURRENT_STAFF_ID = null;
-let currentAdminContext = { clinicName: null, email: null, isFallback: true };
+let currentAdminContext = { clinicNombre: null, email: null, isFallback: true };
 
 /* ---------------------------------------------------------
    Busca la clínica real ligada a la sesión de Supabase activa
@@ -57,22 +57,22 @@ async function loadCurrentAdminContext(){
       return;
     }
     CURRENT_VETERINARY_ID = clinic.id_veterinary;
-    currentAdminContext = { clinicName: clinic.clinic_name, email: clinic.email || user.email, isFallback: false };
+    currentAdminContext = { clinicNombre: clinic.clinic_name, email: clinic.email || user.email, isFallback: false };
   } catch (e) {
     console.error('[Doppy] loadCurrentAdminContext failed:', e);
   }
 }
 
 function applyAdminContextToUI(){
-  const clinicName = currentAdminContext.clinicName || 'Demo Clinic (not signed in)';
+  const clinicNombre = currentAdminContext.clinicNombre || 'Demo Clínica (not signed in)';
   const email = currentAdminContext.email || '—';
-  const initials = clinicName.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'AD';
+  const initials = clinicNombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'AD';
 
-  setText('clinicNameLabel', clinicName);
-  setText('adminNameLabel', clinicName);
-  setText('adminModalName', clinicName);
-  setText('adminModalEmail', email);
-  setText('adminModalClinic', clinicName);
+  setText('clinicNombreLabel', clinicNombre);
+  setText('adminNombreLabel', clinicNombre);
+  setText('adminModalNombre', clinicNombre);
+  setText('adminModalCorreo', email);
+  setText('adminModalClínica', clinicNombre);
   const avatar = document.getElementById('adminAvatarLabel');
   if (avatar) avatar.textContent = initials;
   const modalAvatar = document.getElementById('adminModalAvatar');
@@ -82,31 +82,31 @@ function applyAdminContextToUI(){
 /* ============ I18N ============ */
 const translations = {
   en: {
-    nav: { dashboard: 'Dashboard', pacientes: 'Patients', personal: 'Staff', afiliaciones: 'Affiliations', reportes: 'Reports', config: 'Settings' },
-    promo: { title: 'Improve every pet’s health 💙', text: 'Discover all the features Doppy has for your clinic.', button: 'Learn more' },
-    logout: 'Log out',
-    topbar: { searchPlaceholder: 'Search patients, owners, affiliation codes...', clinic: 'Happy Paws Veterinary Clinic' },
-    profile: { myProfile: 'My Profile', config: 'Settings', logout: 'Log out' },
-    breadcrumbs: { dashboard: 'Dashboard', patients: 'Patients', patientsList: 'Patient List', config: 'Settings', clinicInfo: 'Clinic Information', reports: 'Reports' },
-    patients: { title: 'Patients (Pets)', subtitle: 'Manage and review all pets registered in your clinic.', empty: 'No pets matched those filters.', noResults: 'No results found for this search' },
-    filters: { more: 'More filters', clear: 'Clear' },
-    pets: { table: { pet: 'Pet', species: 'Species', breed: 'Breed', owner: 'Owner', vet: 'Veterinarian', vaccination: 'Vaccination', nextVisit: 'Next Visit', actions: 'Actions' } },
-    config: { title: 'Settings', subtitle: 'Manage and personalize your clinic and the Doppy platform.', clinicInfo: 'Clinic Information', name: 'Clinic Name', address: 'Address', city: 'City', province: 'Province', postalCode: 'Postal Code', phone: 'Phone', email: 'Email', website: 'Website', language: 'Language', save: 'Save Changes', cancel: 'Cancel', plan: 'Your Current Plan', planProfessional: 'Professional Plan', users: 'Users', patients: 'Patients', nextCharge: 'Next charge', managePlan: 'Manage Subscription', help: 'Need help?', helpText: 'Our team is ready to help with any questions.', contactSupport: 'Contact Support', toast: { saveSuccess: '✅ Changes saved successfully', discardChanges: 'Changes discarded', managePlan: 'Opening subscription management', contactSupport: 'Connecting to support…' } },
-    states: { upToDate: 'Up to date', upcoming: 'Upcoming', overdue: 'Overdue', active: 'Active', pending: 'Pending', expired: 'Expired', vacation: 'On vacation', inactive: 'Inactive' },
+    nav: { dashboard: 'Panel', pacientes: 'Pacientes', personal: 'Personal', afiliaciones: 'Afiliaciones', reportes: 'Informes', config: 'Configuración' },
+    promo: { title: 'Improve every pet’s health 💙', text: 'Descubre todas las funciones que Doppy tiene para tu clínica.', button: 'Saber más' },
+    logout: 'Cerrar sesión',
+    topbar: { searchPlaceholder: 'Search patients, owners, affiliation codes...', clinic: 'Clínica Veterinaria Happy Paws' },
+    profile: { myPerfil: 'Mi perfil', config: 'Configuración', logout: 'Cerrar sesión' },
+    breadcrumbs: { dashboard: 'Panel', patients: 'Pacientes', patientsList: 'Lista de pacientes', config: 'Configuración', clinicInfo: 'Información de la clínica', reports: 'Informes' },
+    patients: { title: 'Pacientes (Pets)', subtitle: 'Gestiona y revisa todas las mascotas registradas en tu clínica.', empty: 'No pets matched those filters.', noResults: 'No results found for this search' },
+    filters: { more: 'More filters', clear: 'Limpiar' },
+    pets: { table: { pet: 'Pet', species: 'Especie', breed: 'Raza', owner: 'Dueño', vet: 'Veterinario', vaccination: 'Vacunación', nextVisit: 'Próxima visita', actions: 'Acciones' } },
+    config: { title: 'Configuración', subtitle: 'Gestiona y personaliza tu clínica y la plataforma Doppy.', clinicInfo: 'Información de la clínica', name: 'Nombre de la clínica', address: 'Dirección', city: 'Ciudad', province: 'Provincia', postalCódigo: 'Código postal', phone: 'Teléfono', email: 'Correo', website: 'Sitio web', language: 'Idioma', save: 'Guardar cambios', cancel: 'Cancelar', plan: 'Tu plan actual', planProfessional: 'Plan Profesional', users: 'Usuarios', patients: 'Pacientes', nextCharge: 'Próximo cobro', managePlan: 'Gestionar suscripción', help: '¿Necesitas ayuda?', helpText: 'Nuestro equipo está listo para ayudarte con cualquier duda.', contactSupport: 'Contactar soporte', toast: { saveSuccess: '✅ Changes saved successfully', discardChanges: 'Changes discarded', managePlan: 'Opening subscription management', contactSupport: 'Connecting to support…' } },
+    states: { upToDate: 'Al día', upcoming: 'Próxima', overdue: 'Vencido', active: 'Activo', pending: 'Pendiente', expired: 'Expired', vacation: 'De vacaciones', inactive: 'Inactivo' },
     common: { ok: 'OK' }
   },
   es: {
-    nav: { dashboard: 'Dashboard', pacientes: 'Patients', personal: 'Staff', afiliaciones: 'Affiliations', reportes: 'Reports', config: 'Settings' },
-    promo: { title: 'Improve every pet’s health 💙', text: 'Discover all the features Doppy has for your clinic.', button: 'Learn more' },
-    logout: 'Log out',
-    topbar: { searchPlaceholder: 'Search patients, owners, affiliation codes...', clinic: 'Happy Paws Veterinary Clinic' },
-    profile: { myProfile: 'My Profile', config: 'Settings', logout: 'Log out' },
-    breadcrumbs: { dashboard: 'Dashboard', patients: 'Patients', patientsList: 'Patient List', config: 'Settings', clinicInfo: 'Clinic Information', reports: 'Reports' },
-    patients: { title: 'Patients (Pets)', subtitle: 'Manage and review all pets registered in your clinic.', empty: 'No pets matched those filters.', noResults: 'No results found for this search' },
-    filters: { more: 'More filters', clear: 'Clear' },
-    pets: { table: { pet: 'Pet', species: 'Species', breed: 'Breed', owner: 'Owner', vet: 'Veterinarian', vaccination: 'Vaccination', nextVisit: 'Next Visit', actions: 'Actions' } },
-    config: { title: 'Settings', subtitle: 'Manage and personalize your clinic and the Doppy platform.', clinicInfo: 'Clinic Information', name: 'Clinic Name', address: 'Address', city: 'City', province: 'Province', postalCode: 'Postal Code', phone: 'Phone', email: 'Email', website: 'Website', language: 'Language', save: 'Save Changes', cancel: 'Cancel', plan: 'Your Current Plan', planProfessional: 'Professional Plan', users: 'Users', patients: 'Patients', nextCharge: 'Next charge', managePlan: 'Manage Subscription', help: 'Need help?', helpText: 'Our team is ready to help with any questions.', contactSupport: 'Contact Support', toast: { saveSuccess: '✅ Changes saved successfully', discardChanges: 'Changes discarded', managePlan: 'Opening subscription management', contactSupport: 'Connecting to support…' } },
-    states: { upToDate: 'Up to date', upcoming: 'Upcoming', overdue: 'Overdue', active: 'Active', pending: 'Pending', expired: 'Expired', vacation: 'On vacation', inactive: 'Inactive' },
+    nav: { dashboard: 'Panel', pacientes: 'Pacientes', personal: 'Personal', afiliaciones: 'Afiliaciones', reportes: 'Informes', config: 'Configuración' },
+    promo: { title: 'Improve every pet’s health 💙', text: 'Descubre todas las funciones que Doppy tiene para tu clínica.', button: 'Saber más' },
+    logout: 'Cerrar sesión',
+    topbar: { searchPlaceholder: 'Search patients, owners, affiliation codes...', clinic: 'Clínica Veterinaria Happy Paws' },
+    profile: { myPerfil: 'Mi perfil', config: 'Configuración', logout: 'Cerrar sesión' },
+    breadcrumbs: { dashboard: 'Panel', patients: 'Pacientes', patientsList: 'Lista de pacientes', config: 'Configuración', clinicInfo: 'Información de la clínica', reports: 'Informes' },
+    patients: { title: 'Pacientes (Pets)', subtitle: 'Gestiona y revisa todas las mascotas registradas en tu clínica.', empty: 'No pets matched those filters.', noResults: 'No results found for this search' },
+    filters: { more: 'More filters', clear: 'Limpiar' },
+    pets: { table: { pet: 'Pet', species: 'Especie', breed: 'Raza', owner: 'Dueño', vet: 'Veterinario', vaccination: 'Vacunación', nextVisit: 'Próxima visita', actions: 'Acciones' } },
+    config: { title: 'Configuración', subtitle: 'Gestiona y personaliza tu clínica y la plataforma Doppy.', clinicInfo: 'Información de la clínica', name: 'Nombre de la clínica', address: 'Dirección', city: 'Ciudad', province: 'Provincia', postalCódigo: 'Código postal', phone: 'Teléfono', email: 'Correo', website: 'Sitio web', language: 'Idioma', save: 'Guardar cambios', cancel: 'Cancelar', plan: 'Tu plan actual', planProfessional: 'Plan Profesional', users: 'Usuarios', patients: 'Pacientes', nextCharge: 'Próximo cobro', managePlan: 'Gestionar suscripción', help: '¿Necesitas ayuda?', helpText: 'Nuestro equipo está listo para ayudarte con cualquier duda.', contactSupport: 'Contactar soporte', toast: { saveSuccess: '✅ Changes saved successfully', discardChanges: 'Changes discarded', managePlan: 'Opening subscription management', contactSupport: 'Connecting to support…' } },
+    states: { upToDate: 'Al día', upcoming: 'Próxima', overdue: 'Vencido', active: 'Activo', pending: 'Pendiente', expired: 'Expired', vacation: 'De vacaciones', inactive: 'Inactivo' },
     common: { ok: 'OK' }
   }
 };
@@ -139,14 +139,14 @@ function applyTranslations() {
   if (cfgIdioma) cfgIdioma.value = lang;
 }
 
-function setLanguage(lang) {
+function setIdioma(lang) {
   currentLang = lang in translations ? lang : 'en';
   localStorage.setItem('doppyLang', currentLang);
   applyTranslations();
   renderPets();
   renderAfiliaciones();
   renderVets();
-  renderDashboardTables();
+  renderPanelTables();
 }
 
 /* ============ HTML BODY TEMPLATE ============ */
@@ -159,33 +159,33 @@ const __BODY_TEMPLATE__ = () => `
       <img src="assets/Type 2.png" alt="Doppy Logo" width="150" height="130">
     </div>
     <nav class="nav" id="nav">
-      <button class="nav-item" data-page="dashboard">${ICON.home} <span data-i18n="nav.dashboard">Dashboard</span></button>
-      <button class="nav-item" data-page="pacientes">${ICON.paw} <span data-i18n="nav.pacientes">Patients</span></button>
-      <button class="nav-item" data-page="personal">${ICON.staff} <span data-i18n="nav.personal">Staff</span></button>
-      <button class="nav-item" data-page="afiliaciones">${ICON.tag} <span data-i18n="nav.afiliaciones">Affiliations</span></button>
-      <button class="nav-item" data-page="reportes">${ICON.chart} <span data-i18n="nav.reportes">Reports</span></button>
-      <button class="nav-item" data-page="configuracion">${ICON.gear} <span data-i18n="nav.config">Settings</span></button>
+      <button class="nav-item" data-page="dashboard">${ICON.home} <span data-i18n="nav.dashboard">Panel</span></button>
+      <button class="nav-item" data-page="pacientes">${ICON.paw} <span data-i18n="nav.pacientes">Pacientes</span></button>
+      <button class="nav-item" data-page="personal">${ICON.staff} <span data-i18n="nav.personal">Personal</span></button>
+      <button class="nav-item" data-page="afiliaciones">${ICON.tag} <span data-i18n="nav.afiliaciones">Afiliaciones</span></button>
+      <button class="nav-item" data-page="reportes">${ICON.chart} <span data-i18n="nav.reportes">Informes</span></button>
+      <button class="nav-item" data-page="configuracion">${ICON.gear} <span data-i18n="nav.config">Configuración</span></button>
     </nav>
     <div class="promo">
       <div style="margin-bottom:4px;">
         <img src="assets/paww.png" alt="Paw" style="width:34px;height:34px;object-fit:contain;display:block;">
       </div>
       <h4 data-i18n="promo.title">Improve every pet’s health 💙</h4>
-      <p data-i18n="promo.text">Discover all the features Doppy has for your clinic.</p>
-      <button id="btnExplore" data-i18n="promo.button">Learn more</button>
+      <p data-i18n="promo.text">Descubre todas las funciones que Doppy tiene para tu clínica.</p>
+      <button id="btnExplore" data-i18n="promo.button">Saber más</button>
     </div>
-    <button class="logout-row" id="btnLogout" style="height:30px;">${ICON.logout} <span data-i18n="logout">Log out</span></button>
+    <button class="logout-row" id="btnLogout" style="height:30px;">${ICON.logout} <span data-i18n="logout">Cerrar sesión</span></button>
   </aside>
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <!-- Navbar inferior estilo Instagram, solo visible en mobile (ver CSS) -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="bottom-nav-item" data-page="dashboard" title="Dashboard">${ICON.home}</button>
-    <button class="bottom-nav-item" data-page="pacientes" title="Patients">${ICON.paw}</button>
-    <button class="bottom-nav-item" data-page="personal" title="Staff">${ICON.staff}</button>
-    <button class="bottom-nav-item" data-page="afiliaciones" title="Affiliations">${ICON.tag}</button>
-    <button class="bottom-nav-item" data-page="reportes" title="Reports">${ICON.chart}</button>
-    <button class="bottom-nav-item" data-page="configuracion" title="Settings">${ICON.gear}</button>
+    <button class="bottom-nav-item" data-page="dashboard" title="Panel">${ICON.home}</button>
+    <button class="bottom-nav-item" data-page="pacientes" title="Pacientes">${ICON.paw}</button>
+    <button class="bottom-nav-item" data-page="personal" title="Personal">${ICON.staff}</button>
+    <button class="bottom-nav-item" data-page="afiliaciones" title="Afiliaciones">${ICON.tag}</button>
+    <button class="bottom-nav-item" data-page="reportes" title="Informes">${ICON.chart}</button>
+    <button class="bottom-nav-item" data-page="configuracion" title="Configuración">${ICON.gear}</button>
   </nav>
 
   <!-- MAIN -->
@@ -194,19 +194,19 @@ const __BODY_TEMPLATE__ = () => `
       <button id="btnMenu" class="icon-btn menu-btn">${ICON.menu}</button>
       <div class="search">${ICON.search}<input id="globalSearch" data-i18n-placeholder="topbar.searchPlaceholder" placeholder="Search patients, owners, affiliation codes..."></div>
       <div class="topbar-right">
-        <button class="clinic-pill">${ICON.building} <span id="clinicNameLabel">Happy Paws Veterinary Clinic</span> ${ICON.chevron}</button>
+        <button class="clinic-pill">${ICON.building} <span id="clinicNombreLabel">Clínica Veterinaria Happy Paws</span> ${ICON.chevron}</button>
         <button class="bell" id="btnBell">${ICON.bell}<span class="dot" id="notifDot">3</span>
           <div class="dropdown" id="ddNotif"></div>
         </button>
-        <div class="profile" id="btnProfile">
+        <div class="profile" id="btnPerfil">
           <div class="avatar" id="adminAvatarLabel">AD</div>
-          <div><div class="name" id="adminNameLabel">Administrator</div><div class="role">Super Admin</div></div>
+          <div><div class="name" id="adminNombreLabel">Administrador</div><div class="role">Superadministrador</div></div>
           ${ICON.chevron}
-          <div class="dropdown" id="ddProfile" style="right:0;left:auto;">
-            <div class="item" onclick="showAdminProfile()"><b data-i18n="profile.myProfile">My Profile</b></div>
-            <div class="item" onclick="go('configuracion')"><b data-i18n="profile.config">Settings</b></div>
+          <div class="dropdown" id="ddPerfil" style="right:0;left:auto;">
+            <div class="item" onclick="showAdminPerfil()"><b data-i18n="profile.myPerfil">Mi perfil</b></div>
+            <div class="item" onclick="go('configuracion')"><b data-i18n="profile.config">Configuración</b></div>
             <hr>
-            <div class="item" id="ddLogout"><b style="color:var(--red)" data-i18n="profile.logout">Log out</b></div>
+            <div class="item" id="ddLogout"><b style="color:var(--red)" data-i18n="profile.logout">Cerrar sesión</b></div>
           </div>
         </div>
       </div>
@@ -216,30 +216,30 @@ const __BODY_TEMPLATE__ = () => `
 
       <!-- ================= DASHBOARD ================= -->
       <section class="page active" id="page-dashboard">
-        <div class="page-head"><div><h1>Dashboard</h1><p>Overview of your clinic's overall activity.</p></div></div>
+        <div class="page-head"><div><h1>Panel</h1><p>Resumen de la actividad general de tu clínica.</p></div></div>
 
         <div class="stats">
           <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">👥</div>
-            <div><h3>Total Patients</h3><div class="num" id="statDashPatients">—</div></div></div><div class="delta up" id="statDashPatientsDelta">&nbsp;</div></div>
+            <div><h3>Total de pacientes</h3><div class="num" id="statDashPacientes">—</div></div></div><div class="delta up" id="statDashPacientesDelta">&nbsp;</div></div>
           <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">🧑‍🤝‍🧑</div>
-            <div><h3>Active Owners</h3><div class="num" id="statDashOwners">—</div></div></div><div class="delta up" id="statDashOwnersDelta">&nbsp;</div></div>
+            <div><h3>Dueños activos</h3><div class="num" id="statDashDueños">—</div></div></div><div class="delta up" id="statDashDueñosDelta">&nbsp;</div></div>
           <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--purple-100);">🩺</div>
-            <div><h3>Veterinarians</h3><div class="num" id="statDashVets">—</div></div></div><div class="delta up" id="statDashVetsDelta">&nbsp;</div></div>
+            <div><h3>Veterinarios</h3><div class="num" id="statDashVets">—</div></div></div><div class="delta up" id="statDashVetsDelta">&nbsp;</div></div>
           <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--amber-100);">🪪</div>
-            <div><h3>Pending Affiliations</h3><div class="num" id="statDashPending">—</div></div></div><div class="delta down" id="statDashPendingDelta">&nbsp;</div></div>
+            <div><h3>Afiliaciones pendientes</h3><div class="num" id="statDashPendiente">—</div></div></div><div class="delta down" id="statDashPendienteDelta">&nbsp;</div></div>
         </div>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-head"><h3>Recent Activity</h3><button class="link" onclick="toast('Showing full activity history')">View all</button></div>
+            <div class="card-head"><h3>Actividad reciente</h3><button class="link" onclick="toast('Showing full activity history')">Ver todo</button></div>
             <div id="activityList"></div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>Quick Actions</h3></div>
+            <div class="card-head"><h3>Acciones rápidas</h3></div>
             <div class="quick-grid">
-              <button class="quick-btn" style="background:var(--amber-100);" onclick="go('afiliaciones');setTimeout(()=>generarCodigo(),200)"><div class="qicon">🏷️</div><b>Generate Affiliation Code</b><span>Create a code for an owner</span></button>
-              <button class="quick-btn" style="background:var(--purple-100);" onclick="go('personal');setTimeout(()=>openVetModal(),200)"><div class="qicon">🩺</div><b>Add Veterinarian</b><span>Add a doctor to the clinic</span></button>
-              <button class="quick-btn" style="background:var(--green-100);" onclick="go('reportes')"><div class="qicon">📊</div><b>View Reports</b><span>Check the analytics</span></button>
+              <button class="quick-btn" style="background:var(--amber-100);" onclick="go('afiliaciones');setTimeout(()=>generarCodigo(),200)"><div class="qicon">🏷️</div><b>Generar código de afiliación</b><span>Crear un código para un dueño</span></button>
+              <button class="quick-btn" style="background:var(--purple-100);" onclick="go('personal');setTimeout(()=>openVetModal(),200)"><div class="qicon">🩺</div><b>Agregar veterinario</b><span>Agregar un doctor a la clínica</span></button>
+              <button class="quick-btn" style="background:var(--green-100);" onclick="go('reportes')"><div class="qicon">📊</div><b>Ver informes</b><span>Revisar las estadísticas</span></button>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@ const __BODY_TEMPLATE__ = () => `
           <div class="card-head">
             <h3 style="display:flex;align-items:center;gap:8px;">
               <img src="assets/NotiW.png" alt="Affiliation requests" style="width:18px;height:18px;object-fit:contain;display:block;">
-              Affiliation Requests
+              Solicitudes de afiliación
             </h3>
             <span class="badge amber" id="solicitudesCount">0</span>
           </div>
@@ -258,13 +258,13 @@ const __BODY_TEMPLATE__ = () => `
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-head"><h3>Affiliation Management</h3><button class="link" onclick="go('afiliaciones')">View all</button></div>
-            <div style="overflow-x:auto;"><table><thead><tr><th>Pet</th><th>Owner</th><th>Code</th><th>Status</th><th>Expiration</th><th></th></tr></thead>
+            <div class="card-head"><h3>Gestión de afiliaciones</h3><button class="link" onclick="go('afiliaciones')">Ver todo</button></div>
+            <div style="overflow-x:auto;"><table><thead><tr><th>Pet</th><th>Dueño</th><th>Código</th><th>Estado</th><th>Expiration</th><th></th></tr></thead>
             <tbody id="dashAfilBody"></tbody></table></div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>Veterinary Staff</h3><button class="link" onclick="go('personal')">View all</button></div>
-            <div style="overflow-x:auto;"><table><thead><tr><th>Doctor</th><th>Specialty</th><th>Status</th><th></th></tr></thead>
+            <div class="card-head"><h3>Personal veterinario</h3><button class="link" onclick="go('personal')">Ver todo</button></div>
+            <div style="overflow-x:auto;"><table><thead><tr><th>Doctor</th><th>Specialty</th><th>Estado</th><th></th></tr></thead>
             <tbody id="dashVetBody"></tbody></table></div>
           </div>
         </div>
@@ -272,30 +272,30 @@ const __BODY_TEMPLATE__ = () => `
 
       <!-- ================= PATIENTS ================= -->
       <section class="page" id="page-pacientes">
-        <div class="breadcrumb"><a onclick="go('pacientes')" data-i18n="breadcrumbs.patients">Patients</a> / <b data-i18n="breadcrumbs.patientsList">Patient List</b></div>
+        <div class="breadcrumb"><a onclick="go('pacientes')" data-i18n="breadcrumbs.patients">Pacientes</a> / <b data-i18n="breadcrumbs.patientsList">Lista de pacientes</b></div>
         <div class="page-head">
-          <div><h1 data-i18n="patients.title">Patients (Pets)</h1><p data-i18n="patients.subtitle">Manage and review all pets registered in your clinic.</p></div>
+          <div><h1 data-i18n="patients.title">Pacientes (Pets)</h1><p data-i18n="patients.subtitle">Gestiona y revisa todas las mascotas registradas en tu clínica.</p></div>
           <div class="head-actions">
             <button class="btn" onclick="toast('Select a CSV file to import pets')">${ICON.upload} Import</button>
             <button class="btn" onclick="toast('Exporting patient list to CSV…')">${ICON.download} Export</button>
           </div>
         </div>
         <div class="stats">
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/PawB.png" alt="Pets"></div><div><h3>Total Pets</h3><div class="num" id="statTotalPets">—</div></div></div><div class="delta up">&nbsp;</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/CalendarW.png" alt="Appointments"></div><div><h3>Upcoming Appointments</h3><div class="num" id="statUpcomingAppts">—</div></div></div><div class="delta up">&nbsp;</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/PawB.png" alt="Vaccines"></div><div><h3>Vaccines Due</h3><div class="num" id="statVaccinesDue">—</div></div></div><div class="delta down">&nbsp;</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/dogd.png" alt="Patients"></div><div><h3>New Patients (Month)</h3><div class="num" id="statNewPatients">—</div></div></div><div class="delta up">&nbsp;</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/PawB.png" alt="Pets"></div><div><h3>Total de mascotas</h3><div class="num" id="statTotalPets">—</div></div></div><div class="delta up">&nbsp;</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/CalendarW.png" alt="Appointments"></div><div><h3>Próximas citas</h3><div class="num" id="statPróximaAppts">—</div></div></div><div class="delta up">&nbsp;</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/PawB.png" alt="Vaccines"></div><div><h3>Vacunas pendientes</h3><div class="num" id="statVaccinesDue">—</div></div></div><div class="delta down">&nbsp;</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:#fff;"><img src="assets/dogd.png" alt="Pacientes"></div><div><h3>Pacientes nuevos (Month)</h3><div class="num" id="statNewPacientes">—</div></div></div><div class="delta up">&nbsp;</div></div>
         </div>
 
         <div class="filters">
           <div class="search" style="max-width:280px;">${ICON.search}<input id="petSearch" placeholder="Search by name, owner, microchip…" oninput="renderPets()"></div>
-          <select id="fEspecie" onchange="renderPets()"><option value="">Species: All</option><option>Dog</option><option>Cat</option></select>
-          <select id="fEstado" onchange="renderPets()"><option value="">Status: All</option><option>Up to date</option><option>Upcoming</option><option>Overdue</option></select>
+          <select id="fEspecie" onchange="renderPets()"><option value="">Especie: Todas</option><option>Dog</option><option>Cat</option></select>
+          <select id="fEstado" onchange="renderPets()"><option value="">Estado: Todos</option><option>Al día</option><option>Próxima</option><option>Vencido</option></select>
           <button class="btn" onclick="togglePetFilters()">${ICON.filter} More filters</button>
         </div>
         <div class="filter-panel" id="petFilterPanel">
           <div class="field">
-            <label>Veterinarian</label>
+            <label>Veterinario</label>
             <select id="fVeterinario" onchange="renderPets()">
               <option value="">All</option>
               <option>Dr. Emily Carter</option>
@@ -304,23 +304,23 @@ const __BODY_TEMPLATE__ = () => `
             </select>
           </div>
           <div class="field">
-            <label>Breed</label>
+            <label>Raza</label>
             <select id="fRaza" onchange="renderPets()">
               <option value="">All</option>
               <option>Golden Retriever</option>
               <option>Maine Coon</option>
-              <option>French Bulldog</option>
-              <option>Persian</option>
+              <option>Bulldog Francés</option>
+              <option>Persa</option>
               <option>Labrador</option>
             </select>
           </div>
-          <button class="btn" onclick="clearPetFilters()" data-i18n="filters.clear">Clear</button>
+          <button class="btn" onclick="clearPetFilters()" data-i18n="filters.clear">Limpiar</button>
         </div>
 
         <div class="card">
           <div class="pets-table-wrap">
             <table>
-              <thead><tr><th>Pet</th><th>Species</th><th>Breed</th><th>Owner</th><th>Veterinarian</th><th>Vaccination</th><th>Next Visit</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Pet</th><th>Especie</th><th>Raza</th><th>Dueño</th><th>Veterinario</th><th>Vacunación</th><th>Próxima visita</th><th>Acciones</th></tr></thead>
               <tbody id="petsBody"></tbody>
             </table>
           </div>
@@ -330,37 +330,37 @@ const __BODY_TEMPLATE__ = () => `
         </div>
 
         <div class="quick-grid quick-grid-4" style="margin-top:18px;">
-          <button class="quick-btn" style="background:#fff;border:1px solid var(--line);" onclick="document.getElementById('petSearch').focus();toast('Type to search for a pet')"><div class="qicon" style="background:var(--green-100);"></div><b>Search Pet</b><span>Find a pet quickly</span></button>
-          <button class="quick-btn" style="background:#fff;border:1px solid var(--line);" onclick="go('afiliaciones')"><div class="qicon" style="background:var(--amber-100);"></div><b>View Affiliations</b><span>Manage owner codes</span></button>
-          <button class="quick-btn" style="background:#fff;border:1px solid var(--line);" onclick="go('personal')"><div class="qicon" style="background:var(--purple-100);"></div><b>View Staff</b><span>Check the veterinary team</span></button>
+          <button class="quick-btn" style="background:#fff;border:1px solid var(--line);" onclick="document.getElementById('petSearch').focus();toast('Type to search for a pet')"><div class="qicon" style="background:var(--green-100);"></div><b>Buscar mascota</b><span>Buscar una mascota rápido</span></button>
+          <button class="quick-btn" style="background:#fff;border:1px solid var(--line);" onclick="go('afiliaciones')"><div class="qicon" style="background:var(--amber-100);"></div><b>Ver afiliaciones</b><span>Gestionar códigos de dueños</span></button>
+          <button class="quick-btn" style="background:#fff;border:1px solid var(--line);" onclick="go('personal')"><div class="qicon" style="background:var(--purple-100);"></div><b>Ver personal</b><span>Revisar el equipo veterinario</span></button>
         </div>
       </section>
 
       <!-- ================= AFFILIATIONS ================= -->
       <section class="page" id="page-afiliaciones">
-        <div class="breadcrumb"><a onclick="go('afiliaciones')">Affiliations</a> / <b id="afilTabLabel">Active Codes</b></div>
+        <div class="breadcrumb"><a onclick="go('afiliaciones')">Afiliaciones</a> / <b id="afilTabLabel">Códigos activos</b></div>
         <div class="page-head">
-          <div><h1>Affiliations</h1><p>Generate and manage affiliation codes so new owners can join your clinic.</p></div>
-          <div class="head-actions"><button class="btn primary" onclick="generarCodigo()">${ICON.plus} Generate New Code</button></div>
+          <div><h1>Afiliaciones</h1><p>Generate and manage affiliation codes so new owners can join your clinic.</p></div>
+          <div class="head-actions"><button class="btn primary" onclick="generarCodigo()">${ICON.plus} Generate New Código</button></div>
         </div>
         <div class="stats">
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">📋</div><div><h3>Active Codes</h3><div class="num" id="statActivos">—</div></div></div><div class="delta up">Available codes</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">✅</div><div><h3>Used Codes</h3><div class="num" id="statUsados">—</div></div></div><div class="delta up">&nbsp;</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--amber-100);">⏰</div><div><h3>Expiring in 7 days</h3><div class="num" id="statExpiring7">—</div></div></div><div class="delta down">Attention required</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--purple-100);">💗</div><div><h3>Total Generated</h3><div class="num" id="statTotal">—</div></div></div><div class="delta up">Since the beginning</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">📋</div><div><h3>Códigos activos</h3><div class="num" id="statActivos">—</div></div></div><div class="delta up">Códigos disponibles</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">✅</div><div><h3>Códigos usados</h3><div class="num" id="statUsados">—</div></div></div><div class="delta up">&nbsp;</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--amber-100);">⏰</div><div><h3>Vence en 7 días</h3><div class="num" id="statExpiring7">—</div></div></div><div class="delta down">Requiere atención</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--purple-100);">💗</div><div><h3>Total generado</h3><div class="num" id="statTotal">—</div></div></div><div class="delta up">Desde el inicio</div></div>
         </div>
 
         <div class="tabs">
-          <button class="tab active" data-tab="activos" onclick="switchAfilTab('activos')">Active</button>
+          <button class="tab active" data-tab="activos" onclick="switchAfilTab('activos')">Activo</button>
 
         <div class="split">
           <div class="card">
             <div class="filters" style="margin-bottom:14px;">
               <div class="search" style="max-width:280px;">${ICON.search}<input id="afilSearch" placeholder="Search code, used by, email…" oninput="renderAfiliaciones()"></div>
-              <select id="afilEstado" onchange="renderAfiliaciones()"><option value="">Status: All</option><option>Active</option><option>Pending</option></select>
+              <select id="afilEstado" onchange="renderAfiliaciones()"><option value="">Estado: Todos</option><option>Activo</option><option>Pendiente</option></select>
             </div>
             <div style="overflow-x:auto;"><table>
-              <thead><tr><th>Code</th><th>QR</th><th>Used by</th><th>Email</th><th>Status</th><th>Expiration</th><th>Uses</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Código</th><th>QR</th><th>Usado por</th><th>Correo</th><th>Estado</th><th>Expiration</th><th>Usos</th><th>Acciones</th></tr></thead>
               <tbody id="afilBody"></tbody>
             </table></div>
             <div class="table-foot">
@@ -371,7 +371,7 @@ const __BODY_TEMPLATE__ = () => `
 
           <div class="code-panel" id="codePanel">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;font-size:15px;">Code Details</h3>
+              <h3 style="margin:0;font-size:15px;">Detalles del código</h3>
               <button class="icon-btn" onclick="document.getElementById('codePanel').style.display='none'">${ICON.close}</button>
             </div>
             <div id="codePanelBody"></div>
@@ -383,19 +383,19 @@ const __BODY_TEMPLATE__ = () => `
 
       <!-- ================= STAFF ================= -->
       <section class="page" id="page-personal">
-        <div class="breadcrumb"><a onclick="go('dashboard')">Dashboard</a> / <b>Staff</b></div>
+        <div class="breadcrumb"><a onclick="go('dashboard')">Panel</a> / <b>Personal</b></div>
         <div class="page-head">
-          <div><h1>Staff</h1><p>Manage your clinic's veterinary team and staff.</p></div>
+          <div><h1>Personal</h1><p>Gestiona el equipo veterinario y el personal de tu clínica.</p></div>
           <div class="head-actions">
             <button class="btn" onclick="toast('Invitation sent by email')">${ICON.invite} Invite Member</button>
             <button class="btn" onclick="toast('Exporting staff list…')">${ICON.download} Export List</button>
-            <button class="btn primary" onclick="openVetModal()">${ICON.plus} Add Veterinarian</button>
+            <button class="btn primary" onclick="openVetModal()">${ICON.plus} Agregar veterinario</button>
           </div>
         </div>
         <div class="stats">
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">👥</div><div><h3>Total Veterinarians</h3><div class="num" id="statVets">—</div></div></div><div class="delta up">All veterinary staff</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">✅</div><div><h3>Active Staff</h3><div class="num" id="statActiveStaff">—</div></div></div><div class="delta up">Active accounts</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--amber-100);">📅</div><div><h3>Available Today</h3><div class="num" id="statAvailableToday">—</div></div></div><div class="delta up">Available veterinarians</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">👥</div><div><h3>Total de veterinarios</h3><div class="num" id="statVets">—</div></div></div><div class="delta up">Todo el personal veterinario</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">✅</div><div><h3>Personal activo</h3><div class="num" id="statActivoPersonal">—</div></div></div><div class="delta up">Cuentas activas</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--amber-100);">📅</div><div><h3>Disponible hoy</h3><div class="num" id="statAvailableHoy">—</div></div></div><div class="delta up">Veterinarios disponibles</div></div>
 
         </div>
 
@@ -403,10 +403,10 @@ const __BODY_TEMPLATE__ = () => `
           <div class="card">
             <div class="filters" style="margin-bottom:14px;">
               <div class="search" style="max-width:280px;">${ICON.search}<input id="vetSearch" placeholder="Search veterinarian by name or specialty…" oninput="renderVets()"></div>
-              <select id="vetEstado" onchange="renderVets()"><option value="">Status: All</option><option>Active</option><option>On vacation</option><option>Inactive</option></select>
+              <select id="vetEstado" onchange="renderVets()"><option value="">Estado: Todos</option><option>Activo</option><option>De vacaciones</option><option>Inactivo</option></select>
             </div>
             <div style="overflow-x:auto;"><table>
-              <thead><tr><th>Veterinarian</th><th>Role</th><th>Specialty</th><th>Email</th><th>Schedule</th><th>Patients</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Veterinario</th><th>Rol</th><th>Specialty</th><th>Correo</th><th>Horario</th><th>Pacientes</th><th>Estado</th><th>Acciones</th></tr></thead>
               <tbody id="vetsBody"></tbody>
             </table></div>
             <div class="table-foot"><span id="vetsCount"></span></div>
@@ -414,7 +414,7 @@ const __BODY_TEMPLATE__ = () => `
 
           <div class="code-panel" id="vetPanel">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h3 style="margin:0;font-size:15px;">Profile</h3>
+              <h3 style="margin:0;font-size:15px;">Perfil</h3>
               <button class="icon-btn" onclick="document.getElementById('vetPanel').style.display='none'">${ICON.close}</button>
             </div>
             <div id="vetPanelBody"></div>
@@ -424,41 +424,41 @@ const __BODY_TEMPLATE__ = () => `
 
       <!-- ================= SETTINGS ================= -->
       <section class="page" id="page-configuracion">
-        <div class="breadcrumb"><a onclick="go('configuracion')" data-i18n="breadcrumbs.config">Settings</a> / <b data-i18n="breadcrumbs.clinicInfo">Clinic Information</b></div>
-        <div class="page-head"><div><h1 data-i18n="config.title">Settings</h1><p data-i18n="config.subtitle">Manage and personalize your clinic and the Doppy platform.</p></div></div>
+        <div class="breadcrumb"><a onclick="go('configuracion')" data-i18n="breadcrumbs.config">Configuración</a> / <b data-i18n="breadcrumbs.clinicInfo">Información de la clínica</b></div>
+        <div class="page-head"><div><h1 data-i18n="config.title">Configuración</h1><p data-i18n="config.subtitle">Gestiona y personaliza tu clínica y la plataforma Doppy.</p></div></div>
 
         <div class="split">
           <div class="card">
-            <h3 style="margin-top:0;" data-i18n="config.clinicInfo">Clinic Information</h3>
+            <h3 style="margin-top:0;" data-i18n="config.clinicInfo">Información de la clínica</h3>
             <div class="form-grid" style="margin-top:14px;">
-              <div class="field full"><label data-i18n="config.name">Clinic Name</label><input id="cfgNombre" value="Happy Paws Veterinary Clinic"></div>
-              <div class="field full"><label data-i18n="config.address">Address</label><input id="cfgDireccion" value="123 Veterinarians Ave, Downtown District"></div>
-              <div class="field"><label data-i18n="config.city">City</label><input id="cfgCiudad" value="Panama City"></div>
-              <div class="field"><label data-i18n="config.province">Province</label><input id="cfgProvincia" value="Panama"></div>
-              <div class="field"><label data-i18n="config.postalCode">Postal Code</label><input id="cfgCP" value="0801"></div>
-              <div class="field"><label data-i18n="config.phone">Phone</label><input id="cfgTel" value="+507 1234-5678"></div>
-              <div class="field"><label data-i18n="config.email">Email</label><input id="cfgEmail" value="info@happypawsvet.com"></div>
-              <div class="field"><label data-i18n="config.website">Website</label><input id="cfgWeb" value="www.happypawsvet.com"></div>
-              <div class="field"><label data-i18n="config.language">Language</label><select id="cfgIdioma" onchange="setLanguage(this.value)"><option value="es">Spanish</option><option value="en">English</option></select></div>
+              <div class="field full"><label data-i18n="config.name">Nombre de la clínica</label><input id="cfgNombre" value="Clínica Veterinaria Happy Paws"></div>
+              <div class="field full"><label data-i18n="config.address">Dirección</label><input id="cfgDireccion" value="123 Veterinarios Ave, Downtown District"></div>
+              <div class="field"><label data-i18n="config.city">Ciudad</label><input id="cfgCiudad" value="Panama Ciudad"></div>
+              <div class="field"><label data-i18n="config.province">Provincia</label><input id="cfgProvincia" value="Panama"></div>
+              <div class="field"><label data-i18n="config.postalCódigo">Código postal</label><input id="cfgCP" value="0801"></div>
+              <div class="field"><label data-i18n="config.phone">Teléfono</label><input id="cfgTel" value="+507 1234-5678"></div>
+              <div class="field"><label data-i18n="config.email">Correo</label><input id="cfgCorreo" value="info@happypawsvet.com"></div>
+              <div class="field"><label data-i18n="config.website">Sitio web</label><input id="cfgWeb" value="www.happypawsvet.com"></div>
+              <div class="field"><label data-i18n="config.language">Idioma</label><select id="cfgIdioma" onchange="setIdioma(this.value)"><option value="es">Español</option><option value="en">Inglés</option></select></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;">
-              <button class="btn primary" onclick="guardarConfig()" data-i18n="config.save">Save Changes</button>
-              <button class="btn" onclick="toast(getTranslation('config.toast.discardChanges'))" data-i18n="config.cancel">Cancel</button>
+              <button class="btn primary" onclick="guardarConfig()" data-i18n="config.save">Guardar cambios</button>
+              <button class="btn" onclick="toast(getTranslation('config.toast.discardChanges'))" data-i18n="config.cancel">Cancelar</button>
             </div>
           </div>
           <div>
             <div class="card" style="margin-bottom:14px;">
-              <h3 style="margin-top:0;font-size:15px;" data-i18n="config.plan">Your Current Plan</h3>
-              <div style="font-weight:700;color:var(--amber);margin:8px 0;" id="planNameLabel">Professional Plan</div>
-              <div class="kv"><span data-i18n="config.users">Users</span><span id="planUsersLabel">—</span></div>
-              <div class="kv"><span data-i18n="config.patients">Patients</span><span id="planPatientsLabel">—</span></div>
-              <div class="kv"><span data-i18n="config.nextCharge">Next charge</span><span id="planNextChargeLabel">—</span></div>
-              <button class="btn" style="width:100%;margin-top:12px;" onclick="toast(getTranslation('config.toast.managePlan'))" data-i18n="config.managePlan">Manage Subscription</button>
+              <h3 style="margin-top:0;font-size:15px;" data-i18n="config.plan">Tu plan actual</h3>
+              <div style="font-weight:700;color:var(--amber);margin:8px 0;" id="planNombreLabel">Plan Profesional</div>
+              <div class="kv"><span data-i18n="config.users">Usuarios</span><span id="planUsuariosLabel">—</span></div>
+              <div class="kv"><span data-i18n="config.patients">Pacientes</span><span id="planPacientesLabel">—</span></div>
+              <div class="kv"><span data-i18n="config.nextCharge">Próximo cobro</span><span id="planNextChargeLabel">—</span></div>
+              <button class="btn" style="width:100%;margin-top:12px;" onclick="toast(getTranslation('config.toast.managePlan'))" data-i18n="config.managePlan">Gestionar suscripción</button>
             </div>
             <div class="card" style="margin-bottom:14px;">
-              <h3 style="margin-top:0;font-size:15px;" data-i18n="config.help">Need help?</h3>
-              <p style="color:var(--muted);font-size:13px;" data-i18n="config.helpText">Our team is ready to help with any questions.</p>
-              <button class="btn" style="width:100%;" onclick="toast(getTranslation('config.toast.contactSupport'))" data-i18n="config.contactSupport">Contact Support</button>
+              <h3 style="margin-top:0;font-size:15px;" data-i18n="config.help">¿Necesitas ayuda?</h3>
+              <p style="color:var(--muted);font-size:13px;" data-i18n="config.helpText">Nuestro equipo está listo para ayudarte con cualquier duda.</p>
+              <button class="btn" style="width:100%;" onclick="toast(getTranslation('config.toast.contactSupport'))" data-i18n="config.contactSupport">Contactar soporte</button>
             </div>
           </div>
         </div>
@@ -466,62 +466,62 @@ const __BODY_TEMPLATE__ = () => `
 
       <!-- ================= REPORTS ================= -->
       <section class="page" id="page-reportes">
-        <div class="breadcrumb"><a onclick="go('dashboard')">Dashboard</a> / <b>Reports</b></div>
+        <div class="breadcrumb"><a onclick="go('dashboard')">Panel</a> / <b>Informes</b></div>
         <div class="page-head">
-          <div><h1>Reports</h1><p>Analytics and performance reports for your clinic.</p></div>
+          <div><h1>Informes</h1><p>Estadísticas e informes de rendimiento de tu clínica.</p></div>
           <div class="head-actions">
             <select id="repRango" onchange="renderReportes()">
-              <option value="7d">Last 7 days</option>
-              <option value="30d" selected>Last 30 days</option>
-              <option value="trim">This quarter</option>
-              <option value="anio">This year</option>
+              <option value="7d">Últimos 7 días</option>
+              <option value="30d" selected>Últimos 30 días</option>
+              <option value="trim">Este trimestre</option>
+              <option value="anio">Este año</option>
             </select>
             <button class="btn" onclick="exportarReportePDF()">${ICON.download} Export PDF</button>
           </div>
         </div>
 
         <div class="stats">
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">📅</div><div><h3>Total Appointments</h3><div class="num" id="repCitas">312</div></div></div><div class="delta up" id="repCitasDelta">↑ 9.4% vs last month</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">✅</div><div><h3>Attendance Rate</h3><div class="num" id="repAsistencia">94%</div></div></div><div class="delta up" id="repAsistDelta">↑ 2.1% vs last month</div></div>
-          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--purple-100);">✨</div><div><h3>New Patients</h3><div class="num" id="repNuevos">62</div></div></div><div class="delta up" id="repNuevosDelta">↑ 10.7% vs last month</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--blue-100);">📅</div><div><h3>Total de citas</h3><div class="num" id="repCitas">312</div></div></div><div class="delta up" id="repCitasDelta">↑ 9.4% vs last month</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--green-100);">✅</div><div><h3>Tasa de asistencia</h3><div class="num" id="repAsistencia">94%</div></div></div><div class="delta up" id="repAsistDelta">↑ 2.1% vs last month</div></div>
+          <div class="stat-card"><div class="top"><div class="stat-icon" style="background:var(--purple-100);">✨</div><div><h3>Pacientes nuevos</h3><div class="num" id="repNuevos">62</div></div></div><div class="delta up" id="repNuevosDelta">↑ 10.7% vs last month</div></div>
 
         </div>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-head"><h3>New Patients by Month</h3><button class="link" onclick="toast('Showing full monthly detail')">View detail</button></div>
+            <div class="card-head"><h3>Pacientes nuevos por mes</h3><button class="link" onclick="toast('Showing full monthly detail')">Ver detalle</button></div>
             <div style="height:260px;"><canvas id="chartMonthly"></canvas></div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>Distribution by Species</h3></div>
-            <div style="height:260px;"><canvas id="chartSpecies"></canvas></div>
+            <div class="card-head"><h3>Distribución por especie</h3></div>
+            <div style="height:260px;"><canvas id="chartEspecie"></canvas></div>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-head"><h3>Vaccination Status</h3></div>
+            <div class="card-head"><h3>Estado de vacunación</h3></div>
             <div style="height:240px;"><canvas id="chartVac"></canvas></div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>Patients by Veterinarian</h3><button class="link" onclick="go('personal')">View staff</button></div>
+            <div class="card-head"><h3>Pacientes por veterinario</h3><button class="link" onclick="go('personal')">Ver personal</button></div>
             <div style="height:240px;"><canvas id="chartVets"></canvas></div>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-head"><h3>Affiliation Codes</h3><button class="link" onclick="go('afiliaciones')">View all</button></div>
+            <div class="card-head"><h3>Códigos de afiliación</h3><button class="link" onclick="go('afiliaciones')">Ver todo</button></div>
             <div style="height:220px;"><canvas id="chartAfil"></canvas></div>
           </div>
           <div class="card" id="reportsQuickSummaryCard">
-            <div class="card-head"><h3>Quick Summary</h3></div>
-            <div class="kv"><span>Cancelled appointments</span><span>19</span></div>
-            <div class="kv"><span>No-shows</span><span>12 (3.8%)</span></div>
-            <div class="kv"><span>Avg. code usage time</span><span>4.2 days</span></div>
+            <div class="card-head"><h3>Resumen rápido</h3></div>
+            <div class="kv"><span>Citas canceladas</span><span>19</span></div>
+            <div class="kv"><span>Inasistencias</span><span>12 (3.8%)</span></div>
+            <div class="kv"><span>Tiempo promedio de uso del código</span><span>4.2 days</span></div>
             <div class="kv"><span>Vaccines administered (month)</span><span>87</span></div>
-            <div class="kv"><span>Most requested veterinarian</span><span>Dr. Emily Carter</span></div>
-            <div class="kv"><span>Most in-demand specialty</span><span>Internal Medicine</span></div>
+            <div class="kv"><span>Veterinario más solicitado</span><span>Dr. Emily Carter</span></div>
+            <div class="kv"><span>Especialidad más solicitada</span><span>Medicina interna</span></div>
             <button class="btn" style="width:100%;margin-top:14px;" onclick="generarReporteDetallado()">${ICON.file} Generate Detailed Report</button>
           </div>
         </div>
@@ -534,51 +534,51 @@ const __BODY_TEMPLATE__ = () => `
 <!-- MODALS -->
 <div class="modal-bg" id="petModalBg">
   <div class="modal">
-    <h2>Register Pet</h2><p class="sub">Add a new pet to your clinic.</p>
+    <h2>Registrar mascota</h2><p class="sub">Agrega una nueva mascota a tu clínica.</p>
     <div class="form-grid two">
-      <div class="field"><label>Name</label><input id="mPetName" placeholder="E.g. Rocky"></div>
-      <div class="field"><label>Species</label><select id="mPetSpecies"><option>Dog</option><option>Cat</option></select></div>
-      <div class="field"><label>Breed</label><input id="mPetBreed" placeholder="E.g. Poodle"></div>
-      <div class="field"><label>Owner email</label><input id="mPetOwner" placeholder="owner@email.com"></div>
-      <div class="field"><label>Assigned veterinarian</label>
+      <div class="field"><label>Nombre</label><input id="mPetNombre" placeholder="E.g. Rocky"></div>
+      <div class="field"><label>Especie</label><select id="mPetEspecie"><option>Dog</option><option>Cat</option></select></div>
+      <div class="field"><label>Raza</label><input id="mPetRaza" placeholder="E.g. Poodle"></div>
+      <div class="field"><label>Correo del dueño</label><input id="mPetDueño" placeholder="owner@email.com"></div>
+      <div class="field"><label>Veterinario asignado</label>
         <select id="mPetVet"></select></div>
-      <div class="field"><label>Next visit</label><input id="mPetDate" type="date"></div>
+      <div class="field"><label>Próxima visita</label><input id="mPetDate" type="date"></div>
     </div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('petModalBg')">Cancel</button><button class="btn primary" onclick="submitPet()">Register Pet</button></div>
+    <div class="modal-foot"><button class="btn" onclick="closeModal('petModalBg')">Cancelar</button><button class="btn primary" onclick="submitPet()">Registrar mascota</button></div>
   </div>
 </div>
 
 <div class="modal-bg" id="vetModalBg">
   <div class="modal">
-    <h2>Add Veterinarian</h2><p class="sub">Add a new doctor to your clinic's team.</p>
+    <h2>Agregar veterinario</h2><p class="sub">Agrega un nuevo doctor al equipo de tu clínica.</p>
     <div class="form-grid two">
-      <div class="field"><label>Full name</label><input id="mVetName" placeholder="E.g. Dr. Carlos Ruiz"></div>
+      <div class="field"><label>Nombre completo</label><input id="mVetNombre" placeholder="E.g. Dr. Carlos Ruiz"></div>
       <div class="field"><label>Specialty</label><input id="mVetSpec" placeholder="E.g. Dermatology"></div>
-      <div class="field"><label>Email</label><input id="mVetEmail" placeholder="email@happypawsvet.com"></div>
-      <div class="field"><label>Schedule start</label><input id="mVetScheduleStart" type="time" value="08:00"></div>
-      <div class="field"><label>Schedule end</label><input id="mVetScheduleEnd" type="time" value="17:00"></div>
+      <div class="field"><label>Correo</label><input id="mVetCorreo" placeholder="email@happypawsvet.com"></div>
+      <div class="field"><label>Inicio de horario</label><input id="mVetHorarioStart" type="time" value="08:00"></div>
+      <div class="field"><label>Fin de horario</label><input id="mVetHorarioEnd" type="time" value="17:00"></div>
     </div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('vetModalBg')">Cancel</button><button class="btn primary" onclick="submitVet()">Add Veterinarian</button></div>
+    <div class="modal-foot"><button class="btn" onclick="closeModal('vetModalBg')">Cancelar</button><button class="btn primary" onclick="submitVet()">Agregar veterinario</button></div>
   </div>
 </div>
 
 <div class="modal-bg" id="adminModalBg">
   <div class="modal">
-    <h2>My Profile</h2><p class="sub">Your administrator account information.</p>
+    <h2>Mi perfil</h2><p class="sub">La información de tu cuenta de administrador.</p>
     <div style="text-align:center;margin:14px 0;">
       <div class="avatar" style="width:64px;height:64px;font-size:20px;margin:0 auto 10px;" id="adminModalAvatar">AD</div>
-      <div style="font-weight:700;">Administrator <span class="badge green">Active</span></div>
-      <div class="sub" style="color:var(--muted);font-size:12.5px;">Super Admin</div>
+      <div style="font-weight:700;">Administrador <span class="badge green">Activo</span></div>
+      <div class="sub" style="color:var(--muted);font-size:12.5px;">Superadministrador</div>
     </div>
-    <div class="kv"><span>Name</span><span id="adminModalName">—</span></div>
-    <div class="kv"><span>Email</span><span id="adminModalEmail">—</span></div>
-    <div class="kv"><span>Phone</span><span>+507 6000-0000</span></div>
-    <div class="kv"><span>Clinic</span><span id="adminModalClinic">—</span></div>
-    <div class="kv"><span>Role</span><span>Super Admin</span></div>
-    <div class="kv"><span>Last login</span><span id="adminLastLogin">Today</span></div>
+    <div class="kv"><span>Nombre</span><span id="adminModalNombre">—</span></div>
+    <div class="kv"><span>Correo</span><span id="adminModalCorreo">—</span></div>
+    <div class="kv"><span>Teléfono</span><span>+507 6000-0000</span></div>
+    <div class="kv"><span>Clínica</span><span id="adminModalClínica">—</span></div>
+    <div class="kv"><span>Rol</span><span>Superadministrador</span></div>
+    <div class="kv"><span>Último inicio de sesión</span><span id="adminLastLogin">Hoy</span></div>
     <div class="modal-foot">
-      <button class="btn" onclick="closeModal('adminModalBg')">Close</button>
-      <button class="btn primary" onclick="closeModal('adminModalBg');go('configuracion')">Edit in Settings</button>
+      <button class="btn" onclick="closeModal('adminModalBg')">Cerrar</button>
+      <button class="btn primary" onclick="closeModal('adminModalBg');go('configuracion')">Editar en Configuración</button>
     </div>
   </div>
 </div>
@@ -627,13 +627,13 @@ function stubPage(title, desc){
 /* ============ DATA (cargada desde Supabase) ============ */
 let pets = [];
 let affiliations = [];
-let expiredAffiliations = [];
+let expiredAfiliaciones = [];
 let vets = [];
 let activity = [];
 let notifications = [];
 let solicitudes = [];
 let afilTab = 'activos';
-let selectedCode = null;
+let selectedCódigo = null;
 const statCounters = { activos: 0, total: 0 };
 
 /* ---------------------------------------------------------
@@ -684,11 +684,11 @@ async function loadPets(){
   pets = (data || []).map(p => {
     const dueDates = (p.vaccination_record || []).map(v => v.next_due_date).filter(Boolean).sort();
     const nextDue = dueDates[0];
-    let vac = 'Up to date';
+    let vac = 'Al día';
     if (nextDue) {
       const days = (new Date(nextDue) - new Date()) / 86400000;
-      if (days < 0) vac = 'Overdue';
-      else if (days <= 30) vac = 'Upcoming';
+      if (days < 0) vac = 'Vencido';
+      else if (days <= 30) vac = 'Próxima';
     }
     return {
       dbId: p.id,
@@ -717,18 +717,18 @@ async function loadVets(){
   vets = (data || []).map(v => ({
     dbId: v.id,
     name: v.nombre,
-    role: v.rol || 'Veterinarian',
+    role: v.rol || 'Veterinario',
     spec: v.specialty || '—',
     email: v.email || '—',
     schedule: (v.schedule_start && v.schedule_end) ? `${v.schedule_start.slice(0,5)} - ${v.schedule_end.slice(0,5)}` : '—',
     patients: 0, // TODO: contar mascotas/turnos asignados a este veterinario
-    status: v.status ? (v.status.charAt(0).toUpperCase() + v.status.slice(1).replace('_', ' ')) : 'Active',
+    status: v.status ? (v.status.charAt(0).toUpperCase() + v.status.slice(1).replace('_', ' ')) : 'Activo',
     mv: v.license_number || ('MV-' + v.id)
   }));
 }
 
-async function loadAffiliations(){
-  if (!requireSupabase()) { affiliations = []; expiredAffiliations = []; return; }
+async function loadAfiliaciones(){
+  if (!requireSupabase()) { affiliations = []; expiredAfiliaciones = []; return; }
   const { data, error } = await supabaseClient
     .from('affiliations')
     .select(`
@@ -739,9 +739,9 @@ async function loadAffiliations(){
     .eq('veterinary_id', CURRENT_VETERINARY_ID)
     .order('id', { ascending: false });
 
-  if (error) { console.error('loadAffiliations', error); toast('Error loading affiliations'); affiliations = []; expiredAffiliations = []; return; }
+  if (error) { console.error('loadAfiliaciones', error); toast('Error loading affiliations'); affiliations = []; expiredAfiliaciones = []; return; }
 
-  const statusLabel = { active: 'Active', pending: 'Pending', rejected: 'Rejected', unclaimed: 'Active', expired: 'Expired' };
+  const statusLabel = { active: 'Activo', pending: 'Pendiente', rejected: 'Rechazared', unclaimed: 'Activo', expired: 'Expired' };
 
   const mapped = (data || []).map(a => {
     const daysLeft = a.expiration_date ? Math.max(0, Math.ceil((new Date(a.expiration_date) - new Date()) / 86400000)) : 0;
@@ -749,7 +749,7 @@ async function loadAffiliations(){
     return {
       dbId: a.id,
       petId: a.pet_id,
-      petName: a.pets?.pet_name || null,
+      petNombre: a.pets?.pet_name || null,
       code: a.code,
       owner: a.users?.name || (a.status === 'unclaimed' ? 'Not yet used' : '—'),
       email: a.users?.email || '—',
@@ -763,12 +763,12 @@ async function loadAffiliations(){
   });
 
   affiliations = mapped.filter(a => !a._isExpired);
-  expiredAffiliations = mapped.filter(a => a._isExpired);
+  expiredAfiliaciones = mapped.filter(a => a._isExpired);
 
-  statCounters.activos = affiliations.filter(a => a.status === 'Active').length;
+  statCounters.activos = affiliations.filter(a => a.status === 'Activo').length;
   statCounters.total = mapped.length;
   document.getElementById('statActivos') && (document.getElementById('statActivos').textContent = statCounters.activos);
-  document.getElementById('statUsados') && (document.getElementById('statUsados').textContent = mapped.filter(a => a.status === 'Active' && a.uses !== '0/10').length);
+  document.getElementById('statUsados') && (document.getElementById('statUsados').textContent = mapped.filter(a => a.status === 'Activo' && a.uses !== '0/10').length);
   document.getElementById('statExpiring7') && (document.getElementById('statExpiring7').textContent = affiliations.filter(a => a.daysLeft > 0 && a.daysLeft <= 7).length);
   document.getElementById('statTotal') && (document.getElementById('statTotal').textContent = statCounters.total);
 }
@@ -786,7 +786,7 @@ async function loadSolicitudes(){
   solicitudes = (data || []).map(s => ({
     id: s.id,
     code: s.code,
-    nombre: s.users?.name || 'New Owner',
+    nombre: s.users?.name || 'New Dueño',
     email: s.users?.email || '—',
     time: s.requested_at ? new Date(s.requested_at).toLocaleString('en-US') : 'Recently'
   }));
@@ -824,7 +824,7 @@ async function loadNotifications(){
   notifications = (data || []).map(n => ({ icon: '🔔', title: n.title, desc: n.message, time: new Date(n.created_at).toLocaleString('en-US') }));
 }
 
-async function loadDashboardStats(){
+async function loadPanelStats(){
   if (!requireSupabase()) return;
   const [petsCount, vetsCount, pendingCount, activeAfilCount] = await Promise.all([
     supabaseClient.from('pets').select('id', { count: 'exact', head: true }).eq('primary_clinic_id', CURRENT_VETERINARY_ID),
@@ -833,17 +833,17 @@ async function loadDashboardStats(){
     supabaseClient.from('affiliations').select('id', { count: 'exact', head: true }).eq('veterinary_id', CURRENT_VETERINARY_ID).eq('status', 'active')
   ]);
 
-  setText('statDashPatients', petsCount.count ?? 0);
-  setText('statDashOwners', activeAfilCount.count ?? 0); // dueños con al menos una afiliación activa
+  setText('statDashPacientes', petsCount.count ?? 0);
+  setText('statDashDueños', activeAfilCount.count ?? 0); // dueños con al menos una afiliación activa
   setText('statDashVets', vetsCount.count ?? 0);
-  setText('statDashPending', pendingCount.count ?? 0);
+  setText('statDashPendiente', pendingCount.count ?? 0);
 
   setText('statTotalPets', petsCount.count ?? 0);
   setText('statVets', vetsCount.count ?? 0);
-  setText('statActiveStaff', vets.filter(v => v.status === 'Active').length);
-  setText('statAvailableToday', vets.filter(v => v.status === 'Active').length);
-  setText('statVaccinesDue', pets.filter(p => p.vac === 'Upcoming' || p.vac === 'Overdue').length);
-  // TODO: Upcoming Appointments y New Patients (mes) requieren la tabla appointments
+  setText('statActivoPersonal', vets.filter(v => v.status === 'Activo').length);
+  setText('statAvailableHoy', vets.filter(v => v.status === 'Activo').length);
+  setText('statVaccinesDue', pets.filter(p => p.vac === 'Próxima' || p.vac === 'Vencido').length);
+  // TODO: Próximas citas y Pacientes nuevos (mes) requieren la tabla appointments
   // filtrada por rango de fechas; se dejan sin calcular por ahora.
 }
 
@@ -859,8 +859,8 @@ async function loadAll(){
   await loadCurrentAdminContext();
   applyAdminContextToUI();
   try {
-    await Promise.all([loadPets(), loadVets(), loadAffiliations(), loadSolicitudes(), loadActivity(), loadNotifications()]);
-    await loadDashboardStats();
+    await Promise.all([loadPets(), loadVets(), loadAfiliaciones(), loadSolicitudes(), loadActivity(), loadNotifications()]);
+    await loadPanelStats();
   } catch (e) {
     console.error('[Doppy] loadAll failed:', e);
     toast('⚠️ Could not load data from Supabase — showing the app with no data');
@@ -870,41 +870,41 @@ async function loadAll(){
   renderVets();
   renderAfiliaciones();
   renderSolicitudes();
-  renderDashboardTables();
+  renderPanelTables();
   renderNotifications();
   applyTranslations();
   populateVetSelect();
-  if (affiliations.length) showCodeDetails(affiliations[0].code);
+  if (affiliations.length) showCódigoDetails(affiliations[0].code);
 }
 
 function populateVetSelect(){
   const sel = document.getElementById('mPetVet');
   if (!sel) return;
-  sel.innerHTML = vets.map(v => `<option value="${v.dbId}">${v.name}</option>`).join('') || '<option value="">No veterinarians yet</option>';
+  sel.innerHTML = vets.map(v => `<option value="${v.dbId}">${v.name}</option>`).join('') || '<option value="">Aún no hay veterinarios</option>';
 }
 
 /* ============ RENDER HELPERS ============ */
 function vacBadge(v){
   const labels = {
-    'Up to date': getTranslation('states.upToDate', 'Up to date'),
-    'Upcoming': getTranslation('states.upcoming', 'Upcoming'),
-    'Overdue': getTranslation('states.overdue', 'Overdue')
+    'Al día': getTranslation('states.upToDate', 'Al día'),
+    'Próxima': getTranslation('states.upcoming', 'Próxima'),
+    'Vencido': getTranslation('states.overdue', 'Vencido')
   };
   const label = labels[v] || v;
-  if(v==='Up to date') return `<span class="badge green">✓ ${label}</span>`;
-  if(v==='Upcoming') return `<span class="badge amber">◔ ${label}</span>`;
+  if(v==='Al día') return `<span class="badge green">✓ ${label}</span>`;
+  if(v==='Próxima') return `<span class="badge amber">◔ ${label}</span>`;
   return `<span class="badge red">⚠ ${label}</span>`;
 }
 function statusBadge(s){
   const labels = {
-    Active: getTranslation('states.active', 'Active'),
-    Pending: getTranslation('states.pending', 'Pending'),
+    Activo: getTranslation('states.active', 'Activo'),
+    Pendiente: getTranslation('states.pending', 'Pendiente'),
     Expired: getTranslation('states.expired', 'Expired'),
-    'On vacation': getTranslation('states.vacation', 'On vacation'),
-    Inactive: getTranslation('states.inactive', 'Inactive'),
-    Rejected: 'Rejected'
+    'De vacaciones': getTranslation('states.vacation', 'De vacaciones'),
+    Inactivo: getTranslation('states.inactive', 'Inactivo'),
+    Rechazared: 'Rechazared'
   };
-  const map = {Active:'green', Pending:'amber', Expired:'red', 'On vacation':'amber', Inactive:'red', Rejected:'red'};
+  const map = {Activo:'green', Pendiente:'amber', Expired:'red', 'De vacaciones':'amber', Inactivo:'red', Rechazared:'red'};
   return `<span class="badge ${map[s]||'gray'}">${labels[s] || s}</span>`;
 }
 
@@ -945,7 +945,7 @@ function renderPets(){
         <button class="icon-btn" title="Delete patient" onclick="eliminarPaciente(${p.dbId}, '${p.name.replace(/'/g, "\\'")}')">${ICON.more}</button>
       </div></td>
     </tr>
-  `).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">No pets found matching those filters.</td></tr>`;
+  `).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">No se encontraron mascotas con esos filtros.</td></tr>`;
 
   const countEl = document.getElementById('petsCount');
   if(countEl){
@@ -953,7 +953,7 @@ function renderPets(){
   }
 }
 
-function currentAfilList(){ return afilTab==='activos' ? affiliations : expiredAffiliations; }
+function currentAfilList(){ return afilTab==='activos' ? affiliations : expiredAfiliaciones; }
 
 function renderAfiliaciones(){
   const q = (document.getElementById('afilSearch')?.value || '').toLowerCase();
@@ -964,29 +964,29 @@ function renderAfiliaciones(){
   );
   document.getElementById('afilBody').innerHTML = list.map((a) => `
     <tr class="table-row">
-      <td><b>${a.code}</b><br><button class="link" style="padding:0;font-size:11.5px;" onclick="navigator.clipboard && navigator.clipboard.writeText('${a.code}');toast('Code copied to clipboard')">Copy ⧉</button></td>
-      <td><button class="thumb" style="width:26px;height:26px;font-size:11px;border:none;cursor:pointer;" title="View QR" onclick="showCodeDetails('${a.code}')">▦</button></td>
+      <td><b>${a.code}</b><br><button class="link" style="padding:0;font-size:11.5px;" onclick="navigator.clipboard && navigator.clipboard.writeText('${a.code}');toast('Código copied to clipboard')">Copy ⧉</button></td>
+      <td><button class="thumb" style="width:26px;height:26px;font-size:11px;border:none;cursor:pointer;" title="View QR" onclick="showCódigoDetails('${a.code}')">▦</button></td>
       <td>${a.owner}</td><td>${a.email}</td>
       <td>${statusBadge(a.status)}</td>
       <td>${a.exp}${a.daysLeft?`<div class="sub" style="color:var(--muted);font-size:11.5px;">${a.daysLeft} days left</div>`:''}</td>
       <td>${a.uses}</td>
       <td><div class="row-actions">
-        <button class="icon-btn" title="View details" onclick="showCodeDetails('${a.code}')">${ICON.eye}</button>
+        <button class="icon-btn" title="Ver detalles" onclick="showCódigoDetails('${a.code}')">${ICON.eye}</button>
         <button class="icon-btn" title="Regenerate" onclick="regenerarCodigo('${a.code}')">${ICON.edit}</button>
-        <button class="icon-btn" title="Delete patient" onclick="eliminarPaciente(${a.petId || 'null'}, '${(a.petName || '').replace(/'/g, "\\'")}')">${ICON.more}</button>
+        <button class="icon-btn" title="Delete patient" onclick="eliminarPaciente(${a.petId || 'null'}, '${(a.petNombre || '').replace(/'/g, "\\'")}')">${ICON.more}</button>
       </div></td>
     </tr>
-  `).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">No codes match your search.</td></tr>`;
+  `).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">No hay códigos que coincidan con tu búsqueda.</td></tr>`;
   document.getElementById('afilCount').textContent = `Showing 1 to ${list.length} of ${currentAfilList().length} ${afilTab==='activos' ? 'active' : 'expired'} codes`;
 }
 
 function switchAfilTab(tab){
   afilTab = tab;
   document.querySelectorAll('#page-afiliaciones .tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
-  document.getElementById('afilTabLabel').textContent = tab==='activos' ? 'Active Codes' : 'Expired Codes';
+  document.getElementById('afilTabLabel').textContent = tab==='activos' ? 'Códigos activos' : 'Expired Códigos';
   renderAfiliaciones();
   const list = currentAfilList();
-  if(list.length) showCodeDetails(list[0].code); else document.getElementById('codePanel').style.display = 'none';
+  if(list.length) showCódigoDetails(list[0].code); else document.getElementById('codePanel').style.display = 'none';
 }
 
 // El QR codifica el mismo código alfanumérico que se muestra como texto.
@@ -997,10 +997,10 @@ function drawQR(containerId, text){
   const el = document.getElementById(containerId);
   if(!el) return;
   el.innerHTML = '';
-  if(window.QRCode){
-    new QRCode(el, {text, width:220, height:220, colorDark:'#0F172A', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
+  if(window.QRCódigo){
+    new QRCódigo(el, {text, width:220, height:220, colorDark:'#0F172A', colorLight:'#ffffff', correctLevel:QRCódigo.CorrectLevel.M});
   } else {
-    el.innerHTML = `<div style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;padding:10px;">Could not load the QR generator</div>`;
+    el.innerHTML = `<div style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;padding:10px;">No se pudo cargar el generador de QR</div>`;
   }
 }
 
@@ -1019,8 +1019,8 @@ function downloadQR(containerId, filename){
   toast('⬇️ QR code downloaded');
 }
 
-function shareCode(code){
-  const shareText = `Join Happy Paws Veterinary Clinic on Doppy with code: ${code}`;
+function shareCódigo(code){
+  const shareText = `Join Clínica Veterinaria Happy Paws on Doppy with code: ${code}`;
   if(navigator.share){
     navigator.share({title:'Doppy affiliation code', text:shareText}).catch(()=>{});
   } else if(navigator.clipboard){
@@ -1031,29 +1031,29 @@ function shareCode(code){
   }
 }
 
-function randomCode(){
+function randomCódigo(){
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const rand = n => Array.from({length:n}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
   return `DOPPY-${rand(4)}-${rand(4)}`;
 }
 
-async function eliminarPaciente(petId, petName){
+async function eliminarPaciente(petId, petNombre){
   if (!petId) { toast('No patient linked to this row'); return; }
-  const confirmed = confirm(`Delete ${petName || 'this patient'}? This also removes their vaccination records, appointments and affiliation history. This cannot be undone.`);
+  const confirmed = confirm(`Delete ${petNombre || 'this patient'}? This also removes their vaccination records, appointments and affiliation history. This cannot be undone.`);
   if (!confirmed) return;
   if (!requireSupabase()) return;
   const { error } = await supabaseClient.from('pets').delete().eq('id', petId);
   if (error) { console.error('eliminarPaciente', error); toast('Error deleting patient'); return; }
-  toast(`🗑️ ${petName || 'Patient'} deleted`);
-  await Promise.all([loadPets(), loadAffiliations(), loadDashboardStats()]);
-  renderPets(); renderAfiliaciones(); renderDashboardTables();
+  toast(`🗑️ ${petNombre || 'Patient'} deleted`);
+  await Promise.all([loadPets(), loadAfiliaciones(), loadPanelStats()]);
+  renderPets(); renderAfiliaciones(); renderPanelTables();
 }
 
 /* ============ AFFILIATIONS: ACCIONES CONTRA SUPABASE ============ */
 
 async function generarCodigo(){
   if (!requireSupabase()) return;
-  const code = randomCode();
+  const code = randomCódigo();
   const expiration = new Date(); expiration.setDate(expiration.getDate() + 30);
   const { error } = await supabaseClient.from('affiliations').insert({
     code,
@@ -1065,55 +1065,55 @@ async function generarCodigo(){
     generated_by: CURRENT_STAFF_ID
   });
   if (error) { console.error('generarCodigo', error); toast('Error generating code'); return; }
-  toast(`🏷️ Code ${code} generated successfully`);
-  await loadAffiliations();
+  toast(`🏷️ Código ${code} generated successfully`);
+  await loadAfiliaciones();
   afilTab = 'activos';
   switchAfilTab('activos');
-  showCodeDetails(code);
+  showCódigoDetails(code);
 }
 
-async function regenerarCodigo(oldCode){
+async function regenerarCodigo(oldCódigo){
   if (!requireSupabase()) return;
-  const item = currentAfilList().find(x => x.code === oldCode);
+  const item = currentAfilList().find(x => x.code === oldCódigo);
   if (!item) return;
-  const newCode = randomCode();
+  const newCódigo = randomCódigo();
   const { error } = await supabaseClient.from('affiliations')
-    .update({ code: newCode, current_uses: 0, status: 'unclaimed' })
+    .update({ code: newCódigo, current_uses: 0, status: 'unclaimed' })
     .eq('id', item.dbId);
   if (error) { console.error('regenerarCodigo', error); toast('Error regenerating code'); return; }
-  toast(`🔄 Code regenerated: ${newCode}`);
-  await loadAffiliations();
+  toast(`🔄 Código regenerated: ${newCódigo}`);
+  await loadAfiliaciones();
   renderAfiliaciones();
-  if (selectedCode === oldCode) showCodeDetails(newCode);
+  if (selectedCódigo === oldCódigo) showCódigoDetails(newCódigo);
 }
 
-function showCodeDetails(code){
+function showCódigoDetails(code){
   const a = currentAfilList().find(x => x.code===code);
   if(!a) return;
-  selectedCode = code;
+  selectedCódigo = code;
   document.getElementById('codePanel').style.display = 'block';
   document.getElementById('codePanelBody').innerHTML = `
     <div style="text-align:center;margin-top:10px;">
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700;">Affiliation Code</div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700;">Código de afiliación</div>
       <div style="font-size:22px;font-weight:800;letter-spacing:.03em;font-family:monospace;margin:4px 0 10px;color:var(--ink);">${a.code}</div>
     </div>
     <div class="qr" id="qrTarget" style="display:flex;align-items:center;justify-content:center;margin-bottom:14px;"></div>
     <div style="text-align:center;">
       <div style="margin-bottom:4px;">${statusBadge(a.status)}</div>
-      <button class="btn" style="padding:6px 14px;font-size:12px;display:inline-flex;margin-top:4px;" onclick="navigator.clipboard && navigator.clipboard.writeText('${a.code}');toast('Code copied to clipboard')">⧉ Copy Code</button>
+      <button class="btn" style="padding:6px 14px;font-size:12px;display:inline-flex;margin-top:4px;" onclick="navigator.clipboard && navigator.clipboard.writeText('${a.code}');toast('Código copied to clipboard')">⧉ Copy Código</button>
       <p style="font-size:11.5px;color:var(--muted);margin:10px 0 0;line-height:1.4;">
-        The owner can <b>scan the QR</b> or <b>type this code</b> into the Doppy app: both options do exactly the same thing — they send an affiliation request that appears under <b>Affiliation Requests</b> on the Dashboard for you to approve or reject.
+        The owner can <b>scan the QR</b> or <b>type this code</b> into the Doppy app: both options do exactly the same thing — they send an affiliation request that appears under <b>Solicitudes de afiliación</b> on the Panel for you to approve or reject.
       </p>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:8px;margin-top:14px;">
       <button class="btn" style="flex:1;justify-content:center;" onclick="downloadQR('qrTarget','${a.code}')">${ICON.download} Download QR</button>
-      <button class="btn" style="flex:1;justify-content:center;" onclick="shareCode('${a.code}')">${ICON.invite} Share</button>
+      <button class="btn" style="flex:1;justify-content:center;" onclick="shareCódigo('${a.code}')">${ICON.invite} Share</button>
     </div>
-    <div class="kv"><span>Expiration date</span><span>${a.exp}</span></div>
-    <div class="kv"><span>Uses</span><span>${a.uses}</span></div>
-    <div class="kv"><span>Used by</span><span>${a.owner}</span></div>
-    <div class="kv"><span>Email</span><span>${a.email}</span></div>
-    <button class="btn danger" style="width:100%;margin-top:14px;" onclick="regenerarCodigo('${a.code}')">🔄 Regenerate Code</button>
+    <div class="kv"><span>Fecha de vencimiento</span><span>${a.exp}</span></div>
+    <div class="kv"><span>Usos</span><span>${a.uses}</span></div>
+    <div class="kv"><span>Usado por</span><span>${a.owner}</span></div>
+    <div class="kv"><span>Correo</span><span>${a.email}</span></div>
+    <button class="btn danger" style="width:100%;margin-top:14px;" onclick="regenerarCodigo('${a.code}')">🔄 Regenerate Código</button>
   `;
   drawQR('qrTarget', a.code);
 }
@@ -1125,18 +1125,18 @@ function renderSolicitudes(){
   const count = document.getElementById('solicitudesCount');
   if(!el) return;
   if(count) count.textContent = solicitudes.length;
-  const vetOptions = vets.map(v => `<option value="${v.dbId}">${v.name}</option>`).join('') || '<option value="">No veterinarians yet</option>';
+  const vetOptions = vets.map(v => `<option value="${v.dbId}">${v.name}</option>`).join('') || '<option value="">Aún no hay veterinarios</option>';
   el.innerHTML = solicitudes.length ? solicitudes.map(s => `
     <div class="activity-item" style="align-items:center;">
       <div class="dot-lead" style="background:var(--amber);"></div>
-      <div class="txt"><b>📷 ${s.nombre}</b><p>Wants to affiliate with code <b>${s.code}</b> · ${s.email}</p></div>
+      <div class="txt"><b>📷 ${s.nombre}</b><p>Quiere afiliarse con el código <b>${s.code}</b> · ${s.email}</p></div>
       <div class="row-actions" style="margin-left:auto;align-items:center;">
         <select id="vetSelect-${s.id}" style="padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;">${vetOptions}</select>
-        <button class="btn primary" style="padding:6px 14px;font-size:12px;" onclick="aprobarSolicitud(${s.id})">Approve</button>
-        <button class="btn danger" style="padding:6px 14px;font-size:12px;" onclick="rechazarSolicitud(${s.id})">Reject</button>
+        <button class="btn primary" style="padding:6px 14px;font-size:12px;" onclick="aprobarSolicitud(${s.id})">Aprobar</button>
+        <button class="btn danger" style="padding:6px 14px;font-size:12px;" onclick="rechazarSolicitud(${s.id})">Rechazar</button>
       </div>
     </div>
-  `).join('') : `<div class="empty-note" style="padding:16px;">There are no pending affiliation requests at the moment.</div>`;
+  `).join('') : `<div class="empty-note" style="padding:16px;">No hay solicitudes de afiliación pendientes por el momento.</div>`;
 }
 
 async function aprobarSolicitud(id){
@@ -1154,7 +1154,7 @@ async function aprobarSolicitud(id){
   if (error) { console.error('aprobarSolicitud', error); toast('Error approving request'); return; }
 
   // Vincular la mascota a esta clínica Y al veterinario elegido para que
-  // aparezca en Patients con su doctor asignado, no solo con la clínica.
+  // aparezca en Pacientes con su doctor asignado, no solo con la clínica.
   if (afil.pet_id) {
     const { error: petErr } = await supabaseClient.from('pets')
       .update({ primary_clinic_id: CURRENT_VETERINARY_ID, assigned_veterinarian_id: chosenVetId })
@@ -1163,8 +1163,8 @@ async function aprobarSolicitud(id){
   }
 
   toast('✅ Request approved');
-  await Promise.all([loadSolicitudes(), loadAffiliations(), loadPets(), loadDashboardStats()]);
-  renderSolicitudes(); renderAfiliaciones(); renderPets(); renderDashboardTables();
+  await Promise.all([loadSolicitudes(), loadAfiliaciones(), loadPets(), loadPanelStats()]);
+  renderSolicitudes(); renderAfiliaciones(); renderPets(); renderPanelTables();
 }
 
 async function rechazarSolicitud(id){
@@ -1174,7 +1174,7 @@ async function rechazarSolicitud(id){
     .eq('id', id);
   if (error) { console.error('rechazarSolicitud', error); toast('Error rejecting request'); return; }
   toast('❌ Request rejected');
-  await Promise.all([loadSolicitudes(), loadDashboardStats()]);
+  await Promise.all([loadSolicitudes(), loadPanelStats()]);
   renderSolicitudes();
 }
 
@@ -1189,7 +1189,7 @@ async function recibirSolicitudAfiliacion(code, idClient, petId){
   if (!requireSupabase()) return;
   const { data: match, error: findErr } = await supabaseClient.from('affiliations')
     .select('id, status').eq('code', code).maybeSingle();
-  if (findErr || !match) { toast(`⚠️ Code ${code} is not valid or no longer exists`); return; }
+  if (findErr || !match) { toast(`⚠️ Código ${code} is not valid or no longer exists`); return; }
   if (match.status === 'pending') { toast('There is already a pending request for this code'); return; }
 
   const { error } = await supabaseClient.from('affiliations').update({
@@ -1203,7 +1203,7 @@ async function recibirSolicitudAfiliacion(code, idClient, petId){
 }
 window.recibirSolicitudAfiliacion = recibirSolicitudAfiliacion;
 
-function showAdminProfile(){
+function showAdminPerfil(){
   document.getElementById('adminLastLogin').textContent = new Date().toLocaleString('en-US', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
   document.getElementById('adminModalBg').classList.add('open');
 }
@@ -1229,7 +1229,7 @@ function renderVets(){
         <button class="icon-btn" title="More" onclick="toast('More actions for ${v.name}')">${ICON.more}</button>
       </div></td>
     </tr>
-  `).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">No veterinarians match.</td></tr>`;
+  `).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">No hay veterinarios que coincidan.</td></tr>`;
   document.getElementById('vetsCount').textContent = `Showing 1 to ${filtered.length} of ${vets.length} veterinarians`;
   setText('statVets', vets.length);
 }
@@ -1245,37 +1245,37 @@ function showVetDetails(mv){
       <div class="sub" style="color:var(--muted);font-size:12.5px;">${v.role} · ${v.spec}</div>
       <div class="sub" style="color:var(--muted);font-size:12px;">${v.mv}</div>
     </div>
-    <div class="kv"><span>Email</span><span>${v.email}</span></div>
-    <div class="kv"><span>Schedule</span><span>${v.schedule}</span></div>
-    <div class="kv"><span>Assigned patients</span><span>${v.patients}</span></div>
+    <div class="kv"><span>Correo</span><span>${v.email}</span></div>
+    <div class="kv"><span>Horario</span><span>${v.schedule}</span></div>
+    <div class="kv"><span>Pacientes asignados</span><span>${v.patients}</span></div>
     <div style="display:flex;gap:8px;margin-top:14px;">
-      <button class="btn" style="flex:1;justify-content:center;" onclick="toast('Opening profile editor')">Edit Profile</button>
-      <button class="btn" style="flex:1;justify-content:center;" onclick="toast('Message sent to ${v.name}')">Send Message</button>
+      <button class="btn" style="flex:1;justify-content:center;" onclick="toast('Opening profile editor')">Editar perfil</button>
+      <button class="btn" style="flex:1;justify-content:center;" onclick="toast('Message sent to ${v.name}')">Enviar mensaje</button>
     </div>
-    <button class="btn danger" style="width:100%;margin-top:8px;" onclick="toast('Account for ${v.name} deactivated')">Deactivate Account</button>
+    <button class="btn danger" style="width:100%;margin-top:8px;" onclick="toast('Account for ${v.name} deactivated')">Desactivar cuenta</button>
   `;
 }
 
 async function submitVet(){
   if (!requireSupabase()) return;
-  const name = document.getElementById('mVetName').value.trim();
+  const name = document.getElementById('mVetNombre').value.trim();
   if(!name){ toast('Please enter a name for the veterinarian'); return; }
   const spec = document.getElementById('mVetSpec').value.trim() || 'General Medicine';
-  const email = document.getElementById('mVetEmail').value.trim() || null;
-  const start = document.getElementById('mVetScheduleStart').value || null;
-  const end = document.getElementById('mVetScheduleEnd').value || null;
+  const email = document.getElementById('mVetCorreo').value.trim() || null;
+  const start = document.getElementById('mVetHorarioStart').value || null;
+  const end = document.getElementById('mVetHorarioEnd').value || null;
 
   const { error } = await supabaseClient.from('veterinary_staff').insert({
-    nombre: name, rol: 'Veterinarian', specialty: spec, email,
+    nombre: name, rol: 'Veterinario', specialty: spec, email,
     schedule_start: start, schedule_end: end,
     veterinary_id: CURRENT_VETERINARY_ID, status: 'active'
   });
   if (error) { console.error('submitVet', error); toast('Error adding veterinarian'); return; }
 
   closeModal('vetModalBg');
-  ['mVetName','mVetSpec','mVetEmail'].forEach(id => document.getElementById(id).value = '');
-  await Promise.all([loadVets(), loadDashboardStats()]);
-  renderVets(); renderDashboardTables(); populateVetSelect();
+  ['mVetNombre','mVetSpec','mVetCorreo'].forEach(id => document.getElementById(id).value = '');
+  await Promise.all([loadVets(), loadPanelStats()]);
+  renderVets(); renderPanelTables(); populateVetSelect();
   toast(`✅ ${name} was added to the team`);
 }
 
@@ -1283,17 +1283,17 @@ async function submitVet(){
 
 async function submitPet(){
   if (!requireSupabase()) return;
-  const name = document.getElementById('mPetName').value.trim();
+  const name = document.getElementById('mPetNombre').value.trim();
   if(!name){ toast('Please enter a name for the pet'); return; }
-  const species = document.getElementById('mPetSpecies').value;
-  const breed = document.getElementById('mPetBreed').value.trim() || null;
-  const ownerEmail = document.getElementById('mPetOwner').value.trim();
+  const species = document.getElementById('mPetEspecie').value;
+  const breed = document.getElementById('mPetRaza').value.trim() || null;
+  const ownerCorreo = document.getElementById('mPetDueño').value.trim();
   const date = document.getElementById('mPetDate').value;
 
   let ownerId = null;
-  if (ownerEmail) {
-    const { data: ownerMatch } = await supabaseClient.from('users').select('id_client').eq('email', ownerEmail).maybeSingle();
-    if (!ownerMatch) { toast(`⚠️ No owner found with email ${ownerEmail}. The pet will be registered without an owner.`); }
+  if (ownerCorreo) {
+    const { data: ownerMatch } = await supabaseClient.from('users').select('id_client').eq('email', ownerCorreo).maybeSingle();
+    if (!ownerMatch) { toast(`⚠️ No owner found with email ${ownerCorreo}. The pet will be registered without an owner.`); }
     ownerId = ownerMatch?.id_client || null;
   }
 
@@ -1312,21 +1312,21 @@ async function submitPet(){
   }
 
   closeModal('petModalBg');
-  ['mPetName','mPetBreed','mPetOwner','mPetDate'].forEach(id => document.getElementById(id).value = '');
-  await Promise.all([loadPets(), loadDashboardStats()]);
+  ['mPetNombre','mPetRaza','mPetDueño','mPetDate'].forEach(id => document.getElementById(id).value = '');
+  await Promise.all([loadPets(), loadPanelStats()]);
   renderPets();
   toast(`✅ ${name} was registered successfully`);
 }
 
 /* ============ DASHBOARD ============ */
 
-function renderDashboardTables(){
+function renderPanelTables(){
   document.getElementById('activityList').innerHTML = activity.length ? activity.map(a => `
     <div class="activity-item">
       <div class="dot-lead" style="background:${a.color};"></div>
       <div class="txt"><b>${a.icon} ${a.title}</b><p>${a.desc}</p></div>
       <div class="time">${a.time}</div>
-    </div>`).join('') : `<div class="empty-note" style="padding:16px;">No recent activity yet.</div>`;
+    </div>`).join('') : `<div class="empty-note" style="padding:16px;">Aún no hay actividad reciente.</div>`;
 
   document.getElementById('dashAfilBody').innerHTML = affiliations.slice(0,4).map(a => `
     <tr class="table-row"><td>—</td><td>${a.owner}</td>
@@ -1344,7 +1344,7 @@ function renderNotifications(){
   if(!el) return;
   el.innerHTML = notifications.length ? notifications.map(n => `
     <div class="item">${n.icon} <div><b>${n.title}</b><span>${n.desc}</span></div></div>
-  `).join('') : `<div class="item"><span>You have no new notifications</span></div>`;
+  `).join('') : `<div class="item"><span>No tienes notificaciones nuevas</span></div>`;
   if(dot){
     dot.textContent = notifications.length;
     dot.style.display = notifications.length ? 'flex' : 'none';
@@ -1404,11 +1404,11 @@ function bucketCount(dates, edges, size){
 function setDelta(id, current, previous){
   const el = document.getElementById(id);
   if (!el) return;
-  if (!previous) { el.textContent = 'vs previous period'; el.className = 'delta up'; return; }
+  if (!previous) { el.textContent = 'vs previous period'; el.classNombre = 'delta up'; return; }
   const pct = ((current - previous) / previous) * 100;
   const arrow = pct >= 0 ? '↑' : '↓';
   el.textContent = `${arrow} ${Math.abs(pct).toFixed(1)}% vs previous period`;
-  el.className = 'delta ' + (pct >= 0 ? 'up' : 'down');
+  el.classNombre = 'delta ' + (pct >= 0 ? 'up' : 'down');
 }
 
 async function renderReportes(){
@@ -1442,7 +1442,7 @@ async function renderReportes(){
   const attendanceBase = totalAppts - cancelled;
   const attendance = attendanceBase > 0 ? Math.round((completed / attendanceBase) * 100) : 0;
 
-  const [prevTotalAppts, newPatientsCount, prevNewPatientsCount] = await Promise.all([
+  const [prevTotalAppts, newPacientesCount, prevNewPacientesCount] = await Promise.all([
     countInRange('appointments', { veterinary_id: CURRENT_VETERINARY_ID }, 'appointment_date', prevSince, prevUntil),
     countInRange('pets', { primary_clinic_id: CURRENT_VETERINARY_ID }, 'created_at', since, until),
     countInRange('pets', { primary_clinic_id: CURRENT_VETERINARY_ID }, 'created_at', prevSince, prevUntil)
@@ -1468,8 +1468,8 @@ async function renderReportes(){
   // Turnos por veterinario (dentro del rango) + más solicitado + especialidad más pedida
   const vetApptCounts = {};
   appts.forEach(a => { if (a.veterinarian_id) vetApptCounts[a.veterinarian_id] = (vetApptCounts[a.veterinarian_id] || 0) + 1; });
-  const vetNames = vets.map(v => v.name.replace('Dr. ', ''));
-  const vetPatients = vets.map(v => vetApptCounts[v.dbId] || 0);
+  const vetNombres = vets.map(v => v.name.replace('Dr. ', ''));
+  const vetPacientes = vets.map(v => vetApptCounts[v.dbId] || 0);
   let mostRequestedVet = '—', mostSpecialty = '—';
   if (vets.length) {
     const topVet = vets.reduce((best, v) => (vetApptCounts[v.dbId] || 0) > (vetApptCounts[best.dbId] || 0) ? v : best, vets[0]);
@@ -1480,7 +1480,7 @@ async function renderReportes(){
     if (topSpec && topSpec[1] > 0) mostSpecialty = topSpec[0];
   }
 
-  // "New Patients by Month" — mascotas nuevas agrupadas en el rango elegido
+  // "Pacientes nuevos por mes" — mascotas nuevas agrupadas en el rango elegido
   const { data: petsCreated } = await supabaseClient
     .from('pets').select('created_at')
     .eq('primary_clinic_id', CURRENT_VETERINARY_ID)
@@ -1494,29 +1494,29 @@ async function renderReportes(){
   const dogs = speciesCounts['Dog'] || 0, cats = speciesCounts['Cat'] || 0;
   const others = Math.max(0, pets.length - dogs - cats);
 
-  const vacCounts = { 'Up to date': 0, 'Upcoming': 0, 'Overdue': 0 };
+  const vacCounts = { 'Al día': 0, 'Próxima': 0, 'Vencido': 0 };
   pets.forEach(p => { vacCounts[p.vac] = (vacCounts[p.vac] || 0) + 1; });
 
   /* ---- KPIs ---- */
   document.getElementById('repCitas').textContent = totalAppts.toLocaleString('en-US');
   document.getElementById('repAsistencia').textContent = attendance + '%';
-  document.getElementById('repNuevos').textContent = newPatientsCount;
+  document.getElementById('repNuevos').textContent = newPacientesCount;
   setDelta('repCitasDelta', totalAppts, prevTotalAppts);
-  setDelta('repNuevosDelta', newPatientsCount, prevNewPatientsCount);
+  setDelta('repNuevosDelta', newPacientesCount, prevNewPacientesCount);
   const asistDeltaEl = document.getElementById('repAsistDelta');
-  if (asistDeltaEl) { asistDeltaEl.textContent = `${completed}/${attendanceBase || 0} completed`; asistDeltaEl.className = 'delta up'; }
+  if (asistDeltaEl) { asistDeltaEl.textContent = `${completed}/${attendanceBase || 0} completed`; asistDeltaEl.classNombre = 'delta up'; }
 
-  /* ---- Quick Summary ---- */
+  /* ---- Resumen rápido ---- */
   const summaryCard = document.getElementById('reportsQuickSummaryCard');
   if (summaryCard) {
     summaryCard.innerHTML = `
-      <div class="card-head"><h3>Quick Summary</h3></div>
-      <div class="kv"><span>Cancelled appointments</span><span>${cancelled}</span></div>
-      <div class="kv"><span>No-shows</span><span>${noShows} (${totalAppts ? ((noShows/totalAppts)*100).toFixed(1) : 0}%)</span></div>
-      <div class="kv"><span>Avg. code usage time</span><span>${avgUsageDays} days</span></div>
+      <div class="card-head"><h3>Resumen rápido</h3></div>
+      <div class="kv"><span>Citas canceladas</span><span>${cancelled}</span></div>
+      <div class="kv"><span>Inasistencias</span><span>${noShows} (${totalAppts ? ((noShows/totalAppts)*100).toFixed(1) : 0}%)</span></div>
+      <div class="kv"><span>Tiempo promedio de uso del código</span><span>${avgUsageDays} days</span></div>
       <div class="kv"><span>Vaccines administered (month)</span><span>${vaccinesThisMonth}</span></div>
-      <div class="kv"><span>Most requested veterinarian</span><span>${mostRequestedVet}</span></div>
-      <div class="kv"><span>Most in-demand specialty</span><span>${mostSpecialty}</span></div>
+      <div class="kv"><span>Veterinario más solicitado</span><span>${mostRequestedVet}</span></div>
+      <div class="kv"><span>Especialidad más solicitada</span><span>${mostSpecialty}</span></div>
       <button class="btn" style="width:100%;margin-top:14px;" onclick="generarReporteDetallado()">${ICON.file} Generate Detailed Report</button>
     `;
   }
@@ -1541,7 +1541,7 @@ async function renderReportes(){
   });
 
   destroyChart('species');
-  reportCharts.species = new Chart(document.getElementById('chartSpecies'), {
+  reportCharts.species = new Chart(document.getElementById('chartEspecie'), {
     type:'doughnut',
     data:{ labels:['Dogs','Cats','Others'], datasets:[{
       data: [dogs, cats, others], backgroundColor:['#2563EB','#7C3AED','#D97706'], borderWidth:0
@@ -1554,8 +1554,8 @@ async function renderReportes(){
   destroyChart('vac');
   reportCharts.vac = new Chart(document.getElementById('chartVac'), {
     type:'bar',
-    data:{ labels:['Up to date','Upcoming','Overdue'], datasets:[{
-      data: [vacCounts['Up to date'], vacCounts['Upcoming'], vacCounts['Overdue']],
+    data:{ labels:['Al día','Próxima','Vencido'], datasets:[{
+      data: [vacCounts['Al día'], vacCounts['Próxima'], vacCounts['Vencido']],
       backgroundColor:['#16A34A','#D97706','#DC2626'], borderRadius:8, barThickness:44
     }]},
     options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
@@ -1567,8 +1567,8 @@ async function renderReportes(){
   destroyChart('vets');
   reportCharts.vets = new Chart(document.getElementById('chartVets'), {
     type:'bar',
-    data:{ labels: vetNames, datasets:[{
-      data: vetPatients, backgroundColor:'#818CF8', borderRadius:6, barThickness:22
+    data:{ labels: vetNombres, datasets:[{
+      data: vetPacientes, backgroundColor:'#818CF8', borderRadius:6, barThickness:22
     }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display:false } },
@@ -1577,11 +1577,11 @@ async function renderReportes(){
   });
 
   destroyChart('afil');
-  const usedActiveCount = affiliations.filter(a => a.status === 'Active' && a.uses !== '0/10').length;
+  const usedActivoCount = affiliations.filter(a => a.status === 'Activo' && a.uses !== '0/10').length;
   reportCharts.afil = new Chart(document.getElementById('chartAfil'), {
     type:'bar',
-    data:{ labels:['Active','Used','Expired'], datasets:[{
-      data:[statCounters.activos, usedActiveCount, expiredAffiliations.length],
+    data:{ labels:['Activo','Used','Expired'], datasets:[{
+      data:[statCounters.activos, usedActivoCount, expiredAfiliaciones.length],
       backgroundColor:['#2563EB','#16A34A','#DC2626'], borderRadius:8, barThickness:40
     }]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -1599,7 +1599,7 @@ function exportarReportePDF(){
   let y = margin;
 
   doc.setFont('helvetica','bold'); doc.setFontSize(18);
-  doc.text('Clinic Report — Happy Paws Veterinary Clinic', margin, y); y += 22;
+  doc.text('Clínica Report — Clínica Veterinaria Happy Paws', margin, y); y += 22;
   doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(100);
   const rangoTexto = document.getElementById('repRango').selectedOptions[0].text;
   doc.text(`Range: ${rangoTexto}  ·  Generated: ${new Date().toLocaleString('en-US')}`, margin, y); y += 24;
@@ -1607,20 +1607,20 @@ function exportarReportePDF(){
 
   doc.setFont('helvetica','bold'); doc.setFontSize(12);
   const kpis = [
-    ['Total Appointments', document.getElementById('repCitas').textContent],
-    ['Attendance Rate', document.getElementById('repAsistencia').textContent],
-    ['New Patients', document.getElementById('repNuevos').textContent],
+    ['Total de citas', document.getElementById('repCitas').textContent],
+    ['Tasa de asistencia', document.getElementById('repAsistencia').textContent],
+    ['Pacientes nuevos', document.getElementById('repNuevos').textContent],
   ];
   doc.setFont('helvetica','normal');
   kpis.forEach(([label,val]) => { doc.text(`${label}: ${val}`, margin, y); y += 18; });
   y += 8;
 
   const chartSections = [
-    {id:'chartMonthly', label:'New Patients'},
-    {id:'chartSpecies', label:'Species Distribution'},
-    {id:'chartVac', label:'Vaccination Status'},
-    {id:'chartVets', label:'Patients by Veterinarian'},
-    {id:'chartAfil', label:'Affiliation Codes'},
+    {id:'chartMonthly', label:'Pacientes nuevos'},
+    {id:'chartEspecie', label:'Especie Distribution'},
+    {id:'chartVac', label:'Estado de vacunación'},
+    {id:'chartVets', label:'Pacientes por veterinario'},
+    {id:'chartAfil', label:'Códigos de afiliación'},
   ];
   chartSections.forEach(({id,label}) => {
     const canvas = document.getElementById(id);
@@ -1651,24 +1651,24 @@ function generarReporteDetallado(){
     if(y > 790){ doc.addPage(); y = margin; }
   };
 
-  addLine('Detailed Report — Happy Paws Veterinary Clinic', 18, true);
+  addLine('Detailed Report — Clínica Veterinaria Happy Paws', 18, true);
   addLine(`Generated: ${new Date().toLocaleString('en-US')}`, 10, false);
   y += 10;
 
-  addLine('Veterinary Staff', 13, true);
+  addLine('Personal veterinario', 13, true);
   vets.forEach(v => addLine(`• ${v.name} — ${v.spec} — ${v.patients} patients — ${v.status}`));
   y += 8;
 
-  addLine('Active Affiliation Codes', 13, true);
+  addLine('Activo Códigos de afiliación', 13, true);
   affiliations.forEach(a => addLine(`• ${a.code} — ${a.owner} — ${a.status} — uses ${a.uses} — expires ${a.exp}`));
   y += 8;
 
-  addLine('Expired Codes', 13, true);
-  if(!expiredAffiliations.length) addLine('No expired codes recorded.');
-  expiredAffiliations.forEach(a => addLine(`• ${a.code} — ${a.owner} — uses ${a.uses}`));
+  addLine('Expired Códigos', 13, true);
+  if(!expiredAfiliaciones.length) addLine('No expired codes recorded.');
+  expiredAfiliaciones.forEach(a => addLine(`• ${a.code} — ${a.owner} — uses ${a.uses}`));
   y += 8;
 
-  addLine('Pending Affiliation Requests', 13, true);
+  addLine('Pendiente Solicitudes de afiliación', 13, true);
   if(!solicitudes.length) addLine('No pending requests at this time.');
   solicitudes.forEach(s => addLine(`• ${s.nombre} (${s.email}) — code ${s.code} — ${s.time}`));
 
@@ -1686,7 +1686,7 @@ function go(page){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop')?.classList.remove('open');
   if(page==='reportes') setTimeout(renderReportes, 30);
-  if(page==='configuracion') setTimeout(loadClinicSettings, 30);
+  if(page==='configuracion') setTimeout(loadClínicaConfiguración, 30);
 }
 
 /* ============ MODALS ============ */
@@ -1701,17 +1701,17 @@ function setValue(id, value){
   if (el) el.value = value || '';
 }
 
-let lastLoadedClinic = null;
+let lastLoadedClínica = null;
 
-async function loadClinicSettings(){
+async function loadClínicaConfiguración(){
   if (!requireSupabase()) return;
   const { data: clinic, error } = await supabaseClient
     .from('veterinary')
     .select('*')
     .eq('id_veterinary', CURRENT_VETERINARY_ID)
     .maybeSingle();
-  if (error || !clinic) { console.error('loadClinicSettings', error); toast('Error loading clinic settings'); return; }
-  lastLoadedClinic = clinic;
+  if (error || !clinic) { console.error('loadClínicaConfiguración', error); toast('Error loading clinic settings'); return; }
+  lastLoadedClínica = clinic;
 
   setValue('cfgNombre', clinic.clinic_name);
   setValue('cfgDireccion', clinic.address);
@@ -1719,20 +1719,20 @@ async function loadClinicSettings(){
   setValue('cfgProvincia', clinic.province);
   setValue('cfgCP', clinic.postal_code);
   setValue('cfgTel', clinic.phone);
-  setValue('cfgEmail', clinic.email);
+  setValue('cfgCorreo', clinic.email);
   setValue('cfgWeb', clinic.website);
   const idiomaSel = document.getElementById('cfgIdioma');
-  if (idiomaSel) idiomaSel.value = clinic.language === 'Spanish' ? 'es' : 'en';
+  if (idiomaSel) idiomaSel.value = clinic.language === 'Español' ? 'es' : 'en';
 
   const [{ count: staffCount }, { count: petsCount }] = await Promise.all([
     supabaseClient.from('veterinary_staff').select('id', { count: 'exact', head: true }).eq('veterinary_id', CURRENT_VETERINARY_ID),
     supabaseClient.from('pets').select('id', { count: 'exact', head: true }).eq('primary_clinic_id', CURRENT_VETERINARY_ID)
   ]);
 
-  const planName = clinic.plan ? clinic.plan.charAt(0).toUpperCase() + clinic.plan.slice(1) : 'Basic';
-  setText('planNameLabel', planName + ' Plan');
-  setText('planUsersLabel', `${staffCount ?? 0} / ${clinic.max_users ?? '—'}`);
-  setText('planPatientsLabel', (petsCount ?? 0).toLocaleString('en-US'));
+  const planNombre = clinic.plan ? clinic.plan.charAt(0).toUpperCase() + clinic.plan.slice(1) : 'Basic';
+  setText('planNombreLabel', planNombre + ' Plan');
+  setText('planUsuariosLabel', `${staffCount ?? 0} / ${clinic.max_users ?? '—'}`);
+  setText('planPacientesLabel', (petsCount ?? 0).toLocaleString('en-US'));
   setText('planNextChargeLabel', clinic.next_charge_date
     ? new Date(clinic.next_charge_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
     : '—');
@@ -1740,7 +1740,7 @@ async function loadClinicSettings(){
 
 async function guardarConfig(){
   const lang = document.getElementById('cfgIdioma')?.value || 'en';
-  setLanguage(lang);
+  setIdioma(lang);
 
   if (!requireSupabase()) return;
   const candidate = {
@@ -1750,26 +1750,26 @@ async function guardarConfig(){
     province: document.getElementById('cfgProvincia').value.trim(),
     postal_code: document.getElementById('cfgCP').value.trim(),
     phone: document.getElementById('cfgTel').value.trim(),
-    email: document.getElementById('cfgEmail').value.trim(),
+    email: document.getElementById('cfgCorreo').value.trim(),
     website: document.getElementById('cfgWeb').value.trim(),
-    language: lang === 'es' ? 'Spanish' : 'English'
+    language: lang === 'es' ? 'Español' : 'Inglés'
   };
 
   // Si ya sabemos qué columnas existen de verdad (porque las cargamos antes con
   // select('*')), solo mandamos esas — así una columna todavía no migrada no
   // hace fallar el guardado entero. Si nunca se cargó, se manda todo igual.
   let payload = candidate;
-  if (lastLoadedClinic) {
+  if (lastLoadedClínica) {
     payload = {};
     Object.keys(candidate).forEach(k => {
-      if (Object.prototype.hasOwnProperty.call(lastLoadedClinic, k)) payload[k] = candidate[k];
+      if (Object.prototype.hasOwnProperty.call(lastLoadedClínica, k)) payload[k] = candidate[k];
     });
   }
 
   const { error } = await supabaseClient.from('veterinary').update(payload).eq('id_veterinary', CURRENT_VETERINARY_ID);
   if (error) { console.error('guardarConfig', error); toast('Error saving changes'); return; }
 
-  currentAdminContext.clinicName = payload.clinic_name || currentAdminContext.clinicName;
+  currentAdminContext.clinicNombre = payload.clinic_name || currentAdminContext.clinicNombre;
   applyAdminContextToUI();
   toast(getTranslation('config.toast.saveSuccess', '✅ Changes saved successfully'));
 }
@@ -1795,25 +1795,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnBell').addEventListener('click', (e) => {
     e.stopPropagation();
     document.getElementById('ddNotif').classList.toggle('open');
-    document.getElementById('ddProfile').classList.remove('open');
+    document.getElementById('ddPerfil').classList.remove('open');
   });
-  document.getElementById('btnProfile').addEventListener('click', (e) => {
+  document.getElementById('btnPerfil').addEventListener('click', (e) => {
     e.stopPropagation();
-    document.getElementById('ddProfile').classList.toggle('open');
+    document.getElementById('ddPerfil').classList.toggle('open');
     document.getElementById('ddNotif').classList.remove('open');
   });
   document.addEventListener('click', () => {
     document.getElementById('ddNotif').classList.remove('open');
-    document.getElementById('ddProfile').classList.remove('open');
+    document.getElementById('ddPerfil').classList.remove('open');
   });
   document.getElementById('btnLogout').addEventListener('click', () => {
-    if(confirm('Log out of Doppy?')) toast('Session closed. See you soon!');
+    if(confirm('Cerrar sesión of Doppy?')) toast('Session closed. See you soon!');
   });
   document.getElementById('ddLogout').addEventListener('click', () => {
-    if(confirm('Log out of Doppy?')) toast('Session closed. See you soon!');
+    if(confirm('Cerrar sesión of Doppy?')) toast('Session closed. See you soon!');
   });
   document.getElementById('btnExplore').addEventListener('click', () => toast('Exploring all of Doppy features…'));
-  document.getElementById('cfgIdioma')?.addEventListener('change', (e) => setLanguage(e.target.value));
+  document.getElementById('cfgIdioma')?.addEventListener('change', (e) => setIdioma(e.target.value));
   document.getElementById('globalSearch').addEventListener('input', (e) => {
     const v = e.target.value.trim();
     const petSearch = document.getElementById('petSearch');

@@ -9,7 +9,7 @@
 <body>
 
 <div class="overlay" id="overlay"></div>
-<div class="db-status" id="dbStatus" onclick="showToast(document.getElementById('dbStatusText').textContent)" style="cursor:pointer;" title="Tap to see details"><span class="dot"></span> <span id="dbStatusText">Checking Supabase...</span></div>
+<div class="db-status" id="dbStatus" onclick="showToast(document.getElementById('dbStatusText').textContent)" style="cursor:pointer;" title="Toca para ver detalles"><span class="dot"></span> <span id="dbStatusText">Verificando Supabase...</span></div>
 
 <div class="app">
 
@@ -21,13 +21,13 @@
       </div>
     </div>
 <nav>
-<button class="nav-item active" data-view="dashboard" onclick="showView('dashboard', this)"><span class="icon"><img src="assets/HomeW.png" alt="Dashboard" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Dashboard</span></button>
-<button class="nav-item" data-view="calendar" onclick="showView('calendar', this)"><span class="icon"><img src="assets/CalendarW.png" alt="Calendar" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Calendar</span></button>
-<button class="nav-item" data-view="petwall" onclick="showView('petwall', this)"><span class="icon"><img src="assets/PawW.png" alt="Pet Wall" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Pet Wall</span></button>
-<button class="nav-item" data-view="profile" onclick="showView('profile', this)"><span class="icon"><img src="assets/UserW.png" alt="Profile" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Profile</span></button>
+<button class="nav-item active" data-view="dashboard" onclick="showView('dashboard', this)"><span class="icon"><img src="assets/HomeW.png" alt="Panel" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Panel</span></button>
+<button class="nav-item" data-view="calendar" onclick="showView('calendar', this)"><span class="icon"><img src="assets/CalendarioW.png" alt="Calendario" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Calendario</span></button>
+<button class="nav-item" data-view="petwall" onclick="showView('petwall', this)"><span class="icon"><img src="assets/PawW.png" alt="Muro de mascotas" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Muro de mascotas</span></button>
+<button class="nav-item" data-view="profile" onclick="showView('profile', this)"><span class="icon"><img src="assets/UserW.png" alt="Perfil" width="36" height="36"></span> <span class="nav-label" style="margin-left:10px;">Perfil</span></button>
 </nav>
-    <button class="add-pet-btn" id="addPetBtn">Add pet <span>+</span></button>
-    <!-- Add pet -> abre formulario POST /api/pets (nombre, especie, raza, edad, peso, foto) -->
+    <button class="add-pet-btn" id="addPetBtn">Agregar mascota <span>+</span></button>
+    <!-- Agregar mascota -> abre formulario POST /api/pets (nombre, especie, raza, edad, peso, foto) -->
   </aside>
 
   <!-- ============ MAIN ============ -->
@@ -36,19 +36,19 @@
     <div class="topbar">
       <button class="menu-toggle" id="menuToggle">☰</button>
       <div class="search-box" id="searchBox">
-        🔍 <input type="text" id="searchInput" placeholder="Search the community">
+        🔍 <input type="text" id="searchInput" placeholder="Buscar en la comunidad">
         <!-- input -> GET /api/search?q= (busca posts, eventos, mascotas según la vista activa) -->
       </div>
       <div class="right">
-        <button class="icon-btn" id="bellBtn" title="Notifications"><img src="assets/notiB.png" alt="Notifications" width="36" height="36"><span class="badge" id="bellBadge">1</span></button>
+        <button class="icon-btn" id="bellBtn" title="Notificaciones"><img src="assets/NotiB.png" alt="Notifications" width="36" height="36"><span class="badge" id="bellBadge">1</span></button>
         <!-- notificaciones -> tabla notifications (usuario_id, mensaje, leido, fecha) -->
         <div class="avatar-dropdown">
           <div style="display:flex; align-items:center; gap:6px; cursor:pointer;" id="avatarBtn">
-            <div class="avatar" title="Profile"></div>
+            <div class="avatar" title="Perfil"></div>
             <span class="chev" id="avatarChev">▾</span>
           </div>
           <div class="avatar-menu" id="avatarMenu">
-            <button onclick="showView('profile', document.querySelector('[data-view=profile]')); closeAvatarMenu();">👤 View Profile</button>
+            <button onclick="showView('profile', document.querySelector('[data-view=profile]')); closeAvatarMenu();">👤 View Perfil</button>
             <button onclick="toggleDarkMode(); closeAvatarMenu();">🌙 Toggle dark mode</button>
             <button onclick="handleLogout();">🚪 Log out</button>
           </div>
@@ -62,8 +62,8 @@
     <section class="view active" id="view-dashboard">
       <section class="card">
         <div class="card-header">
-          <h2>Pet features</h2>
-          <button class="link" onclick="showView('petprofile')">view your pet</button>
+          <h2>Datos de la mascota</h2>
+          <button class="link" onclick="showView('petprofile')">ver tu mascota</button>
         </div>
         <div class="pet-features-grid">
           <div class="pet-meta">
@@ -73,23 +73,23 @@
           </div>
           <div class="pet-photo" id="dashPetPhotoWrap">
             <img class="pet-photo-img" id="dashPetPhotoImg" style="display:none;" alt="Pet photo">
-            <input type="file" accept="image/*" id="petPhotoInput" title="Upload pet photo">
+            <input type="file" accept="image/*" id="petPhotoInput" title="Subir foto de la mascota">
             <!-- guardar URL resultante en pets.photo_url -->
           </div>
           <div class="vaccination-card-wrap">
             <div class="vaccination-card">
-              <h4>Vaccination Card</h4>
+              <h4>Carné de vacunación</h4>
               <div class="legend">
-                <span><i class="dot" style="background:#7ee0f0"></i>Rabies</span>
-                <span><i class="dot" style="background:#4fc3e8"></i>Distemper</span>
+                <span><i class="dot" style="background:#7ee0f0"></i>Rabia</span>
+                <span><i class="dot" style="background:#4fc3e8"></i>Moquillo</span>
                 <span><i class="dot" style="background:#2e86d6"></i>Parvovirus</span>
                 <span><i class="dot" style="background:#1e5fa8"></i>Bordetella</span>
               </div>
               <div class="bars">
                 <div class="y-axis"><span>2.5</span><span>2.0</span><span>1.5</span><span>1.0</span><span>0.5</span><span>0.0</span></div>
                 <!-- tabla vaccinations(mascota_id, tipo, dosis, fecha) -->
-                <div class="bar-group"><div class="bar" style="height:55%;background:#7ee0f0"></div><div class="bar-label">Rabies</div></div>
-                <div class="bar-group"><div class="bar" style="height:75%;background:#4fc3e8"></div><div class="bar-label">Distemper</div></div>
+                <div class="bar-group"><div class="bar" style="height:55%;background:#7ee0f0"></div><div class="bar-label">Rabia</div></div>
+                <div class="bar-group"><div class="bar" style="height:75%;background:#4fc3e8"></div><div class="bar-label">Moquillo</div></div>
                 <div class="bar-group"><div class="bar" style="height:90%;background:#2e86d6"></div><div class="bar-label">Parvovirus</div></div>
                 <div class="bar-group"><div class="bar" style="height:100%;background:#1e5fa8"></div><div class="bar-label">Bordetella</div></div>
               </div>
@@ -100,15 +100,15 @@
 
       <div class="bottom-grid">
         <section class="card">
-          <div class="card-header"><h2>Vet features</h2></div>
+          <div class="card-header"><h2>Datos del veterinario</h2></div>
           <div class="vet-photo-wrap">
             <div class="vet-photo" id="vetPhotoWrap">
               <img class="vet-photo-img" id="vetPhotoImg" style="display:none;" alt="Clinic photo">
-              <input type="file" accept="image/*" id="vetPhotoInput" title="Upload clinic photo">
+              <input type="file" accept="image/*" id="vetPhotoInput" title="Subir foto de la clínica">
             </div>
             <div class="vet-actions">
-              <div class="icon-round" title="Affiliate clinic" id="vetAffiliateBtn" onclick="openAffiliateModal()">📷</div>
-              <div class="icon-round" title="History" onclick="openVetHistoryModal()">📋</div>
+              <div class="icon-round" title="Clínica afiliada" id="vetAffiliateBtn" onclick="openAffiliateModal()">📷</div>
+              <div class="icon-round" title="Historial" onclick="openVetHistoryModal()">📋</div>
             </div>
           </div>
           <div class="vet-info">
@@ -118,11 +118,11 @@
             <div class="row"><span class="icon-mini">📞</span><span id="vetTelefono" contenteditable="true" data-field="telefono">[Number]</span></div>
             <!-- campos -> tablas affiliations + veterinary + veterinary_staff (ver loadVetInfoFromSupabase) -->
           </div>
-          <div class="hours" id="vetHours"><div>No affiliated clinic yet</div></div>
+          <div class="hours" id="vetHours"><div>Aún no hay clínica afiliada</div></div>
         </section>
 
         <section class="card">
-          <div class="card-header"><h2>Schedule</h2></div>
+          <div class="card-header"><h2>Horario</h2></div>
           <div id="scheduleList">
             <!-- generado dinámicamente desde tabla appointments vía renderSchedule() -->
           </div>
@@ -131,10 +131,10 @@
         </section>
 
         <section class="card quick-actions-card">
-          <div class="card-header"><h2>Quick actions</h2></div>
+          <div class="card-header"><h2>Acciones rápidas</h2></div>
           <div class="quick-actions">
-            <button class="quick-action" onclick="showView('profile', document.querySelector('[data-view=profile]'))"><span class="qa-icon">👤</span> Profile</button>
-            <button class="quick-action" onclick="showView('petwall', document.querySelector('[data-view=petwall]'))"><span class="qa-icon">💬</span> Pet Wall</button>
+            <button class="quick-action" onclick="showView('profile', document.querySelector('[data-view=profile]'))"><span class="qa-icon">👤</span> Perfil</button>
+            <button class="quick-action" onclick="showView('petwall', document.querySelector('[data-view=petwall]'))"><span class="qa-icon">💬</span> Muro de mascotas</button>
             <button class="quick-action" onclick="goToSettings()"><span class="qa-icon">⚙️</span> Settings</button>
             <button class="quick-action qa-emergency" onclick="confirmEmergency(document.querySelector('[data-view=emergency]'))"><span class="qa-icon">🚨</span> Emergency</button>
           </div>
@@ -147,21 +147,21 @@
     ======================================================== -->
     <section class="view" id="view-profile">
       <div class="page-title">
-        <h1>Profile</h1>
-        <p>Manage your personal information and preferences.</p>
+        <h1>Perfil</h1>
+        <p>Gestiona tu información personal y preferencias.</p>
       </div>
 
       <div class="profile-grid">
         <div>
           <div class="profile-hero card" style="margin-bottom:24px;">
             <div class="avatar-big">👤
-              <div class="camera-badge" title="Change photo"></div>
+              <div class="camera-badge" title="Cambiar foto"></div>
               <!-- Output file oculto -> subir a storage y guardar en users.foto_url -->
             </div>
             <!-- users.name -->
             <h2 id="profileUserName" contenteditable="true" data-field="usuario_nombre">Ana López</h2>
             
-            <div class="pet-tag"><span id="profilePetName" contenteditable="false" data-field="mascota_principal">Loading pet...</span></div>
+            <div class="pet-tag"><span id="profilePetName" contenteditable="false" data-field="mascota_principal">Cargando mascota...</span></div>
           </div>
 
           <section class="card">
@@ -169,30 +169,30 @@
             <div class="info-row">
               <div class="left"><span class="icon-mini"></span> Phone Number</div>
               <!-- users.telefono todavía no existe: se deja este valor de ejemplo editable
-                   hasta que agregues la columna; ver loadUserProfileFromSupabase() -->
+                   hasta que agregues la columna; ver loadUserPerfilFromSupabase() -->
               <div class="value" id="profilePhone" contenteditable="true" data-field="telefono">333-5567</div>
-              <button class="btn-outline" onclick="editField(this)">Edit</button>
+              <button class="btn-outline" onclick="editField(this)">Editar</button>
               <!-- users.telefono -->
             </div>
             <div class="info-row">
               <div class="left"><span class="icon-mini"></span> E-mail</div>
               <!-- users.email -->
               <div class="value" id="profileEmail" contenteditable="true" data-field="email">email@outlook.com</div>
-              <button class="btn-outline" onclick="editField(this)">Edit</button>
+              <button class="btn-outline" onclick="editField(this)">Editar</button>
               <!-- users.email -->
             </div>
             <div class="info-row">
               <div class="left"><span class="icon-mini"></span> Code of access to Doppy</div>
               <!-- users.contra: nunca se muestra el valor real, solo asteriscos -->
               <div class="value" id="profileAccessCode">*********</div>
-              <button class="btn-outline" onclick="openAccessCodeModal()">Edit</button>
+              <button class="btn-outline" onclick="openAccessCodeModal()">Editar</button>
             </div>
             <div class="info-row">
               <div class="left"><span class="icon-mini"></span> Age of the owner</div>
               <!-- users.fecha_nacimiento todavía no existe: valor de ejemplo editable
-                   hasta que agregues la columna; ver loadUserProfileFromSupabase() -->
-              <div class="value" id="profileOwnerAge" contenteditable="true" data-field="fecha_nacimiento">May 15, 1990</div>
-              <button class="btn-outline" onclick="editField(this)">Edit</button>
+                   hasta que agregues la columna; ver loadUserPerfilFromSupabase() -->
+              <div class="value" id="profileOwnerAge" contenteditable="true" data-field="fecha_nacimiento">15 de mayo de 1990</div>
+              <button class="btn-outline" onclick="editField(this)">Editar</button>
               <!-- users.fecha_nacimiento -->
             </div>
           </section>
@@ -202,19 +202,19 @@
             <div class="info-row">
               <!-- affiliations + veterinary (la afiliación se crea al escanear el QR de la clínica) -->
               <div class="left"><span class="icon-mini"></span> Associated clinic(s)</div>
-              <div class="value" id="profileAssocClinics">Loading associated clinics...</div>
+              <div class="value" id="profileAssocClinics">Cargando clínicas asociadas...</div>
             </div>
             <div class="info-row">
               <div class="left"><span class="icon-mini"></span> Preferred contact hours</div>
               <div class="value" contenteditable="true" data-field="horario_contacto">9:00 AM - 6:00 PM</div>
-              <button class="btn-outline" onclick="editField(this)">Edit</button>
+              <button class="btn-outline" onclick="editField(this)">Editar</button>
             </div>
           </section>
         </div>
 
         <div>
           <section class="card">
-            <div class="card-header"><h2>My Pets</h2><button class="link" onclick="openAllPetsModal()">View all</button></div>
+            <div class="card-header"><h2>Mis mascotas</h2><button class="link" onclick="openAllPetsModal()">Ver todo</button></div>
             <div id="myPetsList">
               <!-- generado desde tabla pets WHERE owner_id = usuario vía renderMyPets() -->
             </div>
@@ -223,12 +223,12 @@
           </section>
 
           <section class="card">
-            <div class="card-header"><h2>Account Settings</h2></div>
-            <div class="settings-row" onclick="openChangePasswordModal()"><div class="left">Change password</div><span>›</span></div>
-            <div class="settings-row" onclick="openNotifPrefsModal()"><div class="left">Notification preferences</div><span>›</span></div>
-            <div class="settings-row" onclick="toggleDarkMode()"><div class="left">Appearance</div><span class="value" id="appearanceValue">Light</span><span>›</span></div>
-            <div class="settings-row" onclick="openLanguageModal()"><div class="left">Language</div><span class="value" id="languageValue">English</span><span>›</span></div>
-            <div class="settings-row" onclick="openPrivacyModal()"><div class="left">Privacy settings</div><span>›</span></div>
+            <div class="card-header"><h2>Configuración de la cuenta</h2></div>
+            <div class="settings-row" onclick="openChangePasswordModal()"><div class="left">Cambiar contraseña</div><span>›</span></div>
+            <div class="settings-row" onclick="openNotifPrefsModal()"><div class="left">Preferencias de notificación</div><span>›</span></div>
+            <div class="settings-row" onclick="toggleDarkMode()"><div class="left">Apariencia</div><span class="value" id="appearanceValue">Claro</span><span>›</span></div>
+            <div class="settings-row" onclick="openLanguageModal()"><div class="left">Idioma</div><span class="value" id="languageValue">Inglés</span><span>›</span></div>
+            <div class="settings-row" onclick="openPrivacyModal()"><div class="left">Configuración de privacidad</div><span>›</span></div>
             <div class="settings-row" onclick="openHelpModal()"><div class="left"> Help Center</div><span>›</span></div>
             <!-- cada fila -> conectar persistencia real en tabla users_settings -->
           </section>
@@ -241,22 +241,22 @@
     ======================================================== -->
     <section class="view" id="view-notifications">
       <div class="filter-tabs">
-        <button class="filter-tab active" onclick="filterNotif(this)">All</button>
-        <button class="filter-tab" onclick="filterNotif(this)">Reminders</button>
-        <button class="filter-tab" onclick="filterNotif(this)">Not Seen</button>
+        <button class="filter-tab active" onclick="filterNotif(this)">Todos</button>
+        <button class="filter-tab" onclick="filterNotif(this)">Recordatorios</button>
+        <button class="filter-tab" onclick="filterNotif(this)">Sin registrar</button>
         <!-- filtros -> GET /api/notifications?type= -->
       </div>
 
       <div class="notif-highlight">
-        <div class="ic"><img src="assets/CalendarB.png" alt="Notifications" width="24" height="24"></div>
+        <div class="ic"><img src="assets/CalendarioB.png" alt="Notifications" width="24" height="24"></div>
         <div>
-          <h3>Leo's Checkup Appointment</h3>
-          <p>Reminding you to be careful with Max's appointments</p>
+          <h3>Cita de chequeo de Leo</h3>
+          <p>Recordándote tener cuidado con las citas de Max</p>
         </div>
         <div class="bell-badge"><img src="assets/NotiB.png" alt="Notifications" width="24" height="24"><span class="count">1</span></div>
       </div>
 
-      <div class="section-label">Today</div>
+      <div class="section-label">Hoy</div>
       <div id="notifList">
         <!-- generado desde tabla notifications(usuario_id, titulo, descripcion, tipo, fecha, leido) vía renderNotifications() -->
       </div>
@@ -268,11 +268,11 @@
     <section class="view" id="view-petprofile">
       <div class="pet-profile-top">
         <div class="page-title" style="margin-bottom:0;">
-          <h1 style="font-size:22px;">Your Pet Profile</h1>
+          <h1 style="font-size:22px;">Perfil de tu mascota</h1>
         </div>
         <div style="display:flex; gap:10px;">
-          <div class="icon-square" title="Back" onclick="showView('dashboard', document.querySelector('[data-view=dashboard]'))">←</div>
-          <div class="icon-square" title="Help" onclick="openHelpModal()">?</div>
+          <div class="icon-square" title="Atrás" onclick="showView('dashboard', document.querySelector('[data-view=dashboard]'))">←</div>
+          <div class="icon-square" title="Ayuda" onclick="openHelpModal()">?</div>
         </div>
       </div>
 
@@ -282,22 +282,22 @@
           <div id="petProfilePhotoPlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:96px;">🐾</div>
           <img id="petProfilePhotoImg" alt="Pet photo" style="display:none;">
           <div class="name-badge"><span id="petProfileName" contenteditable="true" data-field="pet_nombre">Max</span></div>
-          <div class="age-badge"> <span><b id="petProfileAge" data-field="pet_edad">2Years old</b><small>Adolescent</small></span></div>
+          <div class="age-badge"> <span><b id="petProfileAge" data-field="pet_edad">2Years old</b><small>Adolescente</small></span></div>
         </div>
 
         <div>
           <div class="owner-card">
             <div class="av">👤</div>
             <div>
-              <h4 contenteditable="true" data-field="owner_nombre">Pet owner name</h4>
-              <p>Owner Contact</p>
+              <h4 contenteditable="true" data-field="owner_nombre">Nombre del dueño</h4>
+              <p>Contacto del dueño</p>
             </div>
-            <div class="call" onclick="showToast('Calling pet owner... (conectar a tel:{{users.telefono}})')">📞</div>
+            <div class="call" onclick="showToast('Llamaring pet owner... (conectar a tel:{{users.telefono}})')">📞</div>
             <!-- click -> iniciar llamada / mostrar users.telefono -->
           </div>
           <div class="attr-card">
-            <div class="attr-row"><span class="ic">♂</span><span class="lbl">Gender</span><span id="petProfileGender" class="val" contenteditable="true" data-field="genero">Male</span></div>
-            <div class="attr-row"><span class="ic">🐕</span><span class="lbl">Race</span><span id="petProfileBreed" class="val" contenteditable="true" data-field="raza">Hound</span></div>
+            <div class="attr-row"><span class="ic">♂</span><span class="lbl">Sexo</span><span id="petProfileGender" class="val" contenteditable="true" data-field="genero">Macho</span></div>
+            <div class="attr-row"><span class="ic">🐕</span><span class="lbl">Raza</span><span id="petProfileBreed" class="val" contenteditable="true" data-field="raza">Sabueso</span></div>
             <!-- pets.genero, pets.raza -->
             <!-- Se sacó el campo "Hair"/pelaje: no aplica a todas las
                  especies (aves, tortugas, etc.) y nunca estuvo conectado
@@ -309,7 +309,7 @@
           <div class="vet-card">
             <div class="av">👨‍⚕️</div>
             <div style="flex:1;">
-              <h4 id="petVetName">No veterinarian assigned yet</h4>
+              <h4 id="petVetName">Aún no hay veterinario asignado</h4>
               <p id="petVetSpecialty"></p>
               <p id="petVetPlace"></p>
               <div class="actions">
@@ -340,7 +340,7 @@
         </div>
         <table class="vacc-table">
           <thead>
-            <tr><th>Vaccine Name</th><th>Application date</th><th>Next</th><th>Lost</th><th>On time</th></tr>
+            <tr><th>Nombre de la vacuna</th><th>Fecha de aplicación</th><th>Siguiente</th><th>Perdido</th><th>A tiempo</th></tr>
           </thead>
           <tbody id="vaccTableBody">
             <!-- generado desde tabla vaccinations(mascota_id, nombre, fecha_aplicacion, fecha_siguiente, estado) vía renderVaccTable() -->
@@ -355,8 +355,8 @@
     <section class="view" id="view-calendar">
       <div class="page-title" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px;">
         <div>
-          <h1>Pet Schedule</h1>
-          <p>Keep track of all your pet's important events and appointments.</p>
+          <h1>Horario de la mascota</h1>
+          <p>Lleva el control de todos los eventos y citas importantes de tu mascota.</p>
         </div>
         <button class="btn-primary" id="newEventBtn">+ New Event</button>
         <!-- abre formulario POST /api/events {titulo, fecha, hora, lugar, tipo, mascota_id} -->
@@ -366,36 +366,36 @@
         <div>
           <div class="cal-toolbar">
             <div class="cal-tabs">
-              <button class="cal-tab active" onclick="setCalFilter(this,'all')">📅 All</button>
+              <button class="cal-tab active" onclick="setCalFilter(this,'all')">📅 Todos</button>
               <button class="cal-tab" onclick="setCalFilter(this,'event')"><span class="dot-yellow"></span> Events</button>
               <button class="cal-tab" onclick="setCalFilter(this,'appointment')"><span class="dot-blue"></span> Appointments</button>
             </div>
           </div>
           <div class="cal-toolbar">
-            <div class="cal-nav"><button onclick="changeMonth(-1)">‹</button> <span id="calMonthLabel">January 2025</span> <button onclick="changeMonth(1)">›</button></div>
+            <div class="cal-nav"><button onclick="changeMonth(-1)">‹</button> <span id="calMonthLabel">Enero 2025</span> <button onclick="changeMonth(1)">›</button></div>
             <div class="view-toggle">
-              <button onclick="goToToday()">Today</button>
-              <button class="active" onclick="showToast('Month view')">Month</button>
-              <button onclick="showToast('Week view is coming soon — hook it up when you add per-week queries')">Week</button>
-              <button onclick="showToast('List view is coming soon — hook it up when you add a flat events query')">List</button>
+              <button onclick="goToToday()">Hoy</button>
+              <button class="active" onclick="showToast('Mes view')">Mes</button>
+              <button onclick="showToast('Semana view is coming soon — hook it up when you add per-week queries')">Semana</button>
+              <button onclick="showToast('Lista view is coming soon — hook it up when you add a flat events query')">Lista</button>
             </div>
           </div>
 
           <div class="cal-grid" id="calGrid">
-            <!-- Celdas generadas dinámicamente por renderCalendar() a partir del mes/año seleccionado y del array `events` (tabla events/appointments) -->
+            <!-- Celdas generadas dinámicamente por renderCalendario() a partir del mes/año seleccionado y del array `events` (tabla events/appointments) -->
           </div>
         </div>
 
         <div>
           <div class="side-card">
-            <h3>Upcoming Events <span class="view-all" onclick="openAllEventsModal()">View all</span></h3>
+            <h3>Próximos eventos <span class="view-all" onclick="openAllEventsModal()">Ver todo</span></h3>
             <div id="upcomingEventsList">
               <!-- generado desde tabla events/appointments ORDER BY fecha vía renderUpcoming() -->
             </div>
           </div>
 
           <div class="side-card">
-            <h3>Discover events</h3>
+            <h3>Descubrir eventos</h3>
             <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 10px;">Public events from the community — add the ones you want to your own calendar.</p>
             <div id="discoverEventsList">
               <!-- generado desde la tabla real "events" vía renderDiscoverEvents() -->
@@ -415,7 +415,7 @@
           </div>
 
           <div class="side-card">
-            <h3>Event Types</h3>
+            <h3>Tipos de evento</h3>
             <div class="event-types">
               <div class="row"><span class="dot-yellow"></span> Events</div>
               <div class="row"><span class="dot-blue"></span> Appointments</div>
@@ -430,24 +430,24 @@
     ======================================================== -->
     <section class="view" id="view-petwall">
       <div class="page-title">
-        <h1>The Pet Wall ♡</h1>
-        <p>A space to share, learn and connect with pet lovers.</p>
+        <h1>The Muro de mascotas ♡</h1>
+        <p>Un espacio para compartir, aprender y conectar con amantes de las mascotas.</p>
       </div>
 
       <div class="wall-filters">
-        <button class="wall-filter active" onclick="filterWall(this)">All</button>
-        <button class="wall-filter" onclick="filterWall(this)">Tips</button>
-        <button class="wall-filter" onclick="filterWall(this)">New Events</button>
-        <button class="wall-filter" onclick="filterWall(this)">Health</button>
-        <button class="wall-filter" onclick="filterWall(this)">Adoption</button>
-        <button class="wall-filter" onclick="filterWall(this)">Training</button>
+        <button class="wall-filter active" onclick="filterWall(this)">Todos</button>
+        <button class="wall-filter" onclick="filterWall(this)">Consejos</button>
+        <button class="wall-filter" onclick="filterWall(this)">Nuevos eventos</button>
+        <button class="wall-filter" onclick="filterWall(this)">Salud</button>
+        <button class="wall-filter" onclick="filterWall(this)">Adopción</button>
+        <button class="wall-filter" onclick="filterWall(this)">Entrenamiento</button>
         <!-- filtros -> GET /api/posts?category= -->
       </div>
 
       <div class="wall-layout">
         <div>
           <div class="friendly-banner" style="margin-bottom:18px;">
-            🛡️ <div><strong>A friendly community</strong>Be kind, helpful and respectful to other pet lovers.</div>
+            🛡️ <div><strong>Una comunidad amigable</strong>Sé amable, servicial y respetuoso con otros amantes de las mascotas.</div>
           </div>
 
           <div id="postsList">
@@ -457,9 +457,9 @@
 
         <div>
           <div class="side-card">
-            <h3>Trending Tips <span class="view-all" onclick="openTrendingTipsModal()">View all</span></h3>
+            <h3>Consejos populares <span class="view-all" onclick="openTrendingTipsModal()">Ver todo</span></h3>
             <ul class="trending-list" id="petWallTrendingTips">
-              <!-- generado desde posts reales con post_type='tip' vía renderPetWallTrendingTips() -->
+              <!-- generado desde posts reales con post_type='tip' vía renderPetWallTrendingConsejos() -->
             </ul>
           </div>
         </div>
@@ -473,8 +473,8 @@
       <div class="emergency-banner">
         <div class="ic">🚨</div>
         <div>
-          <h2>EMERGENCY MODE</h2>
-          <p>We'll help you find the best veterinary care as fast as possible.</p>
+          <h2>MODO DE EMERGENCIA</h2>
+          <p>Te ayudaremos a encontrar la mejor atención veterinaria lo más rápido posible.</p>
         </div>
       </div>
 
@@ -491,10 +491,10 @@
             <div class="card-header"><h2>2. Near Vets</h2></div>
             <div class="emg-map" id="emgMap">
               <div id="emgMapCanvas"></div>
-              <div class="emg-map-badge" id="emgMapBadge" style="display:none;"><span class="spin"></span> <span id="emgMapBadgeText">Loading map...</span></div>
+              <div class="emg-map-badge" id="emgMapBadge" style="display:none;"><span class="spin"></span> <span id="emgMapBadgeText">Cargando mapa...</span></div>
               <div class="emg-map-legend">
-                <span><i class="lg-dot" style="background:var(--blue-mid);"></i>You</span>
-                <span><i class="lg-dot" style="background:#dc2626;"></i>Vet. Open and near</span>
+                <span><i class="lg-dot" style="background:var(--blue-mid);"></i>Tú</span>
+                <span><i class="lg-dot" style="background:#dc2626;"></i>Veterinaria abierta y cercana</span>
               </div>
             </div>
             <div id="emgVetList">
@@ -503,9 +503,9 @@
           </section>
 
           <div class="emg-bottom-actions">
-            <button class="emg-btn-secondary" style="border:1px solid var(--card-border);" onclick="handleEmergencyCall()">Call</button>
-            <button class="emg-btn-secondary" style="border:1px solid var(--card-border);" onclick="handleEmergencyNavigate()">Navigate in the map</button>
-            <button class="emg-btn-secondary" style="border:1px solid var(--card-border);" onclick="handleEmergencyNotifyVet()">Notify Vet</button>
+            <button class="emg-btn-secondary" style="border:1px solid var(--card-border);" onclick="handleEmergencyCall()">Llamar</button>
+            <button class="emg-btn-secondary" style="border:1px solid var(--card-border);" onclick="handleEmergencyNavigate()">Navegar en el mapa</button>
+            <button class="emg-btn-secondary" style="border:1px solid var(--card-border);" onclick="handleEmergencyNotifyVet()">Notificar al veterinario</button>
           </div>
 
           <section class="card" id="emgShareCard" style="margin-top:24px;">
@@ -522,8 +522,8 @@
               <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start;">
                 <div id="emgQrCanvas" style="background:#fff; padding:12px; border-radius:12px; border:1px solid var(--card-border); display:inline-block;"></div>
                 <div style="flex:1; min-width:220px;">
-                  <p style="font-size:13.5px; margin:0 0 6px;"><strong>Pet:</strong> <span id="emgShareInfoPet">—</span></p>
-                  <p style="font-size:13.5px; margin:0 0 6px;"><strong>Expires:</strong> <span id="emgShareInfoExpiry">—</span></p>
+                  <p style="font-size:13.5px; margin:0 0 6px;"><strong>Mascota:</strong> <span id="emgShareInfoPet">—</span></p>
+                  <p style="font-size:13.5px; margin:0 0 6px;"><strong>Vence:</strong> <span id="emgShareInfoExpiry">—</span></p>
                   <p style="font-size:12.5px; color:var(--blue-mid); font-weight:700; margin:0 0 14px;" id="emgShareCountdown"></p>
                   <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <button class="btn-primary" onclick="previewSharedRecord()">👁 Try view now</button>
@@ -540,8 +540,8 @@
 
         <div>
           <div class="emg-location-box">
-            <div style="font-weight:700; margin-bottom:4px;">Your location</div>
-            <div id="emgLocationDesc">Detecting your current location...</div>
+            <div style="font-weight:700; margin-bottom:4px;">Tu ubicación</div>
+            <div id="emgLocationDesc">Detectando tu ubicación actual...</div>
             <div class="status" id="emgLocationStatus">checking…</div>
             <button class="btn-outline" id="emgLocationRetryBtn" style="display:none; margin-top:10px;" onclick="locateUserAndFindClinics()">🔄 Retry</button>
           </div>
@@ -551,7 +551,7 @@
           </div>
 
           <div class="emg-info-panel">
-            <h3 style="margin:0 0 10px; font-size:15px; color:#dc2626;">Medical summary</h3>
+            <h3 style="margin:0 0 10px; font-size:15px; color:#dc2626;">Resumen médico</h3>
             <div id="emgMedicalSummary">
               <!-- generado desde pet seleccionada vía renderEmergencyMedicalSummary() -->
             </div>

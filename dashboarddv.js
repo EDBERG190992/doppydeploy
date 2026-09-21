@@ -3,10 +3,15 @@
    Conectado a Supabase. Antes todo esto era 100% mock data.
    ============================================================ */
 
-const supabaseClient = window.supabase.createClient(
-  'https://xyiebwrjkmvmcpdhenjk.supabase.co',
-  'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
-);
+let supabaseClient = null;
+try {
+  supabaseClient = window.supabase.createClient(
+    'https://xyiebwrjkmvmcpdhenjk.supabase.co',
+    'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
+  );
+} catch (e) {
+  console.error('No se pudo conectar a Supabase (revisa tu conexión a internet):', e);
+}
 
 let CURRENT_STAFF_ID = null;
 let CURRENT_VETERINARY_ID = null;

@@ -18,10 +18,15 @@
    no existen.
    ============================================================ */
 
-const supabaseClient = window.supabase.createClient(
-  'https://xyiebwrjkmvmcpdhenjk.supabase.co',
-  'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
-);
+let supabaseClient = null;
+try {
+  supabaseClient = window.supabase.createClient(
+    'https://xyiebwrjkmvmcpdhenjk.supabase.co',
+    'sb_publishable_0Qsrr-I39mcgsm_yj8dEEA_DhtV_2fg'
+  );
+} catch (e) {
+  console.error('No se pudo conectar a Supabase (revisa tu conexión a internet):', e);
+}
 
 function togglePass(id, btn) {
   const input = document.getElementById(id);
