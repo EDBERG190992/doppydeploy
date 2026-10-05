@@ -42,6 +42,54 @@ function getInitials(name){
 }
 
 /* ============================================================
+   VALIDACIONES (mismas reglas en todo el proyecto, ver CLAUDE.md)
+   Cada validar*() devuelve null si está bien o el mensaje de error.
+   ============================================================ */
+const RE_NOMBRE_MASCOTA = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9' .-]{1,30}$/;
+const RE_RAZA           = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,40}$/;
+const RE_VACUNA         = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9' ().,+\/-]{2,60}$/;
+const APPT_TIPOS_VALIDOS = ['Vacunación', 'Consulta', 'Reseña', 'Chequeo de dermatología', 'Desparasitación'];
+const IMG_MAX_BYTES = 5 * 1024 * 1024;
+
+const limpiarTexto = v => String(v ?? '').trim().replace(/[ \t]+/g, ' ');
+const tieneLetraDv = v => /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(v);
+
+function validarTextoDv(v, min, max, campo){
+  if(!v || v.length < min) return `${campo}: escribe al menos ${min} caracteres.`;
+  if(v.length > max) return `${campo}: máximo ${max} caracteres (tienes ${v.length}).`;
+  return null;
+}
+function validarNombreMascotaDv(v){
+  if(!v) return 'Escribe el nombre de la mascota.';
+  if(!RE_NOMBRE_MASCOTA.test(v) || !tieneLetraDv(v)) return 'Nombre de mascota: solo letras, números y espacios (máx. 30).';
+  return null;
+}
+function validarRazaDv(v){
+  if(!v) return 'Escribe la raza (o "Mestizo").';
+  if(!RE_RAZA.test(v)) return 'La raza solo puede tener letras y espacios (2 a 40).';
+  return null;
+}
+/* "AAAA-MM-DD" a medianoche local */
+function fechaLocal(str){ return new Date(str + 'T00:00:00'); }
+function hoySinHora(){ const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+
+/* Marca el campo en rojo, lo enfoca y avisa. Devuelve false para usar como "return invalido(...)". */
+function invalido(el, msg){
+  if(el){
+    el.classList.add('invalid');
+    el.addEventListener('input', () => el.classList.remove('invalid'), { once: true });
+    el.focus();
+  }
+  alert('⚠️ ' + msg);
+  return false;
+}
+/* Revisa [[elemento, mensaje|null], ...] y marca el primer error */
+function checkAllDv(pares){
+  const malo = pares.find(([, msg]) => msg);
+  return malo ? invalido(malo[0], malo[1]) : true;
+}
+
+/* ============================================================
    SESIÓN: resolver qué veterinario/staff está logueado y a qué
    clínica pertenece (auth.users -> veterinary_staff.auth_user_id)
    ============================================================ */
@@ -223,12 +271,27 @@ function applySearch(){
 
 async function newPet(){
   if(!CURRENT_VETERINARY_ID){ alert('No clinic linked to this account yet.'); return; }
-  const name = prompt('Pet name');
-  if(!name) return;
-  const breed = prompt('Pet breed');
-  if(!breed) return;
+  // Se vuelve a preguntar mientras el dato no sea válido (Cancelar sale).
+  let name = null;
+  while(true){
+    const raw = prompt('Nombre de la mascota', name || '');
+    if(raw === null) return;
+    name = limpiarTexto(raw);
+    const err = validarNombreMascotaDv(name);
+    if(!err) break;
+    alert('⚠️ ' + err);
+  }
+  let breed = null;
+  while(true){
+    const raw = prompt('Raza de la mascota', breed || '');
+    if(raw === null) return;
+    breed = limpiarTexto(raw);
+    const err = validarRazaDv(breed);
+    if(!err) break;
+    alert('⚠️ ' + err);
+  }
   const { error } = await supabaseClient.from('pets').insert({
-    pet_name: name.trim(), pet_breed: breed.trim(), petTypes: 'Dog',
+    pet_name: name, pet_breed: breed, petTypes: 'Dog',
     primary_clinic_id: CURRENT_VETERINARY_ID, assigned_veterinarian_id: CURRENT_STAFF_ID
   });
   if(error){ console.error('[Doppy] newPet', error); alert('Error registering pet: ' + error.message); return; }
@@ -317,16 +380,16 @@ async function openPet(id){
       <div style="margin-top:12px">
         <div class="form-group">
           <label>Vaccine name</label>
-          <input id="new-vaccine-name" type="text" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px" placeholder="Example: Rabies, Distemper, Parvovirus, Bordetella...">
+          <input id="new-vaccine-name" type="text" maxlength="60" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px" placeholder="Example: Rabies, Distemper, Parvovirus, Bordetella...">
         </div>
         <div class="form-row" style="display:flex;gap:12px;margin-top:10px">
           <div class="form-group" style="flex:1">
             <label>Dose number</label>
-            <input id="new-vaccine-dose" type="number" min="1" value="1" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px">
+            <input id="new-vaccine-dose" type="number" min="1" max="10" step="1" value="1" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px">
           </div>
           <div class="form-group" style="flex:1">
             <label>Next due date (optional)</label>
-            <input id="new-vaccine-next" type="date" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px">
+            <input id="new-vaccine-next" type="date" min="${dateKey(new Date())}" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px">
           </div>
         </div>
         <button class="btn-submit" style="margin-top:12px" onclick="saveVaccination(${p.id})">Save vaccine</button>
@@ -338,7 +401,7 @@ async function openPet(id){
       <div style="margin-top:12px">
         <div class="form-group">
           <label>Prescription details</label>
-          <textarea id="new-prescription" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px;min-height:80px;resize:vertical" placeholder="Example: Amoxicillin 250 mg, twice daily for 7 days."></textarea>
+          <textarea id="new-prescription" maxlength="500" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px;min-height:80px;resize:vertical" placeholder="Example: Amoxicillin 250 mg, twice daily for 7 days."></textarea>
         </div>
         <button class="btn-submit" onclick="savePrescription(${p.id})">Save prescription</button>
       </div>
@@ -349,7 +412,7 @@ async function openPet(id){
       <div style="margin-top:12px">
         <div class="form-group">
           <label>Note for veterinarian</label>
-          <textarea id="new-private-note" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px;min-height:80px;resize:vertical" placeholder="Example: Follow up after surgery in 2 weeks."></textarea>
+          <textarea id="new-private-note" maxlength="1000" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:13px;min-height:80px;resize:vertical" placeholder="Example: Follow up after surgery in 2 weeks."></textarea>
         </div>
         <button class="btn-submit" onclick="savePrivateNote(${p.id})">Save note</button>
       </div>
@@ -357,10 +420,28 @@ async function openPet(id){
 }
 
 async function saveVaccination(petId){
-  const name = document.getElementById('new-vaccine-name')?.value.trim();
-  const dose = parseInt(document.getElementById('new-vaccine-dose')?.value, 10) || 1;
-  const next = document.getElementById('new-vaccine-next')?.value || null;
-  if(!name){ alert('Enter the vaccine name.'); return; }
+  const nameEl = document.getElementById('new-vaccine-name');
+  const doseEl = document.getElementById('new-vaccine-dose');
+  const nextEl = document.getElementById('new-vaccine-next');
+  const name = limpiarTexto(nameEl?.value);
+  const doseRaw = (doseEl?.value || '').trim();
+  const next = nextEl?.value || null;
+
+  // Próxima dosis: opcional, pero si se pone tiene que ser desde hoy y como máximo a 5 años.
+  let errNext = null;
+  if(next){
+    const d = fechaLocal(next);
+    const max = hoySinHora(); max.setFullYear(max.getFullYear() + 5);
+    if(isNaN(d)) errNext = 'La fecha de la próxima dosis no es válida.';
+    else if(d < hoySinHora()) errNext = 'La próxima dosis no puede ser una fecha pasada.';
+    else if(d > max) errNext = 'La próxima dosis no puede ser a más de 5 años.';
+  }
+  if(!checkAllDv([
+    [nameEl, !name ? 'Escribe el nombre de la vacuna.' : (!RE_VACUNA.test(name) || !tieneLetraDv(name) ? 'Nombre de vacuna no válido (2 a 60 caracteres).' : null)],
+    [doseEl, !/^\d+$/.test(doseRaw) || +doseRaw < 1 || +doseRaw > 10 ? 'La dosis debe ser un número entero entre 1 y 10.' : null],
+    [nextEl, errNext]
+  ])) return;
+  const dose = Number(doseRaw);
 
   const { error } = await supabaseClient.from('vaccination_record').insert({
     pet_id: petId, veterinary_id: CURRENT_VETERINARY_ID,
@@ -375,8 +456,9 @@ async function saveVaccination(petId){
 }
 
 async function savePrescription(petId){
-  const text = document.getElementById('new-prescription')?.value.trim();
-  if(!text){ alert('Enter the prescription details.'); return; }
+  const el = document.getElementById('new-prescription');
+  const text = limpiarTexto(el?.value);
+  if(!checkAllDv([[el, validarTextoDv(text, 5, 500, 'Receta')]])) return;
   const { error } = await supabaseClient.from('prescriptions').insert({
     pet_id: petId, veterinarian_id: CURRENT_STAFF_ID,
     medicine: text.split('.')[0] || text, instructions: text
@@ -386,8 +468,9 @@ async function savePrescription(petId){
 }
 
 async function savePrivateNote(petId){
-  const text = document.getElementById('new-private-note')?.value.trim();
-  if(!text){ alert('Enter the private note.'); return; }
+  const el = document.getElementById('new-private-note');
+  const text = limpiarTexto(el?.value);
+  if(!checkAllDv([[el, validarTextoDv(text, 3, 1000, 'Nota')]])) return;
   const { error } = await supabaseClient.from('vet_private_notes').insert({
     pet_id: petId, veterinarian_id: CURRENT_STAFF_ID, note: text
   });
@@ -797,10 +880,29 @@ async function saveAppt(){
   const time = document.getElementById('f-time').value;
   const type = document.getElementById('f-type').value;
   const vetId = document.getElementById('f-vet').value || CURRENT_STAFF_ID;
-  const notes = document.getElementById('f-notes')?.value.trim() || null;
-  if(!petId || !date || !time || !type){ alert('Please complete all required fields.'); return; }
+  const notes = limpiarTexto(document.getElementById('f-notes')?.value) || null;
+  const $f = id => document.getElementById(id);
 
-  const isoDateTime = new Date(`${date}T${time}:00`).toISOString();
+  const when = new Date(`${date}T${time}:00`);
+  const max = new Date(); max.setFullYear(max.getFullYear() + 1);
+  let errFecha = null;
+  if(!date || !time || isNaN(when)) errFecha = 'Elige fecha y hora válidas.';
+  else if(when.getTime() < Date.now() - 15 * 60000) errFecha = 'La cita no puede quedar en el pasado.';
+  else if(when > max) errFecha = 'Solo se pueden agendar citas hasta un año por adelantado.';
+
+  if(!checkAllDv([
+    [$f('f-pet'),   petId && pets.some(p => String(p.id) === String(petId)) ? null : 'Elige una mascota.'],
+    [$f('f-date'),  errFecha],
+    [$f('f-type'),  APPT_TIPOS_VALIDOS.includes(type) ? null : 'Elige el tipo de cita.'],
+    [$f('f-notes'), notes && notes.length > 500 ? `Las notas admiten hasta 500 caracteres (tienes ${notes.length}).` : null]
+  ])) return;
+
+  // Mismo veterinario con otra cita a menos de 30 minutos → se avisa antes de guardar.
+  const choque = allAppts.find(a => vetId && String(a.vet) === String(vetId) &&
+    Math.abs(new Date(`${a.date}T${a.time}:00`).getTime() - when.getTime()) < 30 * 60000);
+  if(choque && !confirm(`Este veterinario ya tiene una cita el ${choque.date} a las ${choque.time}. ¿Guardar de todos modos?`)) return;
+
+  const isoDateTime = when.toISOString();
   const { error } = await supabaseClient.from('appointments').insert({
     pet_id: Number(petId), veterinary_id: CURRENT_VETERINARY_ID, veterinarian_id: vetId ? Number(vetId) : null,
     title: type, appointment_date: isoDateTime, type: APPT_TYPE_LABEL_TO_KEY[type] || 'other',
@@ -994,7 +1096,8 @@ function toggleComments(id){
 }
 function addComment(id){
   const input = document.getElementById(`comment-input-${id}`);
-  const text = input.value.trim(); if(!text) return;
+  const text = limpiarTexto(input.value);
+  if(!checkAllDv([[input, validarTextoDv(text, 1, 500, 'Comentario')]])) return;
   const list = document.getElementById(`comments-list-${id}`);
   const div = document.createElement('div');
   div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:flex-start';
@@ -1017,6 +1120,8 @@ function autoResize(el){ el.style.height = 'auto'; el.style.height = el.scrollHe
 
 function handleImageUpload(e){
   const file = e.target.files[0]; if(!file) return;
+  if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)){ e.target.value = ''; alert('⚠️ La imagen debe ser JPG, PNG, WEBP o GIF.'); return; }
+  if(file.size > IMG_MAX_BYTES){ e.target.value = ''; alert('⚠️ La imagen no puede pesar más de 5 MB.'); return; }
   const reader = new FileReader();
   reader.onload = ev => {
     composeImageData = ev.target.result;
@@ -1031,10 +1136,15 @@ function handleImageUpload(e){
 function removeImage(){ composeImageData = null; document.getElementById('img-preview-area').innerHTML = ''; }
 
 async function submitPost(){
-  const title = document.getElementById('compose-title').value.trim();
-  const text = document.getElementById('compose-text').value.trim();
-  if(!title){ alert('Add a title for your post.'); return; }
-  if(!text){ alert('Write something before posting.'); return; }
+  const titleEl = document.getElementById('compose-title');
+  const textEl = document.getElementById('compose-text');
+  const title = limpiarTexto(titleEl.value);
+  const text = textEl.value.trim();
+  const enlaces = (text.match(/https?:\/\//gi) || []).length;
+  if(!checkAllDv([
+    [titleEl, validarTextoDv(title, 3, 120, 'Título')],
+    [textEl,  validarTextoDv(text, 5, 2000, 'Texto') || (enlaces > 3 ? 'Máximo 3 enlaces por publicación.' : null)]
+  ])) return;
   if(!CURRENT_STAFF_ID){ alert('No active session — sign in to post.'); return; }
 
   const typeMap = { tip:'tip', event:'event', poll:'poll', post:'community' };

@@ -68,7 +68,7 @@
         <p>Agrega información básica sobre tu mascota.</p>
       </div>
 
-      <form class="form-area" id="petForm">
+      <form class="form-area" id="petForm" novalidate>
         <div class="pet-card">
           <div class="edit-pencil" title="Cambiar foto">✎</div>
           <div class="pet-avatar"><img id="petIcon" src="assets/dogd.png" alt="Pet icon"></div>
@@ -79,14 +79,14 @@
         <div class="fields">
           <div class="field" id="nameField">
             <label for="petName">Nombre de la mascota</label>
-            <input type="text" id="petName" placeholder="ej. Max" autocomplete="off">
+            <input type="text" id="petName" placeholder="ej. Max" autocomplete="off" maxlength="30">
             <div class="error-msg">Ingresa el nombre de tu mascota.</div>
           </div>
 
           <div class="field" id="ageField">
             <label for="petAge">Edad de la mascota</label>
             <div class="age-row">
-              <input type="number" min="0" id="petAge" placeholder="ej. 2">
+              <input type="number" min="0" max="40" step="1" id="petAge" placeholder="ej. 2">
               <select id="ageUnit">
                 <option value="years">Años</option>
                 <option value="months">Meses</option>
@@ -97,7 +97,7 @@
 
           <div class="field" id="breedField">
             <label for="petBreed">Raza de la mascota</label>
-            <input type="text" id="petBreed" placeholder="ej. Golden Retriever" autocomplete="off">
+            <input type="text" id="petBreed" placeholder="ej. Golden Retriever" autocomplete="off" maxlength="40">
             <div class="error-msg">Ingresa la raza de tu mascota.</div>
           </div>
 

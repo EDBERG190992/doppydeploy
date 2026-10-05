@@ -123,3 +123,8 @@ button{font-family:inherit;cursor:pointer;}
   .right{display:none;}
   .left{padding:26px 26px 32px;}
 }
+
+/* ---------- validaciones ---------- */
+.input-wrap.invalid{border-color:#DC2626;background:#FEF2F2;}
+.input-wrap.invalid .input-icon{color:#DC2626;}
+.field-error{color:#DC2626;font-size:.8rem;font-weight:600;margin:-6px 4px 0;}

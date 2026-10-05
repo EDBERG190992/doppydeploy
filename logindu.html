@@ -38,7 +38,7 @@
     <!-- La verificación real de existencia se hace contra la tabla "users"
          (columnas name, email, auth_user_id) dentro de login(), después de
          que Supabase Auth valida la contraseña. Ver comentarios en logindu.js. -->
-    <form id="loginForm" onsubmit="event.preventDefault(); login();">
+    <form id="loginForm" novalidate onsubmit="event.preventDefault(); login();">
       <div class="input-group">
         <!-- Name -->
         <div class="input-wrap">
@@ -48,7 +48,7 @@
               <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
             </svg>
           </span>
-          <input type="text" id="name" placeholder="Ingresa tu nombre" autocomplete="name" />
+          <input type="text" id="name" placeholder="Ingresa tu nombre" autocomplete="name" maxlength="60" />
         </div>
 
         <!-- Email -->
@@ -59,7 +59,7 @@
               <path d="M22 7l-10 7L2 7"/>
             </svg>
           </span>
-          <input type="email" id="email" placeholder="Ingresa tu correo" autocomplete="email" />
+          <input type="email" id="email" placeholder="Ingresa tu correo" autocomplete="email" maxlength="254" />
         </div>
 
         <!-- Password -->
@@ -71,7 +71,7 @@
                 <path d="M7 11V7a5 5 0 0110 0v4"/>
               </svg>
             </span>
-            <input type="password" id="pass" placeholder="Ingresa tu contraseña" autocomplete="current-password" />
+            <input type="password" id="pass" placeholder="Ingresa tu contraseña" autocomplete="current-password" maxlength="72" />
             <button class="toggle-btn" onclick="togglePass()" type="button" aria-label="Mostrar/ocultar contraseña">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>

@@ -41,16 +41,81 @@ function translateAuthError(message) {
   return 'No se pudo iniciar sesión: ' + message;
 }
 
+/* ============================================================
+   VALIDACIONES (mismas reglas en todo el proyecto, ver CLAUDE.md)
+   ============================================================ */
+const RE_EMAIL  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const RE_NOMBRE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,60}$/;
+const MAX_INTENTOS = 5;          // intentos fallidos seguidos permitidos
+const ESPERA_MS = 30 * 1000;     // espera después de superarlos
+
+function marcarError(inputId, msg) {
+  const wrap = document.getElementById(inputId).closest('.input-wrap');
+  wrap.classList.add('invalid');
+  const host = wrap.closest('.pass-row') || wrap;
+  let err = host.nextElementSibling;
+  if (!err || !err.classList.contains('field-error')) {
+    err = document.createElement('div');
+    err.className = 'field-error';
+    host.after(err);
+  }
+  err.textContent = msg;
+}
+function limpiarErrores() {
+  document.querySelectorAll('.input-wrap.invalid').forEach(w => w.classList.remove('invalid'));
+  document.querySelectorAll('.field-error').forEach(e => e.remove());
+}
+document.querySelectorAll('.input-wrap input').forEach(input => {
+  input.addEventListener('input', () => input.closest('.input-wrap').classList.remove('invalid'));
+});
+
+// Bloqueo temporal tras varios intentos fallidos (se guarda por pestaña).
+function segundosBloqueo() {
+  const hasta = Number(sessionStorage.getItem('doppy_login_lock') || 0);
+  return Math.max(0, Math.ceil((hasta - Date.now()) / 1000));
+}
+function registrarFallo() {
+  const n = Number(sessionStorage.getItem('doppy_login_fails') || 0) + 1;
+  sessionStorage.setItem('doppy_login_fails', String(n));
+  if (n >= MAX_INTENTOS) {
+    sessionStorage.setItem('doppy_login_lock', String(Date.now() + ESPERA_MS));
+    sessionStorage.setItem('doppy_login_fails', '0');
+  }
+}
+function limpiarFallos() {
+  sessionStorage.removeItem('doppy_login_fails');
+  sessionStorage.removeItem('doppy_login_lock');
+}
+
+function validarLogin(name, email, pass) {
+  const errores = [];
+  if (!name) errores.push(['name', 'Escribe tu nombre.']);
+  else if (!RE_NOMBRE.test(name)) errores.push(['name', 'El nombre solo puede tener letras y espacios.']);
+  if (!email) errores.push(['email', 'Escribe tu correo.']);
+  else if (email.length > 254 || !RE_EMAIL.test(email)) errores.push(['email', 'Escribe un correo válido.']);
+  if (!pass) errores.push(['pass', 'Escribe tu contraseña.']);
+  else if (pass.length < 6 || pass.length > 72) errores.push(['pass', 'La contraseña debe tener entre 6 y 72 caracteres.']);
+  return errores;
+}
+
 async function login() {
-  const name  = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
+  const name  = document.getElementById('name').value.trim().replace(/\s+/g, ' ');
+  const email = document.getElementById('email').value.trim().toLowerCase();
   const pass  = document.getElementById('pass').value;
   const btn   = document.querySelector('.btn-cta');
 
-  if (!name || !email || !pass) { showToast('⚠️ Completa todos los campos.'); return; }
-  if (!email.includes('@'))     { showToast('⚠️ Ingresa un correo válido.'); return; }
-  if (pass.length < 6)          { showToast('⚠️ La contraseña debe tener al menos 6 caracteres.'); return; }
-  if (!supabaseClient)          { showToast('❌ No se pudo conectar con el servidor.'); return; }
+  limpiarErrores();
+  const espera = segundosBloqueo();
+  if (espera) { showToast(`⏳ Demasiados intentos. Espera ${espera} s e inténtalo de nuevo.`); return; }
+
+  const errores = validarLogin(name, email, pass);
+  if (errores.length) {
+    errores.forEach(([id, msg]) => marcarError(id, msg));
+    document.getElementById(errores[0][0]).focus();
+    showToast('⚠️ ' + errores[0][1]);
+    return;
+  }
+  if (!supabaseClient) { showToast('❌ No se pudo conectar con el servidor.'); return; }
 
   btn.disabled = true;
   btn.textContent = 'Entrando…';
@@ -59,9 +124,11 @@ async function login() {
     // PASO 1 — Supabase Auth valida email y contraseña
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
     if (error) {
+      registrarFallo();
       showToast('❌ ' + translateAuthError(error.message));
       return;
     }
+    limpiarFallos();
     const user = data.user;
 
     // PASO 2 — ¿Tiene perfil de dueño en "users"?
@@ -133,8 +200,8 @@ async function login() {
    Supabase envía el correo de recuperación al email escrito arriba. */
 document.querySelector('.forgot')?.addEventListener('click', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  if (!email || !email.includes('@')) {
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  if (!email || !RE_EMAIL.test(email)) {
     showToast('✉️ Escribe tu correo arriba y vuelve a tocar aquí.');
     return;
   }

@@ -145,6 +145,107 @@ function apptTypeLabel(a){
   return t ? t.label : 'Cita';
 }
 
+/* ============================================================
+   VALIDACIONES (mismas reglas en todo el proyecto, ver CLAUDE.md)
+   Cada validar*() devuelve null si está bien o el mensaje de error.
+   ============================================================ */
+const RE_EMAIL          = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const RE_NOMBRE         = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,60}$/;
+const RE_NOMBRE_MASCOTA = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9' .-]{1,30}$/;
+const RE_RAZA           = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,40}$/;
+const RE_TELEFONO       = /^\+?[\d\s().-]{7,20}$/;
+const RE_CODIGO_AFIL    = /^DOPPY-[A-Z0-9]{4}-[A-Z0-9]{4}$/;   // formato de randomCódigo() en dashboardda.js
+const EDAD_MAX          = { years: 40, months: 24 };
+const FOTO_MAX_BYTES    = 5 * 1024 * 1024;
+
+const limpiar = v => String(v ?? '').trim().replace(/\s+/g, ' ');
+const tieneLetra = v => /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(v);
+
+function validarNombre(v){
+  if(!v) return 'Escribe un nombre.';
+  if(!RE_NOMBRE.test(v) || !tieneLetra(v)) return 'El nombre solo puede tener letras y espacios (2 a 60 caracteres).';
+  return null;
+}
+function validarEmail(v){
+  if(!v) return 'Escribe un correo.';
+  if(v.length > 254 || !RE_EMAIL.test(v)) return 'Escribe un correo válido (ej. nombre@correo.com).';
+  return null;
+}
+function validarTelefono(v){
+  if(!v) return 'Escribe un teléfono.';
+  const digitos = v.replace(/\D/g, '').length;
+  if(!RE_TELEFONO.test(v) || digitos < 7 || digitos > 15) return 'Teléfono no válido: usa entre 7 y 15 dígitos (puede empezar con +).';
+  return null;
+}
+function validarNombreMascota(v){
+  if(!v) return 'El nombre de la mascota no puede quedar vacío.';
+  if(!RE_NOMBRE_MASCOTA.test(v) || !tieneLetra(v)) return 'Nombre de mascota: solo letras, números y espacios (máx. 30).';
+  return null;
+}
+function validarRaza(v){
+  if(!v) return 'La raza no puede quedar vacía (puedes poner "Mestizo").';
+  if(!RE_RAZA.test(v)) return 'La raza solo puede tener letras y espacios (2 a 40).';
+  return null;
+}
+function validarTexto(v, min, max, campo){
+  if(!v || v.length < min) return `${campo}: escribe al menos ${min} caracteres.`;
+  if(v.length > max) return `${campo}: máximo ${max} caracteres (tienes ${v.length}).`;
+  return null;
+}
+function validarPasswordNueva(v){
+  if(!v || v.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+  if(v.length > 72) return 'La contraseña no puede tener más de 72 caracteres.';
+  if(!/[A-Za-z]/.test(v) || !/\d/.test(v)) return 'La contraseña debe tener letras y números.';
+  if(currentUser?.email && v.toLowerCase() === currentUser.email.toLowerCase()) return 'La contraseña no puede ser igual a tu correo.';
+  return null;
+}
+/* Fecha DD/MM/AAAA → Date (o null si no existe, ej. 31/02/2000) */
+function parseFechaDMY(v){
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(v || '');
+  if(!m) return null;
+  const d = new Date(+m[3], +m[2] - 1, +m[1]);
+  return (d.getDate() === +m[1] && d.getMonth() === +m[2] - 1) ? d : null;
+}
+function validarFechaNacimiento(v){
+  const d = parseFechaDMY(v);
+  if(!d) return 'Escribe la fecha así: DD/MM/AAAA (ej. 15/05/1990).';
+  const edad = (Date.now() - d.getTime()) / (365.25 * 86400000);
+  if(edad < 16) return 'Debes tener al menos 16 años para usar Doppy.';
+  if(edad > 110) return 'Revisa el año de nacimiento.';
+  return null;
+}
+/* Fecha + hora de una cita: futura y como máximo a un año */
+function validarFechaCita(date, time){
+  if(!date || !time) return 'Elige fecha y hora.';
+  const d = new Date(`${date}T${time}:00`);
+  if(isNaN(d)) return 'La fecha u hora no es válida.';
+  if(d.getTime() < Date.now() + 30 * 60000) return 'La cita debe ser al menos 30 minutos en el futuro.';
+  const limite = new Date(); limite.setFullYear(limite.getFullYear() + 1);
+  if(d > limite) return 'Solo se pueden pedir citas hasta un año por adelantado.';
+  return null;
+}
+function validarFoto(file){
+  if(!file) return 'No se eligió ninguna imagen.';
+  if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) return 'La foto debe ser JPG, PNG, WEBP o GIF.';
+  if(file.size > FOTO_MAX_BYTES) return 'La foto no puede pesar más de 5 MB.';
+  return null;
+}
+
+/* Marca en rojo un input (o contenteditable) y le quita la marca al corregirlo */
+function markInvalid(el, msg){
+  if(!el) return;
+  el.classList.add('invalid');
+  el.addEventListener('input', () => el.classList.remove('invalid'), { once: true });
+  if(el.focus) el.focus();
+  if(msg) showToast('⚠️ ' + msg);
+}
+/* Revisa una lista [[elemento, mensaje|null], ...]; marca el primer error y devuelve false */
+function checkAll(pares){
+  const malo = pares.find(([, msg]) => msg);
+  if(malo){ markInvalid(malo[0], malo[1]); return false; }
+  return true;
+}
+
 /* Clínica y veterinario de una mascota (o de la primera afiliación activa) */
 function clinicForPet(pet){
   if(pet && pet.primary_clinic_id && clinicsById[pet.primary_clinic_id]) return clinicsById[pet.primary_clinic_id];
@@ -577,8 +678,11 @@ function renderProfile(){
   const phone = ('phone' in c) ? c.phone : lsGet(clientKey('phone'), '');
   $('profilePhone').textContent = phone || 'Agregar teléfono';
   $('profileEmail').textContent = c.email || currentUser?.email || '—';
-  const birth = ('fecha_nacimiento' in c) ? c.fecha_nacimiento : lsGet(clientKey('birth'), '');
-  $('profileOwnerAge').textContent = birth || 'Agregar fecha';
+  let birth = ('fecha_nacimiento' in c) ? c.fecha_nacimiento : lsGet(clientKey('birth'), '');
+  // En la base viene como AAAA-MM-DD; se muestra (y se edita) como DD/MM/AAAA.
+  const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(birth || '');
+  if(iso) birth = `${iso[3]}/${iso[2]}/${iso[1]}`;
+  $('profileOwnerAge').textContent = birth || 'DD/MM/AAAA';
   const hoursEl = document.querySelector('[data-field="horario_contacto"]');
   if(hoursEl) hoursEl.textContent = lsGet(clientKey('contact_hours'), '9:00 AM - 6:00 PM');
 
@@ -619,12 +723,20 @@ function editField(btn){
 }
 
 async function saveEditable(el){
-  const text = el.textContent.trim();
+  const text = limpiar(el.textContent);
   const orig = el.dataset.orig ?? '';
   const btn = el.parentElement?.querySelector('.btn-outline');
   if(btn && btn.textContent === 'Guardar') btn.textContent = 'Editar';
   if(text === orig) return;
-  const revert = (msg) => { el.textContent = orig; if(msg) showToast(msg); };
+  // Si no pasa la validación se vuelve al valor anterior y se explica por qué.
+  const revert = (msg) => {
+    el.textContent = orig;
+    if(msg){
+      showToast('⚠️ ' + msg);
+      el.classList.add('invalid');
+      setTimeout(() => el.classList.remove('invalid'), 2500);
+    }
+  };
 
   const pet = currentPet();
   const id = el.id;
@@ -633,28 +745,38 @@ async function saveEditable(el){
   try {
     // ----- mascota -----
     if(id === 'dashPetName' || id === 'petProfileName'){
-      if(!pet || !text) return revert('El nombre no puede quedar vacío.');
+      if(!pet) return revert();
+      const err = validarNombreMascota(text);
+      if(err) return revert(err);
       return await updatePet(pet.id, { pet_name: text }, 'Nombre actualizado');
     }
     if(id === 'dashPetAge' || id === 'petProfileAge'){
       if(!pet) return revert();
-      const num = parseInt(text, 10);
-      if(isNaN(num) || num < 0) return revert('Escribe la edad así: "3 años" o "5 meses".');
-      const isYears = !/mes|month/i.test(text);
+      // Acepta "3", "3 años", "5 meses", "2 years"...
+      const m = /^(\d{1,2})\s*(años?|anos?|years?|meses|mes|months?)?$/i.exec(text);
+      if(!m) return revert('Escribe la edad así: "3 años" o "5 meses" (número entero).');
+      const num = Number(m[1]);
+      const isYears = !/mes|month/i.test(m[2] || 'años');
+      if(num > (isYears ? EDAD_MAX.years : EDAD_MAX.months)) {
+        return revert(isYears ? `La edad no puede superar ${EDAD_MAX.years} años.` : `Más de ${EDAD_MAX.months} meses: escríbela en años.`);
+      }
       return await updatePet(pet.id, { pet_age: num, pet_year: isYears }, 'Edad actualizada');
     }
     if(id === 'petProfileBreed'){
-      if(!pet || !text) return revert();
+      if(!pet) return revert();
+      const err = validarRaza(text);
+      if(err) return revert(err);
       return await updatePet(pet.id, { pet_breed: text }, 'Raza actualizada');
     }
     if(id === 'petProfileGender'){
       if(!pet) return revert();
       const t = text.toLowerCase();
-      if(!/^(m|h|f)/.test(t)) return revert('Escribe "Macho" o "Hembra".');
+      if(!/^(macho|hembra|m|h)$/.test(t)) return revert('Escribe "Macho" o "Hembra".');
       return await updatePet(pet.id, { pet_gender: t.startsWith('m') }, 'Sexo actualizado');
     }
     if(field === 'pet_descripcion'){
       if(!pet) return revert();
+      if(text.length > 500) return revert(`La descripción admite hasta 500 caracteres (tiene ${text.length}).`);
       if('description' in pet) return await updatePet(pet.id, { description: text }, 'Descripción guardada');
       lsSet(`doppy_pet_desc_${pet.id}`, text);   // LOCAL
       el.closest('.desc-card')?.classList.toggle('has-text', !!text);
@@ -663,27 +785,42 @@ async function saveEditable(el){
 
     // ----- dueño -----
     if(field === 'usuario_nombre' || field === 'owner_nombre'){
-      if(!text) return revert('El nombre no puede quedar vacío.');
+      const err = validarNombre(text);
+      if(err) return revert(err);
       return await updateClient({ name: text }, 'Nombre actualizado');
     }
     if(field === 'telefono'){
+      const err = validarTelefono(text);
+      if(err) return revert(err);
       if(currentClient && 'phone' in currentClient) return await updateClient({ phone: text }, 'Teléfono actualizado');
       lsSet(clientKey('phone'), text);   // LOCAL hasta que exista users.phone
       return showToast('Teléfono guardado en este dispositivo');
     }
     if(field === 'email'){
-      if(!text.includes('@')) return revert('Escribe un correo válido.');
-      const { error } = await supabaseClient.auth.updateUser({ email: text });
+      const email = text.toLowerCase();
+      const err = validarEmail(email);
+      if(err) return revert(err);
+      const { error } = await supabaseClient.auth.updateUser({ email });
       if(error) return revert('❌ ' + error.message);
-      await updateClient({ email: text }, null);
+      await updateClient({ email }, null);
       return showToast('📬 Te enviamos un correo para confirmar el cambio.');
     }
     if(field === 'fecha_nacimiento'){
-      if(currentClient && 'fecha_nacimiento' in currentClient) return await updateClient({ fecha_nacimiento: text }, 'Fecha actualizada');
+      const err = validarFechaNacimiento(text);
+      if(err) return revert(err);
+      if(currentClient && 'fecha_nacimiento' in currentClient){
+        // En la base se guarda como AAAA-MM-DD
+        const d = parseFechaDMY(text);
+        return await updateClient({ fecha_nacimiento: dateKey(d) }, 'Fecha actualizada');
+      }
       lsSet(clientKey('birth'), text);   // LOCAL
       return showToast('Guardado en este dispositivo');
     }
     if(field === 'horario_contacto'){
+      // Ej. "9:00 AM - 6:00 PM" o "09:00 - 18:00"
+      if(!/^\d{1,2}:\d{2}\s*(AM|PM)?\s*-\s*\d{1,2}:\d{2}\s*(AM|PM)?$/i.test(text)) {
+        return revert('Escribe el horario así: "9:00 AM - 6:00 PM" o "09:00 - 18:00".');
+      }
       lsSet(clientKey('contact_hours'), text);   // LOCAL
       return showToast('Horario de contacto guardado');
     }
@@ -818,7 +955,7 @@ function openAffiliateModal(){
   openModal('Afiliarse a una clínica', `
     <p>Escanea el QR que te da tu clínica o escribe el código de afiliación (por ejemplo <b>DOPPY-AB12-CD34</b>).</p>
     <div class="form-field"><label>Mascota</label><select id="afPet">${petOptions(currentPetId)}</select></div>
-    <div class="form-field"><label>Código de afiliación</label><input id="afCode" placeholder="DOPPY-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase"></div>
+    <div class="form-field"><label>Código de afiliación</label><input id="afCode" placeholder="DOPPY-XXXX-XXXX" autocomplete="off" maxlength="15" style="text-transform:uppercase"><span class="hint">Formato: DOPPY-XXXX-XXXX</span></div>
     <div id="afScanArea"></div>
     <div class="modal-actions">
       <button class="btn-outline" onclick="startQrScan()">📷 Escanear QR</button>
@@ -873,9 +1010,18 @@ function stopQrScan(){
    busca el código y lo deja en "pending" con el dueño y la mascota;
    la clínica lo aprueba desde su panel (Solicitudes). */
 async function submitAffiliation(){
-  const code = ($('afCode').value || '').trim().toUpperCase();
+  const code = ($('afCode').value || '').trim().toUpperCase().replace(/\s+/g, '');
   const petId = $('afPet').value;
-  if(!code){ showToast('Escribe o escanea el código.'); return; }
+  if(!checkAll([
+    [$('afPet'),  petById(petId) ? null : 'Elige una mascota.'],
+    [$('afCode'), !code ? 'Escribe o escanea el código.'
+                  : (!RE_CODIGO_AFIL.test(code) ? 'El código debe tener el formato DOPPY-XXXX-XXXX.' : null)]
+  ])) return;
+  // No mandar otra solicitud si esta mascota ya tiene una pendiente.
+  if(affiliations.some(a => a.status === 'pending' && String(a.pet_id) === String(petId))){
+    showToast('Esta mascota ya tiene una solicitud pendiente. Espera la respuesta de la clínica.');
+    return;
+  }
 
   const { data: match, error } = await supabaseClient
     .from('affiliations').select('id, status, expiration_date, max_uses, current_uses').eq('code', code).maybeSingle();
@@ -936,15 +1082,41 @@ function openNewAppointmentModal(){
       <div class="form-field"><label>Hora</label><input type="time" id="apTime" value="09:00"></div>
     </div>
     <div class="form-field"><label>Motivo</label><select id="apType">${APPT_TYPES.map(t => `<option value="${t.key}">${t.label}</option>`).join('')}</select></div>
-    <div class="form-field"><label>Notas (opcional)</label><textarea id="apNotes" rows="3" placeholder="Síntomas, indicaciones..."></textarea></div>
+    <div class="form-field"><label>Notas (opcional)</label><textarea id="apNotes" rows="3" maxlength="500" placeholder="Síntomas, indicaciones..."></textarea></div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" onclick="saveAppointment()">Guardar cita</button></div>`);
 }
 
 async function saveAppointment(){
   const pet = petById($('apPet').value);
   const date = $('apDate').value, time = $('apTime').value;
-  const type = APPT_TYPES.find(t => t.key === $('apType').value) || APPT_TYPES[0];
-  if(!pet || !date || !time){ showToast('Completa mascota, fecha y hora.'); return; }
+  const type = APPT_TYPES.find(t => t.key === $('apType').value);
+  const notes = limpiar($('apNotes').value);
+
+  if(!checkAll([
+    [$('apPet'),   pet ? null : 'Elige una mascota.'],
+    [$('apType'),  type ? null : 'Elige el motivo de la cita.'],
+    [$('apDate'),  validarFechaCita(date, time)],
+    [$('apNotes'), notes.length > 500 ? `Las notas admiten hasta 500 caracteres (tienes ${notes.length}).` : null]
+  ])) return;
+
+  // Si la mascota tiene veterinario asignado con horario, la cita tiene que caer dentro.
+  const staff = staffForPet(pet);
+  if(staff && staff.schedule_start && staff.schedule_end){
+    const ini = String(staff.schedule_start).slice(0, 5), fin = String(staff.schedule_end).slice(0, 5);
+    if(time < ini || time >= fin){
+      markInvalid($('apTime'), `${staff.nombre} atiende de ${ini} a ${fin}. Elige una hora en ese horario.`);
+      return;
+    }
+  }
+  // Evita dos citas de la misma mascota a menos de una hora de diferencia.
+  const nueva = new Date(`${date}T${time}:00`).getTime();
+  const choque = appointments.find(a => String(a.pet_id) === String(pet.id) && a.status !== 'cancelled' &&
+    Math.abs(new Date(a.appointment_date).getTime() - nueva) < 60 * 60000);
+  if(choque){
+    markInvalid($('apTime'), `${pet.pet_name} ya tiene una cita el ${fmtDate(choque.appointment_date)} a las ${fmtTime(choque.appointment_date)}.`);
+    return;
+  }
+
   const clinic = clinicForPet(pet);
   if(!clinic){
     showToast('Para pedir una cita, primero afilia a tu mascota a una clínica.');
@@ -954,7 +1126,7 @@ async function saveAppointment(){
   const { error } = await supabaseClient.from('appointments').insert({
     pet_id: pet.id, veterinary_id: clinic.id_veterinary, veterinarian_id: pet.assigned_veterinarian_id || null,
     title: type.label, appointment_date: new Date(`${date}T${time}:00`).toISOString(), type: type.key,
-    status: 'scheduled', notes: $('apNotes').value.trim() || null
+    status: 'scheduled', notes: notes || null
   });
   if(error){ console.error('[Doppy] saveAppointment', error); showToast('❌ No se pudo guardar la cita: ' + error.message); return; }
   closeModal();
@@ -1080,24 +1252,35 @@ function addCommunityEvent(id){
 function openNewEventModal(dateStr){
   const d = dateStr || dateKey(new Date());
   openModal('Nuevo evento', `
-    <div class="form-field"><label>Título</label><input id="evTitle" placeholder="Ej. Paseo en el parque, baño, medicina..."></div>
+    <div class="form-field"><label>Título</label><input id="evTitle" maxlength="80" placeholder="Ej. Paseo en el parque, baño, medicina..."></div>
     <div class="form-row2">
       <div class="form-field"><label>Fecha</label><input type="date" id="evDate" value="${d}"></div>
       <div class="form-field"><label>Hora</label><input type="time" id="evTime" value="10:00"></div>
     </div>
-    <div class="form-field"><label>Lugar (opcional)</label><input id="evPlace"></div>
+    <div class="form-field"><label>Lugar (opcional)</label><input id="evPlace" maxlength="100"></div>
     ${pets.length ? `<div class="form-field"><label>Mascota</label><select id="evPet">${petOptions(currentPetId)}</select></div>` : ''}
     <p class="empty">Los eventos personales se guardan en este dispositivo. Las citas con la clínica se piden con "Nueva cita".</p>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" onclick="savePersonalEvent()">Guardar</button></div>`);
 }
 
 function savePersonalEvent(){
-  const title = $('evTitle').value.trim();
+  const title = limpiar($('evTitle').value);
+  const place = limpiar($('evPlace').value);
   const date = $('evDate').value, time = $('evTime').value || '10:00';
-  if(!title || !date){ showToast('Escribe un título y una fecha.'); return; }
+  const when = new Date(`${date}T${time}:00`);
+  const desde = new Date(); desde.setFullYear(desde.getFullYear() - 1);
+  const hasta = new Date(); hasta.setFullYear(hasta.getFullYear() + 5);
+
+  if(!checkAll([
+    [$('evTitle'), validarTexto(title, 2, 80, 'Título')],
+    [$('evDate'),  !date || isNaN(when) ? 'Elige una fecha válida.'
+                   : (when < desde || when > hasta ? 'La fecha debe estar entre hace un año y dentro de 5 años.' : null)],
+    [$('evPlace'), place.length > 100 ? 'El lugar admite hasta 100 caracteres.' : null]
+  ])) return;
+
   personalEvents.push({
-    id: 'p' + Date.now(), title, date: new Date(`${date}T${time}:00`).toISOString(),
-    location: $('evPlace').value.trim(), petId: $('evPet') ? $('evPet').value : currentPetId, source: 'personal'
+    id: 'p' + Date.now(), title, date: when.toISOString(),
+    location: place, petId: $('evPet') ? $('evPet').value : currentPetId, source: 'personal'
   });
   savePersonalEvents();
   closeModal();
@@ -1151,7 +1334,7 @@ function ensureComposeBox(){
   box.id = 'wallCompose';
   box.innerHTML = `
     <input id="wallTitle" maxlength="120" placeholder="Título de tu publicación">
-    <textarea id="wallText" placeholder="Comparte algo con otros amantes de las mascotas..."></textarea>
+    <textarea id="wallText" maxlength="2000" placeholder="Comparte algo con otros amantes de las mascotas..."></textarea>
     <div class="compose-row">
       <select id="wallCat">${WALL_CATEGORIES.map(c => `<option>${c}</option>`).join('')}</select>
       <button class="btn-primary" onclick="submitWallPost()">Publicar</button>
@@ -1188,17 +1371,22 @@ function renderPosts(){
       </div>
       <div class="comments" id="comments-${p.id}" style="display:none">
         ${comments.map(c => `<div class="comment"><b>${esc(c.user_id && String(c.user_id) === String(currentClient?.id_client) ? (currentClient.name || 'Tú') : 'Miembro')}</b>${esc(c[commentTextKey] || '')}</div>`).join('')}
-        <div class="comment-form"><input id="cinput-${p.id}" placeholder="Escribe un comentario..." onkeydown="if(event.key==='Enter')addPostComment(${p.id})"><button class="btn-primary" onclick="addPostComment(${p.id})">Enviar</button></div>
+        <div class="comment-form"><input id="cinput-${p.id}" maxlength="500" placeholder="Escribe un comentario..." onkeydown="if(event.key==='Enter')addPostComment(${p.id})"><button class="btn-primary" onclick="addPostComment(${p.id})">Enviar</button></div>
       </div>
     </article>`;
   }).join('') : `<p class="empty">${posts.length ? 'No hay publicaciones con ese filtro.' : 'Todavía no hay publicaciones. ¡Sé el primero!'}</p>`;
 }
 
 async function submitWallPost(){
-  const title = $('wallTitle').value.trim();
+  const title = limpiar($('wallTitle').value);
   const content = $('wallText').value.trim();
   const category = $('wallCat').value;
-  if(!title || !content){ showToast('Escribe un título y un texto.'); return; }
+  const enlaces = (content.match(/https?:\/\//gi) || []).length;
+  if(!checkAll([
+    [$('wallTitle'), validarTexto(title, 3, 120, 'Título')],
+    [$('wallText'),  validarTexto(content, 5, 2000, 'Texto') || (enlaces > 3 ? 'Máximo 3 enlaces por publicación.' : null)],
+    [$('wallCat'),   WALL_CATEGORIES.includes(category) ? null : 'Elige una categoría.']
+  ])) return;
   const { error } = await supabaseClient.from('posts').insert({
     author_id: currentClient.id_client, author_type: 'owner', title, content,
     image_url: null, category, post_type: category === 'Eventos' ? 'event' : 'community'
@@ -1235,8 +1423,8 @@ function toggleCommentsBox(postId){
 
 async function addPostComment(postId){
   const input = $('cinput-' + postId);
-  const text = input.value.trim();
-  if(!text) return;
+  const text = limpiar(input.value);
+  if(!checkAll([[input, validarTexto(text, 1, 500, 'Comentario')]])) return;
   const row = { post_id: postId, user_id: currentClient.id_client, [commentTextKey]: text };
   const { data, error } = await supabaseClient.from('post_comments').insert(row).select('*').single();
   if(error){ console.error('[Doppy] addPostComment', error); showToast('❌ No se pudo comentar: ' + error.message); return; }
@@ -1348,8 +1536,8 @@ function renderNotifications(){
    ============================================================ */
 function openChangePasswordModal(){
   openModal('Cambiar contraseña', `
-    <div class="form-field"><label>Nueva contraseña</label><input type="password" id="pwNew" autocomplete="new-password"></div>
-    <div class="form-field"><label>Confirmar contraseña</label><input type="password" id="pwNew2" autocomplete="new-password"></div>
+    <div class="form-field"><label>Nueva contraseña</label><input type="password" id="pwNew" autocomplete="new-password" maxlength="72"><span class="hint">Mínimo 8 caracteres, con letras y números.</span></div>
+    <div class="form-field"><label>Confirmar contraseña</label><input type="password" id="pwNew2" autocomplete="new-password" maxlength="72"></div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" onclick="changePassword()">Guardar</button></div>`);
 }
 // "Code of access to Doppy" es la contraseña de la cuenta (nunca se muestra).
@@ -1357,8 +1545,10 @@ function openAccessCodeModal(){ openChangePasswordModal(); }
 
 async function changePassword(){
   const p1 = $('pwNew').value, p2 = $('pwNew2').value;
-  if(p1.length < 6){ showToast('La contraseña debe tener al menos 6 caracteres.'); return; }
-  if(p1 !== p2){ showToast('Las contraseñas no coinciden.'); return; }
+  if(!checkAll([
+    [$('pwNew'),  validarPasswordNueva(p1)],
+    [$('pwNew2'), p1 !== p2 ? 'Las contraseñas no coinciden.' : null]
+  ])) return;
   const { error } = await supabaseClient.auth.updateUser({ password: p1 });
   if(error){ showToast('❌ ' + error.message); return; }
   closeModal();
@@ -1822,6 +2012,8 @@ function bindUI(){
     const file = e.target.files[0]; e.target.value = '';
     const pet = currentPet();
     if(!file || !pet) return;
+    const err = validarFoto(file);
+    if(err){ showToast('⚠️ ' + err); return; }
     try {
       const data = await resizeImage(file, 600);
       if(!lsSet(`doppy_pet_photo_${pet.id}`, data)){ showToast('La imagen es muy grande para guardarla.'); return; }
@@ -1834,6 +2026,8 @@ function bindUI(){
     const clinic = clinicForPet(currentPet());
     if(!file) return;
     if(!clinic){ showToast('Primero afíliate a una clínica.'); return; }
+    const err = validarFoto(file);
+    if(err){ showToast('⚠️ ' + err); return; }
     try {
       const data = await resizeImage(file, 600);
       if(lsSet(`doppy_clinic_photo_${clinic.id_veterinary}`, data)){ showToast('📷 Foto guardada en este dispositivo'); renderVetInfo(); }

@@ -42,28 +42,80 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+/* ============================================================
+   VALIDACIONES (mismas reglas en todo el proyecto, ver CLAUDE.md)
+   ============================================================ */
+const RE_EMAIL  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const RE_NOMBRE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,60}$/;
+
+function validarNombre(v) {
+  if (!v) return 'Escribe tu nombre.';
+  if (!RE_NOMBRE.test(v) || !/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{2}/.test(v)) return 'El nombre solo puede tener letras y espacios (2 a 60 caracteres).';
+  return null;
+}
+function validarEmail(v) {
+  if (!v) return 'Escribe tu correo.';
+  if (v.length > 254 || !RE_EMAIL.test(v)) return 'Escribe un correo válido (ej. nombre@correo.com).';
+  return null;
+}
+// Contraseña nueva: 8 a 72 caracteres, con al menos una letra y un número.
+function validarPasswordNueva(v, email) {
+  if (!v) return 'Escribe una contraseña.';
+  if (v.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+  if (v.length > 72) return 'La contraseña no puede tener más de 72 caracteres.';
+  if (!/[A-Za-z]/.test(v) || !/\d/.test(v)) return 'La contraseña debe tener letras y números.';
+  if (email && v.toLowerCase() === email.toLowerCase()) return 'La contraseña no puede ser igual a tu correo.';
+  return null;
+}
+
+// Marca en rojo el campo con error y muestra el mensaje debajo.
+function marcarError(inputId, msg) {
+  const input = document.getElementById(inputId);
+  const wrap = input.closest('.input-wrap');
+  wrap.classList.add('invalid');
+  let err = wrap.nextElementSibling;
+  if (!err || !err.classList.contains('field-error')) {
+    err = document.createElement('div');
+    err.className = 'field-error';
+    wrap.after(err);
+  }
+  err.textContent = msg;
+}
+function limpiarErrores() {
+  document.querySelectorAll('.input-wrap.invalid').forEach(w => w.classList.remove('invalid'));
+  document.querySelectorAll('.field-error').forEach(e => e.remove());
+}
+// Al corregir un campo se le quita la marca de error.
+document.querySelectorAll('.input-wrap input').forEach(input => {
+  input.addEventListener('input', () => {
+    const wrap = input.closest('.input-wrap');
+    wrap.classList.remove('invalid');
+    const err = wrap.nextElementSibling;
+    if (err && err.classList.contains('field-error')) err.remove();
+  });
+});
+
 async function register() {
-  const nombre = document.getElementById('nombre').value.trim();
-  const email  = document.getElementById('email').value.trim();
+  // Se normalizan espacios: "  Ana   López " → "Ana López"
+  const nombre = document.getElementById('nombre').value.trim().replace(/\s+/g, ' ');
+  const email  = document.getElementById('email').value.trim().toLowerCase();
   const pass   = document.getElementById('pass').value;
   const pass2  = document.getElementById('pass2').value;
 
   const btn = document.querySelector('.btn-cta');
 
-  if (!nombre || !email || !pass || !pass2) {
-    showToast('⚠️ Please fill in all fields.');
-    return;
-  }
-  if (pass !== pass2) {
-    showToast('⚠️ Passwords do not match.');
-    return;
-  }
-  if (pass.length < 6) {
-    showToast('⚠️ Password must be at least 6 characters long.');
-    return;
-  }
-  if (!email.includes('@')) {
-    showToast('⚠️ Enter a valid email address.');
+  limpiarErrores();
+  const errores = [
+    ['nombre', validarNombre(nombre)],
+    ['email',  validarEmail(email)],
+    ['pass',   validarPasswordNueva(pass, email)],
+    ['pass2',  !pass2 ? 'Confirma tu contraseña.' : (pass !== pass2 ? 'Las contraseñas no coinciden.' : null)]
+  ].filter(([, msg]) => msg);
+
+  if (errores.length) {
+    errores.forEach(([id, msg]) => marcarError(id, msg));
+    document.getElementById(errores[0][0]).focus();
+    showToast('⚠️ ' + errores[0][1]);
     return;
   }
 

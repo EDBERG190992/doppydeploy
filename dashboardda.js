@@ -431,14 +431,14 @@ const __BODY_TEMPLATE__ = () => `
           <div class="card">
             <h3 style="margin-top:0;" data-i18n="config.clinicInfo">Información de la clínica</h3>
             <div class="form-grid" style="margin-top:14px;">
-              <div class="field full"><label data-i18n="config.name">Nombre de la clínica</label><input id="cfgNombre" value="Clínica Veterinaria Happy Paws"></div>
-              <div class="field full"><label data-i18n="config.address">Dirección</label><input id="cfgDireccion" value="123 Veterinarios Ave, Downtown District"></div>
-              <div class="field"><label data-i18n="config.city">Ciudad</label><input id="cfgCiudad" value="Panama Ciudad"></div>
-              <div class="field"><label data-i18n="config.province">Provincia</label><input id="cfgProvincia" value="Panama"></div>
-              <div class="field"><label data-i18n="config.postalCódigo">Código postal</label><input id="cfgCP" value="0801"></div>
-              <div class="field"><label data-i18n="config.phone">Teléfono</label><input id="cfgTel" value="+507 1234-5678"></div>
-              <div class="field"><label data-i18n="config.email">Correo</label><input id="cfgCorreo" value="info@happypawsvet.com"></div>
-              <div class="field"><label data-i18n="config.website">Sitio web</label><input id="cfgWeb" value="www.happypawsvet.com"></div>
+              <div class="field full"><label data-i18n="config.name">Nombre de la clínica</label><input id="cfgNombre" maxlength="80" value="Clínica Veterinaria Happy Paws"></div>
+              <div class="field full"><label data-i18n="config.address">Dirección</label><input id="cfgDireccion" maxlength="120" value="123 Veterinarios Ave, Downtown District"></div>
+              <div class="field"><label data-i18n="config.city">Ciudad</label><input id="cfgCiudad" maxlength="60" value="Panama Ciudad"></div>
+              <div class="field"><label data-i18n="config.province">Provincia</label><input id="cfgProvincia" maxlength="60" value="Panama"></div>
+              <div class="field"><label data-i18n="config.postalCódigo">Código postal</label><input id="cfgCP" maxlength="10" value="0801"></div>
+              <div class="field"><label data-i18n="config.phone">Teléfono</label><input id="cfgTel" type="tel" maxlength="20" value="+507 1234-5678"></div>
+              <div class="field"><label data-i18n="config.email">Correo</label><input id="cfgCorreo" type="email" maxlength="254" value="info@happypawsvet.com"></div>
+              <div class="field"><label data-i18n="config.website">Sitio web</label><input id="cfgWeb" maxlength="120" value="www.happypawsvet.com"></div>
               <div class="field"><label data-i18n="config.language">Idioma</label><select id="cfgIdioma" onchange="setIdioma(this.value)"><option value="es">Español</option><option value="en">Inglés</option></select></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;">
@@ -536,10 +536,10 @@ const __BODY_TEMPLATE__ = () => `
   <div class="modal">
     <h2>Registrar mascota</h2><p class="sub">Agrega una nueva mascota a tu clínica.</p>
     <div class="form-grid two">
-      <div class="field"><label>Nombre</label><input id="mPetNombre" placeholder="E.g. Rocky"></div>
+      <div class="field"><label>Nombre</label><input id="mPetNombre" maxlength="30" placeholder="E.g. Rocky"></div>
       <div class="field"><label>Especie</label><select id="mPetEspecie"><option>Dog</option><option>Cat</option></select></div>
-      <div class="field"><label>Raza</label><input id="mPetRaza" placeholder="E.g. Poodle"></div>
-      <div class="field"><label>Correo del dueño</label><input id="mPetDueño" placeholder="owner@email.com"></div>
+      <div class="field"><label>Raza</label><input id="mPetRaza" maxlength="40" placeholder="E.g. Poodle"></div>
+      <div class="field"><label>Correo del dueño</label><input id="mPetDueño" type="email" maxlength="254" placeholder="owner@email.com"></div>
       <div class="field"><label>Veterinario asignado</label>
         <select id="mPetVet"></select></div>
       <div class="field"><label>Próxima visita</label><input id="mPetDate" type="date"></div>
@@ -552,9 +552,9 @@ const __BODY_TEMPLATE__ = () => `
   <div class="modal">
     <h2>Agregar veterinario</h2><p class="sub">Agrega un nuevo doctor al equipo de tu clínica.</p>
     <div class="form-grid two">
-      <div class="field"><label>Nombre completo</label><input id="mVetNombre" placeholder="E.g. Dr. Carlos Ruiz"></div>
-      <div class="field"><label>Specialty</label><input id="mVetSpec" placeholder="E.g. Dermatology"></div>
-      <div class="field"><label>Correo</label><input id="mVetCorreo" placeholder="email@happypawsvet.com"></div>
+      <div class="field"><label>Nombre completo</label><input id="mVetNombre" maxlength="60" placeholder="E.g. Dr. Carlos Ruiz"></div>
+      <div class="field"><label>Specialty</label><input id="mVetSpec" maxlength="60" placeholder="E.g. Dermatology"></div>
+      <div class="field"><label>Correo</label><input id="mVetCorreo" type="email" maxlength="254" placeholder="email@happypawsvet.com"></div>
       <div class="field"><label>Inicio de horario</label><input id="mVetHorarioStart" type="time" value="08:00"></div>
       <div class="field"><label>Fin de horario</label><input id="mVetHorarioEnd" type="time" value="17:00"></div>
     </div>
@@ -1256,14 +1256,74 @@ function showVetDetails(mv){
   `;
 }
 
+/* ============ VALIDACIONES ============
+   Mismas reglas en todo el proyecto (ver CLAUDE.md). Cada validar*()
+   devuelve null si está bien o el mensaje de error. */
+const RE_EMAIL          = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const RE_NOMBRE         = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,60}$/;
+const RE_NOMBRE_MASCOTA = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9' .-]{1,30}$/;
+const RE_RAZA           = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,40}$/;
+const RE_TELEFONO       = /^\+?[\d\s().-]{7,20}$/;
+const RE_LUGAR          = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,60}$/;
+const RE_CODIGO_POSTAL  = /^[A-Za-z0-9 -]{3,10}$/;
+const RE_WEB            = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i;
+
+const limpiarCampo = v => String(v ?? '').trim().replace(/\s+/g, ' ');
+const tieneLetraDa = v => /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(v);
+
+function validarEmailDa(v, requerido){
+  if(!v) return requerido ? 'Escribe un correo.' : null;
+  return v.length > 254 || !RE_EMAIL.test(v) ? 'Escribe un correo válido (ej. nombre@correo.com).' : null;
+}
+function validarTelefonoDa(v){
+  if(!v) return null;
+  const digitos = v.replace(/\D/g, '').length;
+  return !RE_TELEFONO.test(v) || digitos < 7 || digitos > 15 ? 'Teléfono no válido: usa entre 7 y 15 dígitos (puede empezar con +).' : null;
+}
+
+/* Marca el campo en rojo (con mensaje debajo), lo enfoca y muestra el toast */
+function markInvalid(id, msg){
+  const el = document.getElementById(id);
+  if(el){
+    el.classList.add('invalid');
+    const field = el.closest('.field');
+    if(field){
+      let err = field.querySelector('.field-error');
+      if(!err){ err = document.createElement('span'); err.className = 'field-error'; field.appendChild(err); }
+      err.textContent = msg;
+    }
+    el.addEventListener('input', () => { el.classList.remove('invalid'); field?.querySelector('.field-error')?.remove(); }, { once: true });
+    el.focus();
+  }
+  toast('⚠️ ' + msg);
+}
+/* Revisa [[idDelCampo, mensaje|null], ...]; marca todos los errores y devuelve false si hay alguno */
+function checkAllDa(pares){
+  const malos = pares.filter(([, msg]) => msg);
+  malos.slice().reverse().forEach(([id, msg]) => markInvalid(id, msg)); // el primero queda enfocado
+  return !malos.length;
+}
+
 async function submitVet(){
   if (!requireSupabase()) return;
-  const name = document.getElementById('mVetNombre').value.trim();
-  if(!name){ toast('Please enter a name for the veterinarian'); return; }
-  const spec = document.getElementById('mVetSpec').value.trim() || 'General Medicine';
-  const email = document.getElementById('mVetCorreo').value.trim() || null;
+  const name = limpiarCampo(document.getElementById('mVetNombre').value);
+  const specRaw = limpiarCampo(document.getElementById('mVetSpec').value);
+  const emailRaw = limpiarCampo(document.getElementById('mVetCorreo').value).toLowerCase();
   const start = document.getElementById('mVetHorarioStart').value || null;
   const end = document.getElementById('mVetHorarioEnd').value || null;
+
+  const emailRepetido = emailRaw && vets.some(v => (v.email || '').toLowerCase() === emailRaw);
+  if(!checkAllDa([
+    ['mVetNombre', !name ? 'Escribe el nombre del veterinario.'
+                   : (!RE_NOMBRE.test(name) || !tieneLetraDa(name) ? 'El nombre solo puede tener letras y espacios (2 a 60).' : null)],
+    ['mVetSpec', specRaw && (specRaw.length > 60 || !tieneLetraDa(specRaw)) ? 'La especialidad admite hasta 60 caracteres.' : null],
+    ['mVetCorreo', validarEmailDa(emailRaw, true) || (emailRepetido ? 'Ya hay un veterinario con ese correo en tu clínica.' : null)],
+    ['mVetHorarioStart', !start ? 'Elige la hora de inicio.' : null],
+    ['mVetHorarioEnd', !end ? 'Elige la hora de fin.' : (start && end <= start ? 'El horario debe terminar después de empezar.' : null)]
+  ])) return;
+
+  const spec = specRaw || 'General Medicine';
+  const email = emailRaw;
 
   const { error } = await supabaseClient.from('veterinary_staff').insert({
     nombre: name, rol: 'Veterinario', specialty: spec, email,
@@ -1283,12 +1343,30 @@ async function submitVet(){
 
 async function submitPet(){
   if (!requireSupabase()) return;
-  const name = document.getElementById('mPetNombre').value.trim();
-  if(!name){ toast('Please enter a name for the pet'); return; }
+  const name = limpiarCampo(document.getElementById('mPetNombre').value);
   const species = document.getElementById('mPetEspecie').value;
-  const breed = document.getElementById('mPetRaza').value.trim() || null;
-  const ownerCorreo = document.getElementById('mPetDueño').value.trim();
+  const breed = limpiarCampo(document.getElementById('mPetRaza').value) || null;
+  const ownerCorreo = limpiarCampo(document.getElementById('mPetDueño').value).toLowerCase();
   const date = document.getElementById('mPetDate').value;
+
+  // Próxima visita: opcional, desde hoy y como máximo a un año.
+  let errFecha = null;
+  if(date){
+    const d = new Date(date + 'T00:00:00');
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const max = new Date(hoy); max.setFullYear(max.getFullYear() + 1);
+    if(isNaN(d)) errFecha = 'La fecha no es válida.';
+    else if(d < hoy) errFecha = 'La próxima visita no puede ser una fecha pasada.';
+    else if(d > max) errFecha = 'La próxima visita debe ser dentro del próximo año.';
+  }
+  if(!checkAllDa([
+    ['mPetNombre', !name ? 'Escribe el nombre de la mascota.'
+                   : (!RE_NOMBRE_MASCOTA.test(name) || !tieneLetraDa(name) ? 'Nombre de mascota: solo letras, números y espacios (máx. 30).' : null)],
+    ['mPetEspecie', species ? null : 'Elige la especie.'],
+    ['mPetRaza', breed && !RE_RAZA.test(breed) ? 'La raza solo puede tener letras y espacios (2 a 40).' : null],
+    ['mPetDueño', validarEmailDa(ownerCorreo, false)],
+    ['mPetDate', errFecha]
+  ])) return;
 
   let ownerId = null;
   if (ownerCorreo) {
@@ -1743,17 +1821,31 @@ async function guardarConfig(){
   setIdioma(lang);
 
   if (!requireSupabase()) return;
+  const val = id => limpiarCampo(document.getElementById(id).value);
   const candidate = {
-    clinic_name: document.getElementById('cfgNombre').value.trim(),
-    address: document.getElementById('cfgDireccion').value.trim(),
-    city: document.getElementById('cfgCiudad').value.trim(),
-    province: document.getElementById('cfgProvincia').value.trim(),
-    postal_code: document.getElementById('cfgCP').value.trim(),
-    phone: document.getElementById('cfgTel').value.trim(),
-    email: document.getElementById('cfgCorreo').value.trim(),
-    website: document.getElementById('cfgWeb').value.trim(),
+    clinic_name: val('cfgNombre'),
+    address: val('cfgDireccion'),
+    city: val('cfgCiudad'),
+    province: val('cfgProvincia'),
+    postal_code: val('cfgCP'),
+    phone: val('cfgTel'),
+    email: val('cfgCorreo').toLowerCase(),
+    website: val('cfgWeb'),
     language: lang === 'es' ? 'Español' : 'Inglés'
   };
+
+  const c = candidate;
+  if(!checkAllDa([
+    ['cfgNombre', !c.clinic_name ? 'Escribe el nombre de la clínica.'
+                  : (c.clinic_name.length < 2 || c.clinic_name.length > 80 || !tieneLetraDa(c.clinic_name) ? 'El nombre de la clínica debe tener entre 2 y 80 caracteres.' : null)],
+    ['cfgDireccion', c.address.length > 120 ? 'La dirección admite hasta 120 caracteres.' : null],
+    ['cfgCiudad', c.city && !RE_LUGAR.test(c.city) ? 'La ciudad solo puede tener letras y espacios.' : null],
+    ['cfgProvincia', c.province && !RE_LUGAR.test(c.province) ? 'La provincia solo puede tener letras y espacios.' : null],
+    ['cfgCP', c.postal_code && !RE_CODIGO_POSTAL.test(c.postal_code) ? 'El código postal debe tener entre 3 y 10 letras o números.' : null],
+    ['cfgTel', validarTelefonoDa(c.phone)],
+    ['cfgCorreo', validarEmailDa(c.email, true)],
+    ['cfgWeb', c.website && !RE_WEB.test(c.website) ? 'Escribe un sitio web válido (ej. www.miclinica.com).' : null]
+  ])) return;
 
   // Si ya sabemos qué columnas existen de verdad (porque las cargamos antes con
   // select('*')), solo mandamos esas — así una columna todavía no migrada no

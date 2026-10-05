@@ -585,3 +585,8 @@ a{color:inherit;}
   .vacc-table th:nth-child(4),.vacc-table td:nth-child(4){display:none;}
   .form-row2{grid-template-columns:1fr;}
 }
+
+/* ---------- validaciones ---------- */
+.form-field .invalid,.compose .invalid,.comment-form .invalid{border-color:var(--red) !important;background:var(--red-100) !important;}
+.form-field .hint{font-size:11px;color:var(--text-muted);}
+[contenteditable="true"].invalid{box-shadow:0 0 0 2px var(--red) !important;background:var(--red-100) !important;}

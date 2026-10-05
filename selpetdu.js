@@ -85,7 +85,9 @@ form.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const selected = form.querySelector('input[name="petType"]:checked');
-  if (!selected) {
+  // Solo se aceptan los 6 tipos que existen en petsinfo.js (y en los íconos de assets/).
+  const TIPOS_VALIDOS = ['dog', 'cat', 'bird', 'turtle', 'rabbit', 'lizard'];
+  if (!selected || !TIPOS_VALIDOS.includes(selected.value)) {
     showStatus("Por favor selecciona un tipo de mascota.", "error");
     return;
   }

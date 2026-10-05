@@ -90,7 +90,7 @@
           </div>
         </div>
 
-        <form id="registerForm" onsubmit="event.preventDefault(); register();">
+        <form id="registerForm" novalidate onsubmit="event.preventDefault(); register();">
           <div class="input-group">
             <div class="input-wrap">
               <span class="input-icon">
@@ -99,7 +99,7 @@
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
               </span>
-              <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="name" />
+              <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="name" maxlength="60" />
             </div>
 
             <div class="input-wrap">
@@ -109,7 +109,7 @@
                   <path d="M22 7l-10 7L2 7"/>
                 </svg>
               </span>
-              <input type="email" id="email" placeholder="Correo / número de teléfono" autocomplete="email" />
+              <input type="email" id="email" placeholder="Correo electrónico" autocomplete="email" maxlength="254" />
             </div>
 
             <div class="input-wrap">
@@ -119,7 +119,7 @@
                   <path d="M7 11V7a5 5 0 0110 0v4"/>
                 </svg>
               </span>
-              <input type="password" id="pass" placeholder="Contraseña segura" autocomplete="new-password" />
+              <input type="password" id="pass" placeholder="Contraseña (mín. 8, letras y números)" autocomplete="new-password" maxlength="72" />
               <span class="input-toggle" onclick="togglePass('pass', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -135,7 +135,7 @@
                   <path d="M7 11V7a5 5 0 0110 0v4"/>
                 </svg>
               </span>
-              <input type="password" id="pass2" placeholder="Confirmar contraseña" autocomplete="new-password" />
+              <input type="password" id="pass2" placeholder="Confirmar contraseña" autocomplete="new-password" maxlength="72" />
               <span class="input-toggle" onclick="togglePass('pass2', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>

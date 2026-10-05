@@ -404,3 +404,6 @@ button{cursor:pointer;}
   .pet-profile-card{flex-direction:column;text-align:center;}
   .pet-tags{justify-content:center;}
 }
+
+/* ---------- validaciones ---------- */
+.invalid,.form-group .invalid{border-color:var(--red) !important;background:var(--red-100) !important;}

@@ -345,7 +345,7 @@
           </div>
           <div class="form-group">
             <label>Notes (optional)</label>
-            <textarea id="f-notes" placeholder="Instrucciones especiales, motivo de la visita..."></textarea>
+            <textarea id="f-notes" maxlength="500" placeholder="Instrucciones especiales, motivo de la visita..."></textarea>
           </div>
           <button class="btn-submit" onclick="saveAppt()">Guardar cita</button>
         </div>
@@ -371,10 +371,10 @@
               <!-- compose box -->
               <div class="compose-box">
                 <div class="compose-top" style="flex-direction:column;align-items:stretch;gap:8px;">
-                  <input type="text" id="compose-title" placeholder="Title..." style="border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:600;font-family:inherit;outline:none;">
+                  <input type="text" id="compose-title" maxlength="120" placeholder="Title..." style="border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:600;font-family:inherit;outline:none;">
                   <div style="display:flex;gap:10px;">
                     <div class="compose-avatar">AR</div>
-                    <textarea class="compose-input" id="compose-text" placeholder="Comparte un consejo, recomendación, o algo con la comunidad..." rows="1" oninput="autoResize(this)"></textarea>
+                    <textarea class="compose-input" id="compose-text" maxlength="2000" placeholder="Comparte un consejo, recomendación, o algo con la comunidad..." rows="1" oninput="autoResize(this)"></textarea>
                   </div>
                 </div>
                 <div class="compose-actions">

@@ -144,31 +144,52 @@ const petAge = document.getElementById('petAge');
 const petBreed = document.getElementById('petBreed');
 const continueBtn = document.getElementById('continueBtn');
 
+/* ============================================================
+   VALIDACIONES (mismas reglas en todo el proyecto, ver CLAUDE.md)
+   ============================================================ */
+const RE_NOMBRE_MASCOTA = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9' .-]{1,30}$/;
+const RE_RAZA = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]{2,40}$/;
+const EDAD_MAX = { years: 40, months: 24 };
+
+function validarNombreMascota(v){
+  if(!v) return 'Ingresa el nombre de tu mascota.';
+  if(!RE_NOMBRE_MASCOTA.test(v) || !/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(v)) return 'Usa solo letras, números y espacios (máx. 30).';
+  return null;
+}
+function validarEdad(raw, unit){
+  if(raw === '') return 'Ingresa la edad.';
+  if(!/^\d+$/.test(raw)) return 'La edad debe ser un número entero (sin decimales).';
+  const n = Number(raw);
+  if(n > EDAD_MAX[unit]) return unit === 'years' ? `La edad no puede superar ${EDAD_MAX.years} años.` : `Más de ${EDAD_MAX.months} meses: escríbela en años.`;
+  return null;
+}
+function validarRaza(v){
+  if(!v) return 'Ingresa la raza (o "Mestizo").';
+  if(!RE_RAZA.test(v)) return 'La raza solo puede tener letras y espacios (2 a 40).';
+  return null;
+}
+
+function setFieldError(field, msg){
+  field.classList.toggle('invalid', !!msg);
+  if(msg) field.querySelector('.error-msg').textContent = msg;
+}
+
 function validate(){
-  let valid = true;
+  // Se normalizan espacios repetidos antes de validar.
+  petName.value = petName.value.trim().replace(/\s+/g, ' ');
+  petBreed.value = petBreed.value.trim().replace(/\s+/g, ' ');
+  const unit = document.getElementById('ageUnit').value === 'years' ? 'years' : 'months';
 
-  if (petName.value.trim() === '') {
-    nameField.classList.add('invalid');
-    valid = false;
-  } else {
-    nameField.classList.remove('invalid');
-  }
+  const errName  = validarNombreMascota(petName.value);
+  const errAge   = validarEdad(petAge.value.trim(), unit);
+  const errBreed = validarRaza(petBreed.value);
+  setFieldError(nameField, errName);
+  setFieldError(ageField, errAge);
+  setFieldError(breedField, errBreed);
 
-  if (petAge.value === '' || Number(petAge.value) < 0) {
-    ageField.classList.add('invalid');
-    valid = false;
-  } else {
-    ageField.classList.remove('invalid');
-  }
-
-  if (petBreed.value.trim() === '') {
-    breedField.classList.add('invalid');
-    valid = false;
-  } else {
-    breedField.classList.remove('invalid');
-  }
-
-  return valid;
+  const first = [[errName, petName], [errAge, petAge], [errBreed, petBreed]].find(([e]) => e);
+  if(first){ first[1].focus(); showToast(first[0]); }
+  return !first;
 }
 
 function showFatalError(msg){
@@ -188,10 +209,8 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   console.log('[Doppy][petsinfo] Paso 1: submit disparado');
 
-  if (!validate()) {
-    showToast('Please fill in the required fields.');
-    return;
-  }
+  // validate() ya marca los campos y muestra el primer error.
+  if (!validate()) return;
 
   const gender = document.querySelector('.gender-btn.selected').dataset.gender === 'male' ? 'Male' : 'Female';
   const ageUnit = document.getElementById('ageUnit').value === 'years' ? 'years' : 'months';
