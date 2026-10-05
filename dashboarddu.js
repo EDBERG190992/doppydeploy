@@ -26,6 +26,14 @@ try {
   console.error('No se pudo conectar a Supabase (revisa tu conexión a internet):', e);
 }
 
+/* Nombre de respaldo a partir del correo cuando no hay fila en "users".
+   Solo letras y espacios, para cumplir la regla de nombres (ver CLAUDE.md):
+   "ana_lopez92@x.com" → "ana lopez"; si no queda nada útil → "Usuario". */
+function nombreDesdeEmail(email){
+  const base = String(email || '').split('@')[0].replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g, ' ').trim().slice(0, 60);
+  return base.length >= 2 ? base : 'Usuario';
+}
+
 /* ---------- estado ---------- */
 let currentUser = null;        // usuario de Supabase Auth
 let currentClient = null;      // fila de "users"
@@ -306,7 +314,7 @@ async function loadClient(){
     // Mismo respaldo que selpetdu.js / petsinfo.js: si no hay fila en "users", se crea.
     const { data: inserted, error: insErr } = await supabaseClient
       .from('users')
-      .insert([{ auth_user_id: currentUser.id, name: localStorage.getItem('userName') || (currentUser.email || 'Usuario').split('@')[0], email: currentUser.email }])
+      .insert([{ auth_user_id: currentUser.id, name: localStorage.getItem('userName') || nombreDesdeEmail(currentUser.email), email: currentUser.email }])
       .select('*').single();
     if(insErr){ console.error('[Doppy] No se pudo crear la fila en users', insErr); return; }
     currentClient = inserted;
@@ -1022,6 +1030,30 @@ async function submitAffiliation(){
     showToast('Esta mascota ya tiene una solicitud pendiente. Espera la respuesta de la clínica.');
     return;
   }
+
+  // 1) Camino seguro: la función doppy_solicitar_afiliacion (supabase/02_rls_borrador.sql)
+  //    valida el código en el servidor sin exponer la tabla de códigos.
+  const rpc = await supabaseClient.rpc('doppy_solicitar_afiliacion', { p_code: code, p_pet_id: Number(petId) });
+  if(!rpc.error){
+    const msgs = {
+      no_existe: `⚠️ El código ${code} no es válido.`,
+      pendiente: 'Ya hay una solicitud pendiente con este código.',
+      vencido: '⚠️ Este código ya venció. Pide uno nuevo a tu clínica.',
+      agotado: '⚠️ Este código ya alcanzó su límite de usos.',
+      no_es_tu_mascota: '⚠️ Esa mascota no está registrada a tu nombre.',
+      sin_sesion: 'Inicia sesión de nuevo.'
+    };
+    if(rpc.data !== 'ok'){ showToast(msgs[rpc.data] || '❌ No se pudo enviar la solicitud.'); return; }
+    closeModal();
+    showToast('✅ Solicitud enviada. La clínica debe aprobarla.');
+    await loadAffiliationsAndClinics();
+    renderAll();
+    return;
+  }
+  // 2) Si la función todavía no existe en la base (no se aplicó el SQL),
+  //    se usa el flujo directo de siempre (igual a recibirSolicitudAfiliacion en dashboardda.js).
+  const fnMissing = rpc.error.code === 'PGRST202' || /could not find the function/i.test(rpc.error.message || '');
+  if(!fnMissing){ console.error('[Doppy] doppy_solicitar_afiliacion', rpc.error); showToast('❌ Error al verificar el código.'); return; }
 
   const { data: match, error } = await supabaseClient
     .from('affiliations').select('id, status, expiration_date, max_uses, current_uses').eq('code', code).maybeSingle();

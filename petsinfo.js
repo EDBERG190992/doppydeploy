@@ -26,6 +26,14 @@ try {
   console.error('No se pudo conectar a Supabase (revisa tu conexión a internet):', e);
 }
 
+/* Nombre de respaldo a partir del correo cuando no hay fila en "users".
+   Solo letras y espacios, para cumplir la regla de nombres (ver CLAUDE.md):
+   "ana_lopez92@x.com" → "ana lopez"; si no queda nada útil → "Usuario". */
+function nombreDesdeEmail(email){
+  const base = String(email || '').split('@')[0].replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g, ' ').trim().slice(0, 60);
+  return base.length >= 2 ? base : 'Usuario';
+}
+
 // Se agregan turtle y lizard para que coincida con las 6 opciones de selpetdu.html.
 const petTypes = {
   dog:    { image: 'assets/dogd.png', label: 'Dog' },
@@ -117,7 +125,7 @@ async function getCurrentClientId(){
       // crea acá también en vez de fallar directamente.
       const { data: inserted, error: insertErr } = await supabaseClient
         .from('users')
-        .insert([{ auth_user_id: user.id, name: user.email ? user.email.split('@')[0] : 'User', email: user.email }])
+        .insert([{ auth_user_id: user.id, name: nombreDesdeEmail(user.email), email: user.email }])
         .select('id_client')
         .single();
       if (insertErr || !inserted) {
