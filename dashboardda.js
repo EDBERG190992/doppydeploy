@@ -997,8 +997,8 @@ function drawQR(containerId, text){
   const el = document.getElementById(containerId);
   if(!el) return;
   el.innerHTML = '';
-  if(window.QRCódigo){
-    new QRCódigo(el, {text, width:220, height:220, colorDark:'#0F172A', colorLight:'#ffffff', correctLevel:QRCódigo.CorrectLevel.M});
+  if(window.QRCode){
+    new QRCode(el, {text, width:220, height:220, colorDark:'#0F172A', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
   } else {
     el.innerHTML = `<div style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;padding:10px;">No se pudo cargar el generador de QR</div>`;
   }

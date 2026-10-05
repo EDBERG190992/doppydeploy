@@ -96,6 +96,12 @@ form.addEventListener("submit", (e) => {
   // preselección al cargar (nombre/edad/raza se completan ahí).
   localStorage.setItem("doppy_pending_pet_type", petType);
 
+  // Empieza una mascota nueva: se olvida la fila de la mascota anterior
+  // para que petsinfo.js inserte en vez de pisar la que ya existe.
+  // (Si el dueño vuelve atrás desde petsinfo sin pasar por acá, sigue
+  // actualizando la misma fila, que es lo que queremos.)
+  localStorage.removeItem("pet_row_id");
+
   setLoading(true);
   showStatus("Guardado ✓", "success");
 
