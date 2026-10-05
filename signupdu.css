@@ -1,0 +1,150 @@
+/* ============================================================
+   Doppy — Registro de dueños (signupdu.html)
+   ============================================================ */
+:root{
+  --blue:#087cbf;
+  --blue-dark:#06659c;
+  --blue-ui:#2563EB;
+  --blue-100:#DBEAFE;
+  --blue-50:#EFF6FF;
+  --yellow:#FDE05A;
+  --yellow-dark:#f5b301;
+  --yellow-50:#FFFBEB;
+  --green:#16A34A;
+  --green-50:#F0FDF4;
+  --purple-50:#F5F3FF;
+  --ink:#0F172A;
+  --ink-2:#334155;
+  --muted:#64748B;
+  --text-light:#94A3B8;
+  --line:#E5E7EB;
+  --bg:#F5F6F8;
+}
+
+*{box-sizing:border-box;}
+body{margin:0;min-height:100vh;font-family:'Inter',sans-serif;color:var(--ink);background:#fff;}
+a{color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;top:24px;left:50%;transform:translate(-50%,-20px);z-index:100;
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:.9rem;font-weight:600;
+  box-shadow:0 12px 30px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+  max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+
+.page{display:grid;grid-template-columns:1.05fr 1fr;min-height:100vh;}
+
+/* ---------- izquierda ---------- */
+.left{
+  position:relative;overflow:hidden;padding:30px 6% 40px;
+  background:linear-gradient(160deg,#fff 0%,var(--blue-50) 60%,var(--yellow-50) 100%);
+}
+.left::after{
+  content:"";position:absolute;width:280px;height:280px;border-radius:50%;background:rgba(253,224,90,.30);
+  bottom:-110px;right:-90px;pointer-events:none;
+}
+.logo{margin-left:-24px;}
+/* El PNG del logo es cuadrado con mucho margen: se recorta al centro. */
+.logo-img{width:240px;height:100px;object-fit:cover;display:block;}
+
+.hero h1{font-size:clamp(2rem,3.4vw,2.8rem);line-height:1.15;font-weight:800;margin:10px 0 18px;}
+.hero h1 em{font-style:normal;color:var(--blue);}
+.hero-accent{width:70px;height:6px;border-radius:6px;background:var(--yellow);margin-bottom:18px;}
+.hero p{color:var(--muted);font-size:1rem;line-height:1.6;max-width:500px;margin:0;}
+.pet-area{height:0;}
+
+.features{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:620px;position:relative;z-index:1;}
+.feature{
+  display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.85);border:1px solid var(--line);
+  border-radius:16px;padding:14px;
+}
+.feature-icon{
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;
+}
+.fi-blue{background:var(--blue-50);}
+.fi-blue::before{content:"💙";}
+.fi-yellow{background:var(--yellow-50);}
+.fi-yellow::before{content:"🦴";}
+.fi-green{background:var(--green-50);}
+.fi-green::before{content:"📋";}
+.fi-purple{background:var(--purple-50);}
+.fi-purple::before{content:"🐾";}
+.feature-text h3{margin:0 0 3px;font-size:.92rem;}
+.feature-text p{margin:0;font-size:.8rem;color:var(--muted);line-height:1.4;}
+
+/* ---------- derecha ---------- */
+.right{
+  display:flex;align-items:center;justify-content:center;padding:32px 24px;
+  background:linear-gradient(160deg,var(--blue) 0%,#0a5f93 100%);position:relative;overflow:hidden;
+}
+.right::before{
+  content:"";position:absolute;width:360px;height:360px;border-radius:50%;
+  border:40px solid rgba(255,255,255,.06);top:-140px;left:-120px;
+}
+.right-inner{width:100%;max-width:440px;position:relative;z-index:1;}
+.form-card{background:#fff;border-radius:26px;padding:28px 32px 26px;box-shadow:0 24px 60px rgba(0,0,0,.20);}
+.right-nav{display:flex;margin-bottom:4px;}
+.nav-btn{
+  width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:1.4rem;
+  line-height:1;color:var(--ink-2);display:flex;align-items:center;justify-content:center;
+}
+.nav-btn:hover{background:var(--blue-50);color:var(--blue);}
+.form-card h2{text-align:center;font-size:1.55rem;font-weight:800;margin:0 0 6px;}
+.subtitle{text-align:center;color:var(--muted);font-size:.9rem;margin:0 0 18px;line-height:1.45;}
+
+.avatar-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+.avatar{position:relative;width:76px;height:76px;}
+.avatar-bg{
+  width:100%;height:100%;border-radius:50%;background:var(--blue-50);border:3px solid #fff;
+  box-shadow:0 0 0 2px var(--blue-100);display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.avatar-bg svg{width:64px;height:64px;margin-top:10px;}
+.avatar-cam{
+  position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:#1A73E8;
+  border:2px solid #fff;display:flex;align-items:center;justify-content:center;
+}
+.avatar-cam svg{width:14px;height:14px;}
+
+.input-group{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.input-wrap{
+  display:flex;align-items:center;border:1.5px solid var(--line);border-radius:14px;background:#F8FAFC;
+  transition:border-color .15s, background .15s, box-shadow .15s;
+}
+.input-wrap:focus-within{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(8,124,191,.10);}
+.input-icon{display:flex;padding:0 12px 0 16px;color:var(--text-light);}
+.input-icon svg{width:18px;height:18px;}
+.input-wrap:focus-within .input-icon{color:var(--blue);}
+.input-wrap input{
+  flex:1;min-width:0;border:none;background:transparent;outline:none;padding:14px 12px 14px 0;
+  font-size:.93rem;font-family:inherit;color:var(--ink);
+}
+.input-wrap input::placeholder{color:var(--text-light);}
+.input-toggle{display:flex;padding:0 16px;color:var(--text-light);cursor:pointer;}
+.input-toggle svg{width:18px;height:18px;}
+.input-toggle:hover{color:var(--blue);}
+
+.btn-cta{
+  width:100%;border:none;border-radius:14px;padding:15px;background:var(--yellow);color:var(--ink);
+  font-size:1rem;font-weight:800;box-shadow:0 10px 24px rgba(245,179,1,.30);transition:background .15s, transform .15s;
+}
+.btn-cta:hover{background:var(--yellow-dark);transform:translateY(-1px);}
+.btn-cta:disabled{opacity:.7;cursor:wait;transform:none;}
+
+.login-link{text-align:center;font-size:.88rem;color:var(--muted);margin:16px 0 0;}
+.login-link a{color:var(--blue);font-weight:700;text-decoration:none;}
+.login-link a:hover{text-decoration:underline;}
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  .page{grid-template-columns:1fr;}
+  .left{padding:24px 6% 28px;}
+  .features{display:none;}
+  .hero p{margin-bottom:0;}
+}
+@media (max-width:480px){
+  .form-card{padding:22px 20px;}
+  .right{padding:20px 14px;}
+}

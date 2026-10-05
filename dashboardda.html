@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doppy – Panel de la clínica</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dashboardda.css">
+
+<!-- Supabase (ruta UMD explícita: deja disponible window.supabase) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- Gráficos de la sección Informes (window.Chart) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Exportar informes a PDF (window.jspdf) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Códigos QR de afiliación (window.QRCode) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- dashboardda.js dibuja todo el panel dentro de #root (ver __BODY_TEMPLATE__).
+     Por eso el script va al final: #root tiene que existir cuando se ejecute. -->
+<div id="root"></div>
+
+<script src="dashboardda.js"></script>
+</body>
+</html>

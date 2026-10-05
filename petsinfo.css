@@ -1,0 +1,171 @@
+/* ============================================================
+   Doppy — Información de la mascota (petsinfo.html, paso 2)
+   Mismo esquema que selpetdu.css (paso 1).
+   ============================================================ */
+/* petsinfo.html no enlaza la fuente, así que se importa aquí. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --blue:#087cbf;
+  --blue-dark:#06659c;
+  --blue-100:#DBEAFE;
+  --blue-50:#EFF6FF;
+  --yellow:#FDE05A;
+  --yellow-dark:#f5b301;
+  --yellow-50:#FFFBEB;
+  --green:#16A34A;
+  --green-50:#F0FDF4;
+  --red:#DC2626;
+  --red-50:#FEF2F2;
+  --ink:#0F172A;
+  --ink-2:#334155;
+  --muted:#64748B;
+  --text-light:#94A3B8;
+  --line:#E5E7EB;
+  --bg:#F5F6F8;
+}
+
+*{box-sizing:border-box;}
+body{margin:0;min-height:100vh;font-family:'Inter',sans-serif;color:var(--ink);background:var(--bg);}
+button,input,select{font-family:inherit;}
+button{cursor:pointer;}
+
+.app{display:grid;grid-template-columns:360px 1fr;min-height:100vh;}
+
+/* ---------- panel lateral ---------- */
+.sidebar{
+  position:relative;overflow:hidden;background:#fff;border-right:1px solid var(--line);padding:24px 32px 32px;
+}
+.sidebar::after{
+  content:"";position:absolute;left:50%;bottom:-90px;transform:translateX(-50%);width:280px;height:180px;
+  border-radius:50% 50% 0 0;background:linear-gradient(160deg,var(--yellow) 0%,#FFEFA0 100%);pointer-events:none;
+}
+.sidebar .logo{height:80px;overflow:hidden;display:flex;align-items:center;margin-left:-14px;}
+.sidebar .logo img{transform:scale(1.25);}
+.heart-badge{
+  width:44px;height:44px;border-radius:14px;background:var(--blue-50);color:var(--blue);font-size:22px;
+  display:flex;align-items:center;justify-content:center;margin:12px 0 14px;
+}
+.sidebar h1{font-size:1.6rem;line-height:1.25;font-weight:800;margin:0 0 10px;}
+.hl{color:var(--blue);}
+.sidebar .sub{color:var(--muted);font-size:.9rem;line-height:1.5;margin:0 0 24px;}
+.feature{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;position:relative;z-index:1;}
+.feature-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.feature-icon.blue{background:var(--blue-50);}
+.feature-icon.green{background:var(--green-50);}
+.feature-icon.yellow{background:var(--yellow-50);}
+.feature h3{margin:0 0 2px;font-size:.92rem;}
+.feature p{margin:0;font-size:.82rem;color:var(--muted);line-height:1.45;}
+
+/* ---------- principal ---------- */
+.main{padding:24px 48px 36px;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;}
+.back-btn,.help-btn{
+  border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 14px;font-size:.88rem;
+  font-weight:600;color:var(--ink-2);transition:background .15s, color .15s;
+}
+.back-btn:hover,.help-btn:hover{background:var(--blue-50);color:var(--blue);}
+
+.stepper{display:flex;align-items:center;gap:10px;}
+.step{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.85rem;font-weight:600;}
+.circle{
+  width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;
+}
+.step.done .circle{background:var(--green);border-color:var(--green);color:#fff;}
+.step.active{color:var(--ink);}
+.step.active .circle{background:var(--blue);border-color:var(--blue);color:#fff;}
+.step-line{width:48px;height:2px;background:var(--line);}
+.step-line.done{background:var(--green);}
+
+.content-wrap{max-width:980px;margin:0 auto;}
+.title-block h2{font-size:1.9rem;font-weight:800;margin:0 0 6px;}
+.title-block p{color:var(--muted);margin:0 0 24px;}
+
+.form-area{display:grid;grid-template-columns:280px 1fr;gap:24px;margin-bottom:24px;}
+
+/* tarjeta con el tipo de mascota */
+.pet-card{
+  position:relative;background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px 20px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;align-self:start;
+}
+.edit-pencil{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:10px;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;
+}
+.pet-avatar{
+  width:150px;height:150px;border-radius:50%;background:linear-gradient(160deg,#FFF3B0 0%,var(--yellow) 100%);
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  box-shadow:0 0 0 8px var(--yellow-50);
+}
+.pet-avatar img{width:115px;height:115px;object-fit:contain;}
+.pet-card h3{margin:0 0 12px;font-size:1.3rem;}
+.change-type{
+  border:1.5px solid var(--blue-100);background:var(--blue-50);color:var(--blue);border-radius:12px;
+  padding:9px 16px;font-size:.86rem;font-weight:700;transition:background .15s, border-color .15s;
+}
+.change-type:hover{border-color:var(--blue);}
+
+/* campos */
+.fields{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px 26px;display:flex;flex-direction:column;gap:18px;}
+.field label{display:block;font-size:.86rem;font-weight:700;margin-bottom:7px;color:var(--ink-2);}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;background:#F8FAFC;padding:13px 14px;
+  font-size:.93rem;color:var(--ink);outline:none;transition:border-color .15s, background .15s, box-shadow .15s;
+}
+.field input::placeholder{color:var(--text-light);}
+.field input:focus,.field select:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(8,124,191,.10);}
+.age-row{display:grid;grid-template-columns:1fr 130px;gap:10px;}
+.error-msg{display:none;color:var(--red);font-size:.8rem;font-weight:600;margin-top:6px;}
+.field.invalid input{border-color:var(--red);background:var(--red-50);}
+.field.invalid .error-msg{display:block;}
+
+.gender-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.gender-btn{
+  border:1.5px solid var(--line);background:#F8FAFC;border-radius:12px;padding:13px;font-size:.92rem;
+  font-weight:700;color:var(--ink-2);transition:border-color .15s, background .15s, color .15s;
+}
+.gender-btn:hover{border-color:var(--blue-100);}
+.gender-btn.selected{border-color:var(--blue);background:var(--blue-50);color:var(--blue);}
+.gender-btn.selected[data-gender="female"]{border-color:#DB2777;background:#FDF2F8;color:#DB2777;}
+
+/* pie */
+.footer-row{display:flex;align-items:center;gap:18px;}
+.safe-banner{
+  flex:1;display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;
+}
+.safe-banner .shield{font-size:24px;}
+.safe-banner strong{display:block;font-size:.9rem;}
+.safe-banner .desc{font-size:.82rem;color:var(--muted);}
+.safe-banner .lock{margin-left:auto;font-size:18px;opacity:.6;}
+.continue-btn{
+  border:none;border-radius:14px;background:var(--blue);color:#fff;padding:15px 34px;font-size:1rem;
+  font-weight:700;box-shadow:0 10px 24px rgba(8,124,191,.25);white-space:nowrap;transition:background .15s, transform .15s;
+}
+.continue-btn:hover{background:var(--blue-dark);transform:translateY(-1px);}
+.continue-btn:disabled{opacity:.7;cursor:wait;transform:none;}
+
+/* toast */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translate(-50%,20px);z-index:100;
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:.9rem;font-weight:600;
+  box-shadow:0 12px 30px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+  max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+
+/* ---------- responsive ---------- */
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{border-right:none;border-bottom:1px solid var(--line);padding:18px 24px;}
+  .sidebar::after,.feature,.sidebar .sub,.heart-badge{display:none;}
+  .sidebar h1{font-size:1.25rem;margin:4px 0 0;}
+  .main{padding:22px 24px 32px;}
+}
+@media (max-width:760px){
+  .form-area{grid-template-columns:1fr;}
+  .pet-card{align-self:stretch;}
+  .stepper .label,.help-btn{display:none;}
+  .footer-row{flex-direction:column;align-items:stretch;}
+  .title-block h2{font-size:1.5rem;}
+}

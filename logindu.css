@@ -1,0 +1,125 @@
+/* ============================================================
+   Doppy — Login de dueños (logindu.html)
+   logindv.css usa el mismo diseño (mismo HTML para veterinaria).
+   ============================================================ */
+:root{
+  --blue:#087cbf;
+  --blue-dark:#06659c;
+  --blue-ui:#2563EB;
+  --blue-100:#DBEAFE;
+  --blue-50:#EFF6FF;
+  --yellow:#FDE05A;
+  --yellow-dark:#f5b301;
+  --ink:#0F172A;
+  --ink-2:#334155;
+  --muted:#64748B;
+  --text-light:#94A3B8;
+  --line:#E5E7EB;
+  --bg:#F5F6F8;
+  --red:#DC2626;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;min-height:100vh;font-family:'Inter',sans-serif;color:var(--ink);
+  background:var(--bg);background-image:radial-gradient(#e3e6ec 1px,transparent 1px);background-size:22px 22px;
+  display:flex;align-items:center;justify-content:center;padding:28px 16px;
+}
+a{color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;top:24px;left:50%;transform:translate(-50%,-20px);z-index:100;
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:.9rem;font-weight:600;
+  box-shadow:0 12px 30px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+  max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+
+/* ---------- tarjeta ---------- */
+.card{
+  width:100%;max-width:980px;min-height:600px;display:grid;grid-template-columns:1fr 1fr;
+  background:#fff;border-radius:28px;box-shadow:0 20px 50px rgba(15,23,42,.10);overflow:hidden;
+}
+
+.left{padding:32px 52px 40px;display:flex;flex-direction:column;}
+.top-nav{display:flex;justify-content:space-between;margin-bottom:10px;}
+.nav-btn{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink-2);
+  display:flex;align-items:center;justify-content:center;transition:background .15s, color .15s, border-color .15s;
+}
+.nav-btn svg{width:18px;height:18px;}
+.nav-btn:hover{background:var(--blue-50);color:var(--blue);border-color:var(--blue-100);}
+
+.logo{display:flex;justify-content:center;}
+.logo-frame{width:220px;height:92px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+/* El PNG del logo es cuadrado con mucho margen: se recorta al centro. */
+.logo-img{width:220px;height:220px;object-fit:contain;}
+
+.left h2{text-align:center;font-size:1.65rem;font-weight:800;margin:6px 0 6px;}
+.sub{text-align:center;color:var(--muted);font-size:.93rem;margin:0 0 26px;}
+
+.input-group{display:flex;flex-direction:column;gap:14px;margin-bottom:22px;}
+.input-wrap{
+  position:relative;display:flex;align-items:center;border:1.5px solid var(--line);border-radius:14px;
+  background:#F8FAFC;transition:border-color .15s, background .15s, box-shadow .15s;
+}
+.input-wrap:focus-within{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(8,124,191,.10);}
+.input-icon{display:flex;padding:0 12px 0 16px;color:var(--text-light);}
+.input-icon svg{width:18px;height:18px;}
+.input-wrap:focus-within .input-icon{color:var(--blue);}
+.input-wrap input{
+  flex:1;border:none;background:transparent;outline:none;padding:15px 14px 15px 0;font-size:.95rem;
+  font-family:inherit;color:var(--ink);min-width:0;
+}
+.input-wrap input::placeholder{color:var(--text-light);}
+.toggle-btn{
+  border:none;background:none;color:var(--text-light);padding:0 16px;display:flex;align-items:center;height:100%;
+}
+.toggle-btn svg{width:18px;height:18px;}
+.toggle-btn:hover{color:var(--blue);}
+
+.btn-cta{
+  width:100%;border:none;border-radius:14px;padding:15px;background:var(--blue);color:#fff;font-size:1rem;
+  font-weight:700;box-shadow:0 10px 24px rgba(8,124,191,.25);transition:background .15s, transform .15s;
+}
+.btn-cta:hover{background:var(--blue-dark);transform:translateY(-1px);}
+.btn-cta:disabled{opacity:.7;cursor:wait;transform:none;}
+
+.forgot{display:block;text-align:center;margin-top:16px;font-size:.88rem;font-weight:600;color:var(--blue);text-decoration:none;}
+.forgot:hover{text-decoration:underline;}
+
+/* ---------- derecha (decorativa) ---------- */
+.right{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,var(--blue) 0%,#0a5f93 100%);
+}
+.right-heart{
+  position:absolute;top:44px;right:44px;width:78px;height:78px;border-radius:22px;background:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.15);
+  animation:float 5s ease-in-out infinite;z-index:2;
+}
+.right-heart svg{width:44px;height:44px;}
+.right-dot-1,.right-dot-2{position:absolute;border-radius:50%;background:var(--yellow);}
+.right-dot-1{width:18px;height:18px;top:150px;left:56px;}
+.right-dot-2{width:10px;height:10px;top:200px;left:100px;opacity:.7;}
+/* Círculo grande con la mascota en el centro del panel */
+.right-circle-lg{
+  position:absolute;width:300px;height:300px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-48%);
+  background:rgba(255,255,255,.14) url('assets/dogd.png') center/62% no-repeat;
+  box-shadow:0 0 0 26px rgba(255,255,255,.06), 0 0 0 52px rgba(255,255,255,.04);
+}
+.right-wave{
+  position:absolute;left:-10%;right:-10%;bottom:-60px;height:160px;background:var(--yellow);
+  border-radius:50% 50% 0 0;opacity:.95;
+}
+
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* ---------- responsive ---------- */
+@media (max-width:820px){
+  .card{grid-template-columns:1fr;min-height:0;max-width:480px;}
+  .right{display:none;}
+  .left{padding:26px 26px 32px;}
+}
